@@ -6,7 +6,7 @@ https://docs.google.com/document/d/1oTxNgpphXCsH4tusHdM-gtaBT5298PA5A8lp5YpwnsA/
 
 ## קובץ ההדפסה הנוכחי
 PDF מתוך המסמך, בגודל A4:
-https://drive.google.com/file/d/1-ZcejWghx0LdcLagA7aoL2-o9H3HAOFu/view
+https://drive.google.com/file/d/1mBx7Kb5OQxUkoQJYE3dCWBW386cwF8jl/view
 
 ## האתר
 https://tnufa.vercel.app
