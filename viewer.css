@@ -135,15 +135,33 @@ main{flex:1;width:100%}
   transition:opacity .2s,transform .2s}
 .to-top.show{opacity:1;transform:translateY(0)}
 
-/* ===================== PRINT (A4) ===================== */
+/* ===================== MOBILE CHROME ===================== */
+@media(max-width:600px){
+  .brand small{display:none}
+  .act.primary{padding:10px 18px;font-size:14.5px;border-radius:12px}
+}
+
+/* ===================== PRINT (A4 — every page incl. cover) ===================== */
 @page{size:A4;margin:0}
 @media print{
   :root{--bg:#fff;--maxw:100%}
-  body{background:#fff}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{background:#fff;width:210mm}
   .topbar,.to-top{display:none!important}
-  .sep{border:0}
-  .cover{break-after:page}
-  .pdf-page{break-inside:avoid}
+  .sep{border:0;height:0;margin:0}
+
+  /* cover = exactly one A4 page (green + banner print in colour) */
+  .cover{width:210mm;height:297mm;overflow:hidden;margin:0 auto;
+    break-after:page;break-inside:avoid}
+  .cv-banner-img{max-height:150mm}
+  .cv-body{flex:1 1 auto}
+
+  /* each exam page = exactly one A4 page */
+  .pdf-page{width:210mm;height:297mm;overflow:hidden;margin:0 auto;
+    break-after:page;break-inside:avoid;background:#fff}
+  .pdf-page canvas{width:100%;height:100%;object-fit:contain}
+
+  /* credit footer flows after the last page */
   .site-footer{background:#fff;color:#17284a;border-top:3px solid var(--blue)}
   .footer-rule{background:var(--blue)}
   .footer-lines b{color:#17284a}

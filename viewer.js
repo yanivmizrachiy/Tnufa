@@ -90,20 +90,8 @@ async function setupPdf() {
   }
 }
 
-/* ---------- chrome: print (renders every page first), progress, back-to-top ---------- */
+/* ---------- chrome: progress, back-to-top ---------- */
 function wireChrome() {
-  $("print-btn").addEventListener("click", async () => {
-    const btn = $("print-btn");
-    btn.disabled = true;
-    const label = btn.querySelector("span");
-    const prev = label ? label.textContent : "";
-    if (label) label.textContent = "מכין להדפסה…";
-    try { await Promise.all(PAGE_ELS.map(el => RENDER(el))); } catch (e) { console.error(e); }
-    if (label) label.textContent = prev;
-    btn.disabled = false;
-    window.print();
-  });
-
   const fill = $("scroll-fill");
   const toTop = $("to-top");
   const onScroll = () => {
