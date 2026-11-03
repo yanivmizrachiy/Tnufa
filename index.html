@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6fa">
+<meta name="description" content="דוגמה למבחן לקראת מבחן תנופה — 17 שאלות במתמטיקה, תצוגה מותאמת לנייד והדפסה.">
+<title>דוגמה למבחן לקראת מבחן תנופה</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div id="loading" class="loading" aria-live="polite">טוען את המבחן…</div>
+<div id="app" hidden>
+  <header class="masthead"><div class="masthead-inner">
+    <div class="brand"><img src="assets/logo.svg" alt="לוגו ההדרכה במחוז ירושלים" class="logo"><div><span class="eyebrow">הדרכה במחוז ירושלים · מתמטיקה</span><h1 id="exam-title"></h1></div></div>
+    <div class="head-actions"><button id="print-btn" class="ghost-btn" type="button" title="הדפסה או שמירה כ-PDF"><span aria-hidden="true">⎙</span><span>הדפסה</span></button><button id="menu-btn" class="ghost-btn" type="button"><span aria-hidden="true">☷</span><span>כל השאלות</span></button></div>
+  </div></header>
+  <div class="page-shell">
+    <section class="intro" aria-label="פרטי המבחן"><div class="intro-top"><span class="pill" id="timing"></span><span class="pill" id="points"></span><span class="pill" id="count"></span></div>
+      <p class="disclaimer" id="disclaimer"></p><div class="identity"><label>שם <input type="text" autocomplete="name" placeholder="שם התלמיד/ה" aria-label="שם התלמיד"></label><label>כיתה <input type="text" placeholder="כיתה" aria-label="כיתה"></label></div>
+      <details class="instructions" id="instructions-wrap"><summary>הוראות המבחן</summary><ul id="instructions"></ul></details>
+    </section>
+    <section class="exam-panel" aria-label="שאלות המבחן">
+      <div class="progress-info"><span id="current-label" aria-live="polite"></span><span id="current-points"></span></div>
+      <div class="progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="17" aria-valuenow="1" aria-label="התקדמות בשאלות"><span id="progress-fill"></span></div>
+      <div id="questions"></div>
+      <div class="navigation"><button type="button" id="prev-btn" class="nav-btn nav-secondary">השאלה הקודמת</button><button type="button" id="next-btn" class="nav-btn nav-primary">השאלה הבאה</button></div>
+    </section>
+    <p class="end-note">לפני הגשה: בדקו סימנים, יחידות, סבירות ונימוקים.</p>
+  </div>
+  <footer class="footer"><img src="assets/logo.svg" alt="" class="footer-logo"><div id="footer-lines"></div></footer>
+  <div class="mobile-dock" aria-label="מעבר בין שאלות"><button type="button" id="dock-prev" aria-label="השאלה הקודמת">→</button><button type="button" id="dock-menu">שאלה <span id="dock-number"></span> מתוך 17 <span aria-hidden="true">⌄</span></button><button type="button" id="dock-next" aria-label="השאלה הבאה">←</button></div>
+  <dialog id="questions-dialog" class="questions-dialog" aria-labelledby="dialog-title"><div class="dialog-head"><h2 id="dialog-title">בחירת שאלה</h2><button type="button" id="dialog-close" class="close-btn" aria-label="סגירה">×</button></div><p class="dialog-caption">עברו ישירות לכל שאלה במבחן</p><div class="question-grid" id="question-grid"></div></dialog>
+</div>
+</body>
+</html>
