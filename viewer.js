@@ -2,7 +2,6 @@
 const $ = id => document.getElementById(id);
 
 let PAGE_ELS = [];
-let QUESTIONS = [];
 let RENDER = async () => {};
 
 /* ---------- high-quality, lazy rendering of the real exam.pdf ---------- */
@@ -18,14 +17,8 @@ async function setupPdf() {
     const QUALITY = Math.min(Math.max(dpr, 1) + 1, 3);
     const MAX_SIDE = 4200; // cap any single canvas dimension (memory safety)
 
-    // 1) lay out all pages as aspect-correct placeholders (+ turquoise separators)
+    // 1) lay out all pages as aspect-correct placeholders
     for (let n = 1; n <= pdf.numPages; n++) {
-      if (n > 1) {
-        const sep = document.createElement("div");
-        sep.className = "sep";
-        sep.setAttribute("aria-hidden", "true");
-        host.append(sep);
-      }
       const page = await pdf.getPage(n);
       const base = page.getViewport({ scale: 1 });
       const wrap = document.createElement("div");
@@ -34,34 +27,27 @@ async function setupPdf() {
       wrap.setAttribute("aria-label", "עמוד " + n);
       wrap._page = page;
       wrap._base = base;
+
+      // uniform footer overlay — covers the credit baked at the bottom of every page
+      const foot = document.createElement("div");
+      foot.className = "page-foot";
+      foot.setAttribute("aria-hidden", "true");
+      foot.innerHTML =
+        '<span class="pf-rule"></span>' +
+        '<div class="pf-row">' +
+          '<img class="pf-logo" src="assets/logo.svg" alt="">' +
+          '<div class="pf-lines">' +
+            '<b>יניב רז — מדריך מחוזי חט״ב בעיר ירושלים</b>' +
+            '<span>הדרכה במחוז ירושלים והעיר ירושלים — מנח״י, בהובלת איילת קריספין</span>' +
+          '</div>' +
+        '</div>';
+      wrap._foot = foot;
+      wrap.append(foot);
+
       host.append(wrap);
       PAGE_ELS.push(wrap);
-
-      // collect "שאלה N" anchors from the text layer (for the question navigator)
-      try {
-        const tc = await page.getTextContent();
-        const lines = {};
-        for (const it of tc.items) {
-          if (!it.str || !it.str.trim()) continue;
-          const y = Math.round(it.transform[5]);
-          (lines[y] = lines[y] || []).push(it.str);
-        }
-        for (const y in lines) {
-          const text = lines[y].join("").replace(/\s+/g, " ").trim();
-          const m = text.match(/שאלה\s*(\d+)/);
-          if (m && text.indexOf(m[0]) <= 3) {
-            QUESTIONS.push({ num: +m[1], page: n, yFrac: 1 - (+y) / base.height });
-          }
-        }
-      } catch (e) { /* page has no text layer */ }
     }
     $("loading").hidden = true;
-
-    // keep one anchor per question number, ordered 1..N, then build the navigator
-    const seen = new Set();
-    QUESTIONS = QUESTIONS.filter(q => (seen.has(q.num) ? false : seen.add(q.num)))
-                         .sort((a, b) => a.num - b.num);
-    buildQuestionNav();
 
     // 2) render one page at high resolution
     RENDER = async function (wrap) {
@@ -81,7 +67,7 @@ async function setupPdf() {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
-      wrap.replaceChildren(canvas);
+      wrap.replaceChildren(canvas, wrap._foot);
       wrap._renderedAt = cssW;
       wrap._done = true;
       wrap._busy = false;
@@ -115,94 +101,18 @@ async function setupPdf() {
   }
 }
 
-/* ---------- floating question navigator (green numbered chips) ---------- */
-function headerOffset() {
-  const t = document.querySelector(".topbar");
-  return (t ? t.offsetHeight : 56) + 12;
-}
-function qTop(q) {
-  const w = PAGE_ELS[q.page - 1];
-  return w ? w.offsetTop + q.yFrac * w.offsetHeight : 0;
-}
-function buildQuestionNav() {
-  if (QUESTIONS.length < 2) return;
-
-  const nav = document.createElement("nav");
-  nav.id = "qnav";
-  nav.className = "qnav";
-  nav.setAttribute("aria-label", "ניווט שאלות");
-  const list = document.createElement("div");
-  list.className = "qnav-list";
-  nav.append(list);
-
-  let closeNav = () => {};
-  const chips = QUESTIONS.map(q => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "qchip";
-    b.textContent = q.num;
-    b.setAttribute("aria-label", "שאלה " + q.num);
-    b.addEventListener("click", () => {
-      window.scrollTo({ top: Math.max(0, qTop(q) - headerOffset()), behavior: "smooth" });
-      closeNav();
-    });
-    list.append(b);
-    return b;
-  });
-  document.body.append(nav);
-
-  // collapsible control for narrow screens
-  const fab = document.createElement("button");
-  fab.type = "button";
-  fab.className = "qnav-fab";
-  fab.setAttribute("aria-label", "ניווט שאלות");
-  fab.setAttribute("aria-expanded", "false");
-  fab.innerHTML =
-    '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>';
-  const back = document.createElement("div");
-  back.className = "qnav-backdrop";
-  const openNav = () => {
-    nav.classList.add("open"); back.classList.add("show"); fab.setAttribute("aria-expanded", "true");
-  };
-  closeNav = () => {
-    nav.classList.remove("open"); back.classList.remove("show"); fab.setAttribute("aria-expanded", "false");
-  };
-  fab.addEventListener("click", () => (nav.classList.contains("open") ? closeNav() : openNav()));
-  back.addEventListener("click", closeNav);
-  document.body.append(back, fab);
-
-  // highlight the question currently in view
-  let ticking = false;
-  const spy = () => {
-    ticking = false;
-    const y = window.scrollY + headerOffset() + 4;
-    let active = -1;
-    for (let i = 0; i < QUESTIONS.length; i++) {
-      if (qTop(QUESTIONS[i]) <= y) active = i; else break;
-    }
-    chips.forEach((c, i) => c.classList.toggle("active", i === active));
-  };
-  document.addEventListener("scroll", () => {
-    if (!ticking) { ticking = true; requestAnimationFrame(spy); }
-  }, { passive: true });
-  spy();
-}
-
-/* ---------- chrome: progress, back-to-top ---------- */
-function wireChrome() {
+/* ---------- thin reading-progress bar under the top bar ---------- */
+function wireProgress() {
   const fill = $("scroll-fill");
-  const toTop = $("to-top");
+  if (!fill) return;
   const onScroll = () => {
     const h = document.documentElement;
     const max = h.scrollHeight - h.clientHeight;
     fill.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + "%";
-    toTop.hidden = false;
-    toTop.classList.toggle("show", h.scrollTop > 480);
   };
   document.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
-  toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
-wireChrome();
+wireProgress();
 setupPdf();
