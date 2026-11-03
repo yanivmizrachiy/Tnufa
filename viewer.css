@@ -111,8 +111,7 @@ main{flex:1;width:100%}
 /* ===================== FOOTER ===================== */
 .site-footer{position:relative;background:var(--navy);color:#dfe6f2;text-align:center;
   padding:30px var(--pad) calc(26px + env(safe-area-inset-bottom));margin-top:4px}
-.footer-rule{position:absolute;top:0;inset-inline:0;height:5px;
-  background:linear-gradient(90deg,var(--blue-dark),var(--blue),var(--blue-dark))}
+.footer-rule{position:absolute;top:0;inset-inline:0;height:4px;background:var(--blue)}
 .footer-logo{width:66px;height:66px;border-radius:50%;background:#fff;object-fit:cover;
   box-shadow:0 0 0 3px rgba(255,255,255,.18),0 10px 26px rgba(0,0,0,.3);margin:6px auto 14px;display:block}
 .footer-lines{display:flex;flex-direction:column;gap:3px;font-size:14px;line-height:1.55}
