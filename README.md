@@ -1,11 +1,9 @@
 # דוגמה למבחן לקראת מבחן תנופה
 
-אתר עצמאי וייעודי למבחן תנופה, בתצוגת נייד ובהדפסת A4.
+עמוד ציבורי אחד, עם **כפתור יחיד להורדת המבחן להדפסה**. כל המבחן בקובץ PDF בגודל A4.
 
-- מקור התוכן באתר: `exam.json`.
-- המקור המקורי: [Google Docs](https://docs.google.com/document/d/1oTxNgpphXCsH4tusHdM-gtaBT5298PA5A8lp5YpwnsA/edit).
-- הוראות עדכון: `SOURCE_OF_TRUTH.md`.
-- קוד תצוגה: `index.html`, `site.css`, `app.js`.
-- יש לוודא התאמה למקור לפני פרסום שינויי תוכן.
+- האתר: https://tnufa.vercel.app
+- PDF: https://drive.google.com/file/d/1IaRGQT3vB-x0u_BRx83r7KgZ966wwjax/view
+- מקור אמת: [SOURCE_OF_TRUTH.md](SOURCE_OF_TRUTH.md)
 
-**הבהרה:** מבחן עצמאי — אינו מבחן רשמי של ראמ״ה.
+אין תצוגת שאלות באתר. המבחן עצמאי ואינו מבחן רשמי של ראמ״ה.
