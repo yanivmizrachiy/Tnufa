@@ -2,6 +2,7 @@
 const $ = id => document.getElementById(id);
 
 let PAGE_ELS = [];
+let QUESTIONS = [];
 let RENDER = async () => {};
 
 /* ---------- high-quality, lazy rendering of the real exam.pdf ---------- */
@@ -35,8 +36,32 @@ async function setupPdf() {
       wrap._base = base;
       host.append(wrap);
       PAGE_ELS.push(wrap);
+
+      // collect "שאלה N" anchors from the text layer (for the question navigator)
+      try {
+        const tc = await page.getTextContent();
+        const lines = {};
+        for (const it of tc.items) {
+          if (!it.str || !it.str.trim()) continue;
+          const y = Math.round(it.transform[5]);
+          (lines[y] = lines[y] || []).push(it.str);
+        }
+        for (const y in lines) {
+          const text = lines[y].join("").replace(/\s+/g, " ").trim();
+          const m = text.match(/שאלה\s*(\d+)/);
+          if (m && text.indexOf(m[0]) <= 3) {
+            QUESTIONS.push({ num: +m[1], page: n, yFrac: 1 - (+y) / base.height });
+          }
+        }
+      } catch (e) { /* page has no text layer */ }
     }
     $("loading").hidden = true;
+
+    // keep one anchor per question number, ordered 1..N, then build the navigator
+    const seen = new Set();
+    QUESTIONS = QUESTIONS.filter(q => (seen.has(q.num) ? false : seen.add(q.num)))
+                         .sort((a, b) => a.num - b.num);
+    buildQuestionNav();
 
     // 2) render one page at high resolution
     RENDER = async function (wrap) {
@@ -88,6 +113,79 @@ async function setupPdf() {
       'לא ניתן להציג את עמודי המבחן כעת. ' +
       '<a href="exam.pdf" style="color:#0e8f80;font-weight:800">פתחו את ה-PDF ישירות</a>.';
   }
+}
+
+/* ---------- floating question navigator (green numbered chips) ---------- */
+function headerOffset() {
+  const t = document.querySelector(".topbar");
+  return (t ? t.offsetHeight : 56) + 12;
+}
+function qTop(q) {
+  const w = PAGE_ELS[q.page - 1];
+  return w ? w.offsetTop + q.yFrac * w.offsetHeight : 0;
+}
+function buildQuestionNav() {
+  if (QUESTIONS.length < 2) return;
+
+  const nav = document.createElement("nav");
+  nav.id = "qnav";
+  nav.className = "qnav";
+  nav.setAttribute("aria-label", "ניווט שאלות");
+  const list = document.createElement("div");
+  list.className = "qnav-list";
+  nav.append(list);
+
+  let closeNav = () => {};
+  const chips = QUESTIONS.map(q => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "qchip";
+    b.textContent = q.num;
+    b.setAttribute("aria-label", "שאלה " + q.num);
+    b.addEventListener("click", () => {
+      window.scrollTo({ top: Math.max(0, qTop(q) - headerOffset()), behavior: "smooth" });
+      closeNav();
+    });
+    list.append(b);
+    return b;
+  });
+  document.body.append(nav);
+
+  // collapsible control for narrow screens
+  const fab = document.createElement("button");
+  fab.type = "button";
+  fab.className = "qnav-fab";
+  fab.setAttribute("aria-label", "ניווט שאלות");
+  fab.setAttribute("aria-expanded", "false");
+  fab.innerHTML =
+    '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>';
+  const back = document.createElement("div");
+  back.className = "qnav-backdrop";
+  const openNav = () => {
+    nav.classList.add("open"); back.classList.add("show"); fab.setAttribute("aria-expanded", "true");
+  };
+  closeNav = () => {
+    nav.classList.remove("open"); back.classList.remove("show"); fab.setAttribute("aria-expanded", "false");
+  };
+  fab.addEventListener("click", () => (nav.classList.contains("open") ? closeNav() : openNav()));
+  back.addEventListener("click", closeNav);
+  document.body.append(back, fab);
+
+  // highlight the question currently in view
+  let ticking = false;
+  const spy = () => {
+    ticking = false;
+    const y = window.scrollY + headerOffset() + 4;
+    let active = -1;
+    for (let i = 0; i < QUESTIONS.length; i++) {
+      if (qTop(QUESTIONS[i]) <= y) active = i; else break;
+    }
+    chips.forEach((c, i) => c.classList.toggle("active", i === active));
+  };
+  document.addEventListener("scroll", () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(spy); }
+  }, { passive: true });
+  spy();
 }
 
 /* ---------- chrome: progress, back-to-top ---------- */
