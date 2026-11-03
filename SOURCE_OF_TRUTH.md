@@ -6,7 +6,7 @@ https://docs.google.com/document/d/1oTxNgpphXCsH4tusHdM-gtaBT5298PA5A8lp5YpwnsA/
 
 ## קובץ ההדפסה הנוכחי
 PDF מתוך המסמך, בגודל A4:
-https://drive.google.com/file/d/1IaRGQT3vB-x0u_BRx83r7KgZ966wwjax/view
+https://drive.google.com/file/d/1-oUc9EyYAa_8xZQcdoHWtw5obslw7Qub/view
 
 ## האתר
 https://tnufa.vercel.app
@@ -17,3 +17,8 @@ https://tnufa.vercel.app
 המיתוג נמצא בעמודי ה־PDF המקורי, והלוגו התקני שמור גם ב-`assets/logo.svg`.
 
 **מבחן עצמאי — אינו מבחן רשמי של ראמ״ה.**
+
+## אימות תיקון 03.11.2026
+- שאלה 1: הכותרת וכל גוף השאלה בצבע טקסט כהה, ללא כחול.
+- הלוגו העגול המקורי של ההדרכה במחוז ירושלים הוטמע בכותרת התחתית של כל עמוד PDF.
+- אומתו 9 עמודי A4, לוגו בכל עמוד, ארבעה שרטוטים ו־17 שאלות.
