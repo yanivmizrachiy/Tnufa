@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#276149">
+<title>לקראת תנופה — עמוד שער</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Gveret+Levin+AlefAlefAlef&family=Suez+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#5ca585; --g2:#3c8468; --g3:#276149; --g-ink:#0e3626; --g-deep:#123f2c;
+  --cream:#fbf7ea; --turq:#15bda9; --il-blue:#0038b8; --blue:#15386e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#e9edf2;font-family:Heebo,"Assistant",system-ui,Arial,sans-serif;
+  display:flex;align-items:flex-start;justify-content:center;padding:18px;color:var(--g-ink);
+  -webkit-font-smoothing:antialiased}
+
+/* ---- A4 sheet ---- */
+.sheet{position:relative;width:min(100%,794px);aspect-ratio:210/297;overflow:hidden;
+  border-radius:16px;color:var(--cream);
+  background:linear-gradient(152deg,var(--g1) 0%,var(--g2) 48%,var(--g3) 100%);
+  box-shadow:0 24px 60px rgba(18,63,44,.32);
+  display:flex;flex-direction:column;
+  padding:clamp(22px,4.4vw,40px)}
+
+/* decorative background */
+.bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:48% 52% 60% 40%/55% 48% 52% 45%;filter:blur(2px)}
+.b1{width:34%;aspect-ratio:1;background:rgba(255,255,255,.12);top:-6%;inset-inline-start:-8%}
+.b2{width:30%;aspect-ratio:1;background:var(--g-deep);opacity:.38;bottom:-8%;inset-inline-end:-6%;
+  border-radius:60% 40% 45% 55%/50% 60% 40% 50%}
+.b3{width:18%;aspect-ratio:1;background:rgba(251,247,234,.10);bottom:18%;inset-inline-start:30%}
+.geo{position:absolute;color:rgba(251,247,234,.22)}
+.g-compass{width:15%;bottom:16%;inset-inline-end:6%}
+.g-ruler{width:22%;top:7%;inset-inline-end:-4%;rotate:-14deg}
+.g-tri{width:16%;bottom:7%;inset-inline-start:-3%;rotate:8deg}
+
+.row{position:relative;z-index:1}
+
+/* top bar: kicker + brand chip */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kicker{margin:0;font-size:clamp(14px,2.4vw,20px);font-weight:700;letter-spacing:.03em;
+  display:inline-flex;align-items:center;gap:9px;color:rgba(251,247,234,.95)}
+.kicker::before{content:"";width:clamp(22px,4vw,34px);height:3px;border-radius:3px;background:var(--cream);opacity:.85}
+.chip{display:inline-flex;align-items:center;gap:8px;background:rgba(14,54,38,.42);
+  border:1px solid rgba(251,247,234,.28);border-radius:999px;padding:6px 12px 6px 7px;
+  font-size:clamp(11px,2vw,13px);font-weight:700}
+.chip img{width:26px;height:26px;border-radius:50%;background:#fff;object-fit:cover}
+
+/* note */
+.note{position:relative;align-self:flex-end;max-width:62%;margin-top:clamp(14px,3vw,26px);
+  background:var(--cream);color:var(--g-ink);padding:clamp(14px,2.6vw,20px) clamp(14px,2.6vw,20px) clamp(12px,2.2vw,16px);
+  border-radius:8px;rotate:-2.3deg;box-shadow:0 16px 32px rgba(10,40,26,.3);
+  font-family:"Gveret Levin AlefAlefAlef",Heebo,cursive}
+.note .tape{position:absolute;top:-11px;inset-inline-end:24px;width:64px;height:22px;rotate:7deg;
+  background:rgba(21,189,169,.6);border:1px solid rgba(255,255,255,.45);border-radius:2px;
+  box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.note p{margin:0;font-size:clamp(16px,2.9vw,22px);line-height:1.5;font-weight:400}
+.note .hl{background:linear-gradient(transparent 55%,#ffe14d 55% 94%,transparent 94%);padding:0 2px}
+.note b{display:block;margin-top:5px;color:var(--g3);font-size:1.08em}
+
+/* title */
+.head{margin-top:auto}
+.title{margin:0;font-family:"Suez One",Heebo,serif;font-weight:400;color:#fff;
+  font-size:clamp(44px,10.5vw,104px);line-height:.96;letter-spacing:-.01em;
+  text-shadow:0 3px 0 rgba(10,40,26,.22),0 12px 28px rgba(10,40,26,.3)}
+
+.badges{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,2.4vw,18px);margin-top:clamp(16px,3vw,26px)}
+.grade{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  width:clamp(74px,12vw,104px);aspect-ratio:1;border-radius:50%;background:var(--g-ink);color:var(--cream);
+  box-shadow:0 12px 26px rgba(10,40,26,.35),inset 0 0 0 3px rgba(251,247,234,.25);line-height:1}
+.grade small{font-size:clamp(12px,2vw,16px);font-weight:600;opacity:.85}
+.grade b{font-family:"Suez One",Heebo,serif;font-weight:400;font-size:clamp(30px,5.2vw,46px);margin-top:3px}
+.israel{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--il-blue);
+  padding:9px 16px 9px 11px;border-radius:999px;font-weight:800;font-size:clamp(15px,2.9vw,22px);
+  box-shadow:0 12px 26px rgba(10,40,26,.3),inset 0 0 0 2px #eaf0ff;rotate:-1.5deg}
+.il-flag{width:clamp(40px,7vw,52px);height:auto;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+
+.name{display:flex;align-items:flex-end;gap:12px;margin-top:clamp(18px,3.4vw,30px);max-width:460px;
+  color:#fff;font-weight:700;font-size:clamp(14px,2.4vw,19px)}
+.name .line{flex:1;height:0;border-bottom:2.5px dashed rgba(251,247,234,.75);transform:translateY(-5px)}
+
+/* credit footer on cover */
+.credit{position:relative;z-index:1;margin-top:clamp(18px,3.4vw,28px);padding-top:clamp(12px,2.4vw,18px);
+  border-top:3px solid var(--g-ink);display:flex;align-items:center;gap:12px;justify-content:center;text-align:center}
+.credit img{width:clamp(42px,7vw,58px);height:auto;border-radius:50%;background:#fff;
+  box-shadow:0 0 0 3px rgba(251,247,234,.25)}
+.credit .lines{display:flex;flex-direction:column;gap:2px;font-size:clamp(11px,2vw,14px);color:rgba(251,247,234,.95)}
+.credit .lines b{font-size:clamp(12px,2.1vw,15px);color:#fff}
+
+@media print{
+  @page{size:A4;margin:0}
+  body{background:#fff;padding:0}
+  .sheet{width:210mm;height:297mm;aspect-ratio:auto;border-radius:0;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="bg" aria-hidden="true">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <svg class="geo g-compass" viewBox="0 0 120 120"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="60" cy="18" r="7"/><path d="M60 25 38 104M60 25l22 79M46 78h28"/><circle cx="60" cy="18" r="2.5" fill="currentColor"/></g></svg>
+    <svg class="geo g-ruler" viewBox="0 0 160 40"><g fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="8" width="154" height="24" rx="4"/><path d="M23 8v10M43 8v10M63 8v10M83 8v10M103 8v10M123 8v10M143 8v10"/></g></svg>
+    <svg class="geo g-tri" viewBox="0 0 120 100"><path d="M10 90h100L10 20z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M10 72h18v18" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+  </div>
+
+  <div class="row top">
+    <p class="kicker">לקראת תנופה</p>
+    <span class="chip"><img src="assets/logo.svg" alt="">הדרכה · מנח״י ירושלים</span>
+  </div>
+
+  <figure class="note row" style="margin:clamp(14px,3vw,26px) 0 0">
+    <span class="tape" aria-hidden="true"></span>
+    <p>
+      <span class="hl">מכל הלב אוהבים את ארצנו —</span>
+      כאן גדֵלים, לומדים ומגשימים.
+      מאמינים בכם בכל צעד,
+      ויודעים שתעשו חַיִל.
+      <b>קדימה, אתם מסוגלים!</b>
+    </p>
+  </figure>
+
+  <div class="row head">
+    <h1 class="title">מבחן<br>במתמטיקה</h1>
+    <div class="badges">
+      <span class="grade" aria-label="כיתה ט׳"><small>כיתה</small><b>ט׳</b></span>
+      <span class="israel" aria-label="ישראל תצליח">
+        <svg class="il-flag" viewBox="0 0 66 44" aria-hidden="true">
+          <rect width="66" height="44" rx="4" fill="#fff" stroke="#d7dbe6"/>
+          <rect x="4" y="7" width="58" height="5.4" fill="#0038b8"/>
+          <rect x="4" y="31.6" width="58" height="5.4" fill="#0038b8"/>
+          <g fill="none" stroke="#0038b8" stroke-width="2.4" stroke-linejoin="round">
+            <path d="M33 15.5l6.1 10.6H26.9z"/><path d="M33 28.5l-6.1-10.6h12.2z"/>
+          </g>
+        </svg>
+        <b>ישראל תצליח</b>
+      </span>
+    </div>
+    <div class="name"><label>שם התלמיד/ה:</label><span class="line"></span></div>
+  </div>
+
+  <div class="credit">
+    <img src="assets/logo.svg" alt="לוגו ההדרכה">
+    <div class="lines">
+      <b>יניב רז — מדריך מחוזי חט״ב בעיר ירושלים</b>
+      <span>הדרכה במחוז ירושלים והעיר ירושלים — מנח״י</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
