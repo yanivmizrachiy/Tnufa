@@ -11,7 +11,7 @@ async function setupPdf() {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-    const pdf = await pdfjsLib.getDocument("exam.pdf").promise;
+    const pdf = await pdfjsLib.getDocument("exam.pdf?v=2").promise;
     const dpr = window.devicePixelRatio || 1;
     // oversample: ~2x on standard screens, up to 3x on retina → crisp text & thin grid
     const QUALITY = Math.min(Math.max(dpr, 1) + 1, 3);
