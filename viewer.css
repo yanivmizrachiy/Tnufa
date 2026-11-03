@@ -135,6 +135,40 @@ main{flex:1;width:100%}
   transition:opacity .2s,transform .2s}
 .to-top.show{opacity:1;transform:translateY(0)}
 
+/* ===================== QUESTION NAV (green numbered chips) ===================== */
+.qnav{position:fixed;z-index:46;inset-inline-start:10px;top:50%;transform:translateY(-50%)}
+.qnav-list{display:flex;flex-direction:column;gap:7px;align-items:center;
+  max-height:84vh;overflow-y:auto;scrollbar-width:none;
+  padding:9px 7px;border-radius:999px;
+  background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid rgba(39,97,73,.16);box-shadow:0 14px 34px rgba(10,40,26,.18)}
+.qnav-list::-webkit-scrollbar{display:none}
+.qchip{flex:0 0 auto;width:30px;height:30px;border-radius:50%;cursor:pointer;padding:0;
+  background:#fff;border:2px solid var(--g2);color:var(--g3);
+  font:800 13px/1 Heebo,system-ui,sans-serif;display:grid;place-items:center;
+  transition:transform .12s,background .12s,border-color .12s,color .12s}
+.qchip:hover{background:#eef6f1;border-color:var(--g3);transform:translateY(-1px)}
+.qchip.active{background:var(--g3);border-color:var(--g3);color:#fff;
+  box-shadow:0 6px 14px rgba(39,97,73,.4)}
+.qnav-fab{display:none}
+.qnav-backdrop{display:none}
+
+/* narrow screens: collapse the rail behind a button so it never covers the exam */
+@media(max-width:980px){
+  .qnav{inset-inline-start:12px;top:auto;bottom:calc(76px + env(safe-area-inset-bottom));transform:none;display:none}
+  .qnav.open{display:block}
+  .qnav-list{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:9px;
+    max-width:min(74vw,250px);max-height:52vh;border-radius:18px;padding:12px;
+    background:rgba(255,255,255,.98)}
+  .qchip{width:34px;height:34px;font-size:14px}
+  .qnav-fab{position:fixed;z-index:46;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom));
+    width:46px;height:46px;border:0;border-radius:50%;cursor:pointer;
+    background:var(--g3);color:#fff;display:grid;place-items:center;
+    box-shadow:0 10px 24px rgba(10,40,26,.32)}
+  .qnav-backdrop{position:fixed;inset:0;z-index:45;background:transparent}
+  .qnav-backdrop.show{display:block}
+}
+
 /* ===================== MOBILE CHROME ===================== */
 @media(max-width:600px){
   .brand small{display:none}
@@ -147,7 +181,7 @@ main{flex:1;width:100%}
   :root{--bg:#fff;--maxw:100%}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   html,body{background:#fff;width:210mm}
-  .topbar,.to-top{display:none!important}
+  .topbar,.to-top,.qnav,.qnav-fab,.qnav-backdrop{display:none!important}
   .sep{border:0;height:0;margin:0}
 
   /* cover = exactly one A4 page (green + banner print in colour) */
