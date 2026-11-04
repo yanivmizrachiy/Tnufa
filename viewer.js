@@ -11,7 +11,7 @@ async function setupPdf() {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-    const pdf = await pdfjsLib.getDocument("exam.pdf?v=2").promise;
+    const pdf = await pdfjsLib.getDocument("exam.pdf?v=3").promise;
     const dpr = window.devicePixelRatio || 1;
     // oversample: ~2x on standard screens, up to 3x on retina → crisp text & thin grid
     const QUALITY = Math.min(Math.max(dpr, 1) + 1, 3);
@@ -28,21 +28,6 @@ async function setupPdf() {
       wrap._page = page;
       wrap._base = base;
 
-      // uniform footer overlay — covers the credit baked at the bottom of every page
-      const foot = document.createElement("div");
-      foot.className = "page-foot";
-      foot.setAttribute("aria-hidden", "true");
-      foot.innerHTML =
-        '<span class="pf-rule"></span>' +
-        '<div class="pf-row">' +
-          '<img class="pf-logo" src="assets/logo.svg" alt="">' +
-          '<div class="pf-lines">' +
-            '<b>יניב רז — מדריך מחוזי חט״ב בעיר ירושלים</b>' +
-            '<span>הדרכה במחוז ירושלים והעיר ירושלים — מנח״י, בהובלת איילת קריספין</span>' +
-          '</div>' +
-        '</div>';
-      wrap._foot = foot;
-      wrap.append(foot);
 
       host.append(wrap);
       PAGE_ELS.push(wrap);
@@ -67,7 +52,7 @@ async function setupPdf() {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
-      wrap.replaceChildren(canvas, wrap._foot);
+      wrap.replaceChildren(canvas);
       wrap._renderedAt = cssW;
       wrap._done = true;
       wrap._busy = false;
@@ -97,7 +82,7 @@ async function setupPdf() {
     console.error(err);
     $("loading").innerHTML =
       'לא ניתן להציג את עמודי המבחן כעת. ' +
-      '<a href="exam.pdf" style="color:#0e8f80;font-weight:800">פתחו את ה-PDF ישירות</a>.';
+      '<a href="exam.pdf?v=3" style="color:#0e8f80;font-weight:800">פתחו את ה-PDF ישירות</a>.';
   }
 }
 

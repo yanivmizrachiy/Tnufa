@@ -112,19 +112,10 @@ main{flex:1;width:100%}
 .cv-credit .lines b{font-size:clamp(12px,2.1vw,15px);color:#fff}
 
 /* ===================== PDF PAGES ===================== */
-#pages{max-width:var(--maxw);margin:0 auto}
-.pdf-page{position:relative;display:block;width:100%;height:auto;background:#fff}
+#pages{max-width:var(--maxw);margin:0 auto;display:flex;flex-direction:column;gap:clamp(12px,2.4vw,24px);padding-block:clamp(12px,2.4vw,24px)}
+.pdf-page{position:relative;display:block;width:100%;height:auto;background:#fff;box-shadow:0 1px 8px rgba(22,31,49,.14)}
 .pdf-page canvas{display:block;width:100%;height:auto}
 
-/* uniform per-page footer (hides the credit baked into each PDF page) */
-.page-foot{position:absolute;inset-inline:0;bottom:0;height:10%;background:#fff;overflow:hidden}
-.pf-rule{position:absolute;top:0;inset-inline:0;height:2.5px;background:var(--blue)}
-.pf-row{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  gap:clamp(8px,1.6%,14px);padding:3px 5% 0}
-.pf-logo{width:clamp(22px,4%,38px);height:auto;flex:0 0 auto;border-radius:50%;background:#fff}
-.pf-lines{display:flex;flex-direction:column;line-height:1.28;text-align:center}
-.pf-lines b{font-weight:800;font-size:clamp(8px,1.45vw,12.5px);color:#122f4c}
-.pf-lines span{font-size:clamp(7px,1.25vw,11px);color:#3a5168}
 .loading{text-align:center;padding:40px 20px;color:var(--ink-soft);font-weight:600}
 
 /* ===================== FOOTER ===================== */
@@ -162,8 +153,9 @@ main{flex:1;width:100%}
   .cv-body{flex:1 1 auto}
 
   /* each exam page = exactly one A4 page */
+  #pages{display:block;padding:0}
   .pdf-page{width:210mm;height:297mm;overflow:hidden;margin:0 auto;
-    break-after:page;break-inside:avoid;background:#fff}
+    break-after:page;break-inside:avoid;background:#fff;box-shadow:none}
   .pdf-page canvas{width:100%;height:100%;object-fit:contain}
 
   /* credit footer flows after the last page */
