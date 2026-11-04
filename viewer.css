@@ -215,6 +215,9 @@ main{flex:1;width:100%}
   #pages{display:block;padding:0;width:auto!important;max-width:none}
   .pdf-page{width:210mm;height:297mm;overflow:hidden;margin:0 auto;contain:none;
     break-after:page;break-inside:avoid;background:#fff;box-shadow:none}
+  /* the long key page keeps its height and flows over several A4 sheets */
+  .pdf-page.long{height:auto;overflow:visible;aspect-ratio:var(--ratio);break-inside:auto;break-after:auto}
+  .pdf-page.long canvas{width:100%;height:auto}
   .pdf-page canvas{width:100%;height:100%;object-fit:contain}
 
   /* credit footer flows after the last page */

@@ -416,6 +416,7 @@
         el.setAttribute("role", "img");
         el.setAttribute("aria-label", "עמוד " + (i + 1) + " מתוך " + pdf.numPages);
         el.style.setProperty("--ratio", base.width + " / " + base.height);
+        if (base.height / base.width > 1.6) el.classList.add("long");
         const mark = document.createElement("span");
         mark.className = "ph";
         mark.setAttribute("aria-hidden", "true");
