@@ -593,23 +593,23 @@ KEY = [
         ("ב", "לא", "%s: ההוזלה מחושבת מהמחיר החדש, ולכן המחיר אינו חוזר ל־150." % m("180 · 0.8 = 144"))]),
     ("הכללה של תופעה מספרית", [
         ("א", "16, 21, 51", "בכל צורה נוספים 5 מוטות."),
-        ("ב", m("5n + 1"), "בצורה 1 יש 6 מוטות, ובכל צורה נוספים 5."),
+        ("ב", "ב: %s" % m("5n + 1"), "בצורה 1 יש 6 מוטות, ובכל צורה נוספים 5."),
         ("ג", "לא", "%s נותן %s, ומספר הצורה חייב להיות שלם." % (m("5n + 1 = 100"), m("n = 19.8")))]),
     ("ישרים מקבילים, ניצבות, זוויות מתחלפות", [
         ("א", m("∢BED = 85°"), "מעבירים דרך E ישר מקביל לשני הישרים, ולפי זוויות מתחלפות %s." % m("35° + 50° = 85°")),
-        ("ב", m("∢ABE = 30°"), "%s, ולפי סעיף א %s. לכן %s, ו־%s." % (m("∢BED = 90°"), m("∢BED = ∢ABE + ∢CDE"), m("x + 2x = 90°"), m("x = 30°")))]),
+        ("ב", m("∢ABE = 30°"), "נסמן %s, ואז %s. %s, ולפי סעיף א %s. לכן %s, ו־%s." % (m("∢ABE = x"), m("∢CDE = 2x"), m("∢BED = 90°"), m("∢BED = ∢ABE + ∢CDE"), m("x + 2x = 90°"), m("x = 30°")))]),
     ("דיאגרמה, ממוצע, שכיח, חציון", [
         ("א", "1.5 שערים", "30 שערים ב־20 משחקים."),
         ("ב", "היגד 1: נכון<br>היגד 2: לא נכון<br>היגד 3: אי אפשר לדעת", "1: בכל תוצאה של המשחק הנוסף החציון נשאר 1. 2: אחרי שלושה משחקים של 2 שערים השכיח הוא 2. 3: לא נתון כמה שערים הבקיעה הקבוצה היריבה."),
         ("ג", "12 שערים", m("(30 + x) / 21 = 2"))]),
     ("חזקות, שורש, מספרים שליליים", [
         ("א", "4", "%s, ו־%s." % (m("25 − 9 = 16"), m("√16 = 4"))),
-        ("ב", "%s ו־%s" % (m("−3"), m("3")), "%s, ולכן התוצאה 0." % m("(±3)² − 9 = 0")),
+        ("ב", "ב: %s, ד: %s" % (m("−3"), m("3")), "%s, ולכן התוצאה 0." % m("(±3)² − 9 = 0")),
         ("ג", "אין שורש למספר שלילי", "%s, ולמספר שלילי אין שורש ריבועי." % m("4 − 9 = −5"))]),
     ("מבוא לפונקציות, קריאת גרף", [
         ("א", "10 שניות", "6 שניות בגובה 40 מטרים, ו־4 שניות בגובה 20 מטרים."),
         ("ב", "3 ו־11 שניות", "קוראים מהגרף את הזמנים שבהם הגובה 30 מטרים."),
-        ("ג", "בין השנייה ה־10 לשנייה ה־12", "10 מטרים בשנייה, לעומת 5 מטרים בשנייה.")]),
+        ("ג", "א: בין השנייה ה־10 לשנייה ה־12", "10 מטרים בשנייה, לעומת 5 מטרים בשנייה.")]),
     ("משוואת ישר, מערכת משוואות", [
         ("א", "ג: %s" % m("y = −x + 4"), "קוראים מהגרף את שיפוע הישר ואת נקודת החיתוך עם ציר y."),
         ("ב", m("P(1.5,2.5)"), "פותרים %s." % m("3x − 2 = −x + 4"))]),
@@ -622,7 +622,7 @@ KEY = [
         ("א", "לא", "באורן %s תלמידים, ובברוש %s תלמידים." % (m("400 · 0.25 = 100"), m("900 · 0.15 = 135"))),
         ("ב", "ג: בערך 40%", "%s, ו־%s." % (m("120 + 405 = 525"), m("525 / 1300 ≈ 0.40")))]),
     ("חפיפה, משפט פיתגורס, שטחים", [
-        ("א", "הוכחה", "למשל צ.צ.ז: AD צלע משותפת, %s, %s. מתקבלת כל הוכחה תקפה." % (m("AB = AC"), m("∢ADB = ∢ADC = 90°"))),
+        ("א", "הוכחה", "למשל צ.צ.ז: AD צלע משותפת, %s, %s (AD גובה), והזווית הישרה מול הצלע הגדולה. מתקבלת כל הוכחה תקפה." % (m("AB = AC"), m("∢ADB = ∢ADC = 90°"))),
         ("ב", "2.5 מטרים", "%s (מהחפיפה), ולפי פיתגורס %s." % (m("BD = 2"), m("AB² = 2² + 1.5²"))),
         ("ג", "21 מ״ר", "צידי הגג %s, החזית והגב %s." % (m("2 · 2.5 · 3 = 15"), m("2 · (4 · 1.5 / 2) = 6")))]),
     ("חוק הפילוג המורחב", [
@@ -631,7 +631,7 @@ KEY = [
         ("ג", "כן", "%s, וההפרש תמיד 1." % m("(x + 4)² = x² + 8x + 16"))]),
     ("שטח עיגול, חשיבה ביקורתית", [
         ("א", "לא", "הגדולה 706.5 סמ״ר, ושתי הקטנות יחד 628 סמ״ר (עם %s)." % m("π = 3.14")),
-        ("ב", "שתי פיצות קטנות", "בערך 0.080 ש״ח לסמ״ר, לעומת בערך 0.085 ש״ח לסמ״ר.")]),
+        ("ב", "ב: שתי פיצות קטנות", "בערך 0.080 ש״ח לסמ״ר, לעומת בערך 0.085 ש״ח לסמ״ר.")]),
     ("פונקציה קווית, סרטוט גרף", [
         ("א", "ב: %s" % m("y = 20 − 2x"), "גובה התחלתי 20, ובכל שעה מתקצר ב־2."),
         ("ב", "ישר מ־%s ל־%s" % (m("(0,12)"), m("(12,0)")), "נר ב׳ מתקצר ב־1 ס״מ בכל שעה."),
@@ -649,10 +649,10 @@ def key_group(n):
     return "<tbody>%s</tbody>" % out
 
 
-def key_sheet(groups, first=True):
-    head = '<h1 class="kh">מחוון תשובות%s</h1>%s' % ("" if first else " — המשך", '<p class="ks">מבחן במתמטיקה לכיתה ט׳ לקראת תנופה · למורה</p>' if first else "")
+def key_sheet():
+    head = '<h1 class="kh">מחוון תשובות</h1><p class="ks">מבחן במתמטיקה לכיתה ט׳ לקראת תנופה · למורה</p>'
     return head + ('<table class="key"><thead><tr><th class="kq">שאלה</th><th class="kt">נושא</th><th class="kp">סעיף</th><th class="ka">תשובה</th>'
-                   '<th>דרך הפתרון</th></tr></thead>%s</table>' % "".join(key_group(g) for g in groups))
+                   '<th>דרך הפתרון</th></tr></thead>%s</table>' % "".join(key_group(g) for g in range(len(KEY))))
 
 
 # ---------- print layout ----------
@@ -859,29 +859,13 @@ with sync_playwright() as p:
         sheets.append(cur)
         print("sheets:", [[i + 1 for i in s] for s in sheets])
 
-        # 3. the key: a question's rows never split across sheets
-        write(HEAD + sheet(key_sheet(range(len(KEY)))).replace('class="page"', 'class="page" style="height:auto;overflow:visible"') + "</body></html>")
-        pg.goto(uri, wait_until="networkidle")
-        pg.evaluate("document.fonts.ready.then(()=>1)")
-        kh = pg.evaluate("[...document.querySelectorAll('.key tbody')].map(e => e.getBoundingClientRect().height)")
-        ktop = pg.evaluate("document.querySelector('.key tbody').getBoundingClientRect().top - document.querySelector('.content').getBoundingClientRect().top")
-        key_pages, cur, used = [], [], ktop
-        for i, h in enumerate(kh):
-            if cur and used + h > avail - 6:
-                key_pages.append(cur); cur, used = [], ktop - 34
-            cur.append(i); used += h
-        key_pages.append(cur)
-        print("key sheets:", [[i + 1 for i in s_] for s_ in key_pages])
-
-        # 4. final document: instructions, question sheets, two draft sheets, closing page, key
+        # 3. A4 sheets: instructions, questions, two draft sheets, closing page
         body = sheet(INTRO)
         for s in sheets:
             body += sheet("".join(q(i + 1, Q[i]) for i in s))
         for n in (1, 2):
             body += sheet('<div class="fill"></div><h2 class="draft">דף טיוטה %d — לא ייבדק</h2>' % n)
         body += sheet(FINALE).replace('class="foot"', 'class="foot fin"')
-        for i, groups in enumerate(key_pages):
-            body += sheet(key_sheet(groups, i == 0))
         write(HEAD + body + "</body></html>")
         pg.goto(uri, wait_until="networkidle")
         pg.evaluate("document.fonts.ready.then(()=>1)")
@@ -893,7 +877,19 @@ with sync_playwright() as p:
         assert not errs, errs
         raw = PDF + ".raw"
         pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        expected = len(sheets) + 4 + len(key_pages)
+        expected = len(sheets) + 4
+
+        # 4. the key: one long page as tall as its content, so a phone scrolls through it without a break
+        write(HEAD + sheet(key_sheet()).replace('class="page"', 'class="page" style="height:auto;overflow:visible"') + "</body></html>")
+        pg.goto(uri, wait_until="networkidle")
+        pg.evaluate("document.fonts.ready.then(()=>1)")
+        key_h = math.ceil(pg.evaluate("document.querySelector('.page').getBoundingClientRect().height")) + 48
+        pg.evaluate("h => { const s = document.querySelector('.page').style; s.height = h + 'px'; s.overflow = 'hidden'; }", key_h)
+        assert not errs, errs
+        key_raw = PDF + ".key"
+        pg.add_style_tag(content="@page{size:210mm %dpx;margin:0}.page{break-after:auto}.key tbody{break-inside:auto}" % key_h)
+        pg.pdf(path=key_raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+        print("key page height: %d px" % key_h)
     finally:
         br.close()
         if os.path.exists(TMP):
@@ -901,6 +897,12 @@ with sync_playwright() as p:
 
 doc = fitz.open(raw)
 assert doc.page_count == expected, (doc.page_count, expected)
+key_doc = fitz.open(key_raw)
+assert key_doc.page_count == 1, key_doc.page_count
+doc.insert_pdf(key_doc)
+key_doc.close()
+os.remove(key_raw)
+expected += 1
 toc = [[1, "הוראות", 1]]
 for i, s_ in enumerate(sheets):
     toc += [[1, "שאלה %d" % (q_ + 1), i + 2] for q_ in s_]
