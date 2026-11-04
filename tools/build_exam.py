@@ -552,6 +552,12 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .foot .lines{display:flex;flex-direction:column;text-align:center;line-height:1.3}
 .foot b{font-weight:800;font-size:12.5px;color:#122f4c}
 .foot span{font-size:11px;color:#3a5168}
+.finale{position:absolute;inset:0 0 var(--foot) 0;background:#0a2550;display:flex;flex-direction:column;overflow:hidden}
+.fsky{flex:0 0 auto;padding:52px 20px 10px;text-align:center;color:#fff;font-family:"Rubik","Heebo",sans-serif;font-weight:900;font-size:176px;line-height:1.04}
+.fsky p{margin:0}
+.fimg{flex:1 1 auto;min-height:0;position:relative}
+.fimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:53% 100%;display:block}
+.fimg::after{content:"";position:absolute;inset:0 0 auto 0;height:150px;background:linear-gradient(to bottom,#0a2550,rgba(10,37,80,0))}
 .q{padding-block:14px 16px;border-top:1.5px solid var(--line)}
 .q:first-child{border-top:0;padding-top:0}
 .qh{display:flex;gap:12px;align-items:flex-start}
@@ -580,7 +586,7 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .nl{display:block;width:100%;max-width:470px;height:auto;font-family:"Heebo",Arial,sans-serif}
 .work,.fill{position:relative;overflow:hidden}
 .work svg,.fill svg{position:absolute;inset:0;display:block}
-.fill{flex:1 1 auto;min-height:0;margin-top:6px;margin-bottom:10px}
+.fill{position:absolute;inset:0 0 var(--foot) 0}
 .ans{font-weight:500}
 .blank{display:inline-block;position:relative;width:97px;height:25px;margin-inline:3px;vertical-align:middle}
 .blank svg{position:absolute;inset:0;display:block}
@@ -599,7 +605,7 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .intro h2{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#2d4799;font-size:22.5px;text-align:center;margin:28px 0 12px}
 .intro p.l{margin:0 0 13px}
 .intro .luck{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#2d4799;font-size:24px;text-align:center;margin-top:44px}
-.draft{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#1d4ed8;font-size:18.5px;text-align:center;margin:0}
+h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align:center;font-family:"Rubik","Heebo",sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:#15386e}
 """
 
 GRID_JS = """
@@ -611,7 +617,11 @@ const squares = (cols, rows, S, x0, y0) => {
   for (let j = 0; j <= rows; j++) g += `<line x1="${x0}" y1="${y0 + j * S}" x2="${x0 + cols * S}" y2="${y0 + j * S}"/>`;
   return `<g ${LINE}>${g}</g>`;
 };
-document.querySelectorAll('.work,.fill').forEach(el => {
+document.querySelectorAll('.fill').forEach(el => {
+  const S = 18, w = Math.ceil(el.clientWidth), h = Math.ceil(el.clientHeight);
+  el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${squares(Math.ceil(w / S), Math.ceil(h / S), S, 0, 0)}</svg>`);
+});
+document.querySelectorAll('.work').forEach(el => {
   const S = 18, IN = 3, w = Math.floor(el.clientWidth), h = Math.floor(el.clientHeight);
   const cols = Math.floor((w - 2 * IN) / S), rows = Math.floor((h - 2 * IN) / S);
   el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${squares(cols, rows, S, Math.floor((w - cols * S) / 2), IN)}</svg>`);
@@ -642,8 +652,11 @@ INTRO = """<div class="intro">
 <p class="luck">בהצלחה!</p>
 </div>"""
 
+FINALE = """<div class="finale"><div class="fsky"><p>ירושלים</p><p>תצליח!</p></div>
+<div class="fimg"><img src="../assets/jerusalem.jpg" alt=""></div></div>"""
+
 HEAD = ('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>מבחן במתמטיקה לכיתה ט׳</title>'
-        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@700&display=swap">'
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@700;900&display=swap">'
         '<style>' + CSS + '</style></head><body>')
 
 
@@ -708,12 +721,13 @@ with sync_playwright() as p:
         sheets.append(cur)
         print("sheets:", [[i + 1 for i in s] for s in sheets])
 
-        # 3. final document: instructions, question sheets, two draft sheets
+        # 3. final document: instructions, question sheets, two draft sheets, closing page
         body = sheet(INTRO)
         for s in sheets:
             body += sheet("".join(q(i + 1, Q[i]) for i in s))
         for n in (1, 2):
-            body += sheet('<h2 class="draft">דף טיוטה %d — לא ייבדק</h2><div class="fill" style="margin-top:10px"></div>' % n)
+            body += sheet('<div class="fill"></div><h2 class="draft">דף טיוטה %d — לא ייבדק</h2>' % n)
+        body += sheet(FINALE)
         write(HEAD + body + "</body></html>")
         pg.goto(uri, wait_until="networkidle")
         pg.evaluate("document.fonts.ready.then(()=>1)")
@@ -725,7 +739,7 @@ with sync_playwright() as p:
         assert not errs, errs
         raw = PDF + ".raw"
         pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        expected = len(sheets) + 3
+        expected = len(sheets) + 4
     finally:
         br.close()
         if os.path.exists(TMP):

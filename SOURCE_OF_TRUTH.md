@@ -20,7 +20,7 @@ https://docs.google.com/document/d/1oTxNgpphXCsH4tusHdM-gtaBT5298PA5A8lp5YpwnsA/
 PDF סופי בגודל A4 עם משבצות חשבון באזורי הפתרון:
 https://tnufa.vercel.app/exam.pdf
 
-המבחן כולל 18 עמודים: עמוד הוראות, 15 עמודי שאלות ושני דפי טיוטה.
+המבחן כולל 19 עמודים: עמוד הוראות, 15 עמודי שאלות, שני דפי טיוטה ועמוד סיום עם הכיתוב "ירושלים תצליח!".
 
 ## האתר
 https://tnufa.vercel.app
