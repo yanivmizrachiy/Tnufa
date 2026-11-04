@@ -11,7 +11,7 @@ async function setupPdf() {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-    const pdf = await pdfjsLib.getDocument("exam.pdf?v=8").promise;
+    const pdf = await pdfjsLib.getDocument("exam.pdf?v=9").promise;
     const dpr = window.devicePixelRatio || 1;
     // oversample: ~2x on standard screens, up to 3x on retina → crisp text & thin grid
     const QUALITY = Math.min(Math.max(dpr, 1) + 1, 3);
@@ -82,7 +82,7 @@ async function setupPdf() {
     console.error(err);
     $("loading").innerHTML =
       'לא ניתן להציג את עמודי המבחן כעת. ' +
-      '<a href="exam.pdf?v=8" style="color:#0e8f80;font-weight:800">פתחו את ה-PDF ישירות</a>.';
+      '<a href="exam.pdf?v=9" style="color:#0e8f80;font-weight:800">פתחו את ה-PDF ישירות</a>.';
   }
 }
 
