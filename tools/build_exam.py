@@ -224,32 +224,23 @@ Q.append("""<p>נועה בונה צורות של חלת דבש ממוטות זה
     part("ג", "לנועה יש בדיוק 100 מוטות. האם היא יכולה לבנות צורה אחת ולהשתמש בכל המוטות?" + yesno() + "<p>נמקו את תשובתכם.</p>" + work(84))))
 
 # ---------- Q5 ----------
-ang = 40
-tan = math.tan(math.radians(ang)); cs = math.cos(math.radians(ang)); sn = math.sin(math.radians(ang))
-yT, yB = 46, 196
-A = (470, yT); B_ = (470 - (yB - yT) / tan, yB); C_ = (470 - 2 * (yB - yT) / tan, yT)
-S = (A[0] + 104 * cs, A[1] + 104 * sn); E = (C_[0] - 90 * cs, C_[1] + 90 * sn)
-b = ""
-for x in range(24, 600, 13):
-    b += line(x, yT, x + 9, yT - 11, MUTE, 1) + line(x, yB, x - 9, yB + 11, MUTE, 1)
-b += line(20, yT, 600, yT, NAVY, 3) + line(20, yB, 600, yB, NAVY, 3)
-for p1, p2 in ((S, A), (A, B_), (B_, C_), (C_, E)):
-    b += line(p1[0], p1[1], p2[0], p2[1], AMBER, 2.4)
-    mx, my = p1[0] * .46 + p2[0] * .54, p1[1] * .46 + p2[1] * .54
-    b += head(mx, my, math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0])), AMBER, 10)
-b += arc(A[0], A[1], 34, 0, ang) + t(A[0] + 54, A[1] + 19, "40°", 14, ltr=True, w=600)
-b += arc(A[0], A[1], 30, 180 - ang, 180) + t(A[0] - 44, A[1] + 17, "β", 16, ltr=True, w=600)
-b += arc(B_[0], B_[1], 30, -ang, 0) + t(B_[0] + 44, B_[1] - 8, "α", 16, ltr=True, w=600)
-for lab, pt, dy in (("A", A, -18), ("B", B_, 28), ("C", C_, -18)):
-    b += circ(pt[0], pt[1], 3.6, NAVY) + t(pt[0], pt[1] + dy, lab, 16, ltr=True, w=700)
-b += t(545, yT - 18, "מראה עליונה", 13, c=MUTE) + t(80, yB + 28, "מראה תחתונה", 13, c=MUTE)
-Q.append("""<p>שתי מראות ישרות ומקבילות מוצבות זו מול זו.</p>
-<p>קרן אור פוגעת במראה העליונה בנקודה %s, מוחזרת אל המראה התחתונה בנקודה %s, וממנה מוחזרת אל המראה העליונה בנקודה %s (ראו סרטוט).</p>
-<p>קרן אור מוחזרת ממראה באותה זווית שבה היא פוגעת בה.</p>%s%s%s%s""" % (
-    m("A"), m("B"), m("C"), svg(620, 240, b, "קרן אור בין שתי מראות מקבילות"),
-    part("א", "מהו הגודל של הזווית %s? נמקו את תשובתכם." % m("α") + work(84) + ans('תשובה: &nbsp;<bdi dir="ltr" class="math">α = %s°</bdi>' % BLANK)),
-    part("ב", "מהו הגודל של הזווית %s? הציגו את דרך הפתרון." % m("∢ABC") + work(70) + ans("תשובה: %s °" % BLANK)),
-    part("ג", "הסבירו מדוע המשולש %s הוא משולש שווה־שוקיים." % m("ABC") + work(84))))
+yT, yB, h1, h2 = 40, 220, 100, 80
+Bx = 190
+Ex, Ey = Bx + h1 / math.tan(math.radians(35)), yT + h1
+Dx = Ex - h2 / math.tan(math.radians(50))
+assert abs(Ey + h2 - yB) < 1e-9
+b = line(120, yT, 560, yT, NAVY, 2.6) + line(120, yB, 560, yB, NAVY, 2.6)
+b += head(452, yT, 0, NAVY, 10) + head(452, yB, 0, NAVY, 10)
+b += line(Bx, yT, Ex, Ey, G3, 2.6) + line(Ex, Ey, Dx, yB, G3, 2.6)
+b += arc(Bx, yT, 40, 0, 35) + t(Bx + 66 * math.cos(math.radians(17.5)), yT + 66 * math.sin(math.radians(17.5)) + 5, "35°", 15, ltr=True, w=600)
+b += arc(Dx, yB, 40, -50, 0) + t(Dx + 66 * math.cos(math.radians(25)), yB - 66 * math.sin(math.radians(25)) + 5, "50°", 15, ltr=True, w=600)
+b += arc(Ex, Ey, 26, 130, 215, AMBER, 1.8) + t(Ex - 44, Ey + 11, "?", 20, ltr=True, w=700, c=AMBER)
+for lab, x, y, dx, dy in (("B", Bx, yT, 0, -13), ("A", 500, yT, 0, -13), ("D", Dx, yB, 0, 25), ("C", 500, yB, 0, 25), ("E", Ex, Ey, 18, 6)):
+    b += circ(x, y, 3.8, NAVY) + t(x + dx, y + dy, lab, 16, ltr=True, w=700)
+Q.append("""<p>בסרטוט שלפניכם הישרים %s ו־%s מקבילים. הנקודה %s נמצאת בין שני הישרים.</p>
+<p>נתון: %s, &nbsp; %s.</p>%s<p>מהו הגודל של הזווית %s? הציגו את דרך הפתרון.</p>%s%s""" % (
+    m("AB"), m("CD"), m("E"), m("∢ABE = 35°"), m("∢CDE = 50°"), svg(620, 256, b, "שני ישרים מקבילים ונקודה E ביניהם"),
+    m("BED"), work(145), ans('תשובה: &nbsp;<bdi dir="ltr" class="math">∢BED = %s°</bdi>' % BLANK)))
 
 # ---------- Q6 ----------
 b = ""
@@ -307,86 +298,48 @@ Q.append("""<p>הגרף שלפניכם מתאר את הגובה של רחפן מ
 
 
 # ---------- Q9 ----------
-def balance(cx, items, weight):
-    y = 44
-    b = poly([(cx, y), (cx - 26, 172), (cx + 26, 172)], PALE2, G3, 1.6)
-    b += line(cx - 92, y, cx + 92, y, NAVY, 4) + circ(cx, y, 5, NAVY)
-    pan = 126
-    for sx in (cx - 92, cx + 92):
-        b += line(sx, y, sx - 60, pan, MUTE, 1.2) + line(sx, y, sx + 60, pan, MUTE, 1.2)
-        b += line(sx - 62, pan, sx + 62, pan, NAVY, 3.2)
-    # items stand on the right-hand pan, the weight on the left-hand pan
-    n = len(items); step = 21; start = cx + 92 + (n - 1) * step / 2
-    for i, it in enumerate(items):
-        ix = start - i * step
-        if it == "c":
-            b += rect(ix - 9.5, pan - 21, 19, 19, G2, G3, 1.2, 2)
-        elif it == "b":
-            b += circ(ix, pan - 11, 9.5, AMBER)
-        else:
-            b += t(ix, pan - 7, "?", 21, w=700, c=AMBER)
-    wx = cx - 92
-    b += poly([(wx - 18, pan - 2), (wx + 18, pan - 2), (wx + 12, pan - 34), (wx - 12, pan - 34)], NAVY)
-    b += t(wx, pan + 22, weight + " ק״ג", 14, w=600)
-    return b
-
-
-b = balance(160, ["c", "c", "b"], "14") + balance(480, ["c", "b", "b", "b"], "17")
-b3 = balance(160, ["c", "c", "c", "q"], "23")
-Q.append("""<p>שני זוגות המאזניים שלפניכם מאוזנים. כל הקוביות זהות זו לזו, וכל הכדורים זהים זה לזה.</p>%s
-<p>נסמן: %s — משקל של קובייה אחת (בק״ג), %s — משקל של כדור אחד (בק״ג).</p>%s%s%s""" % (
-    svg(640, 186, b, "שני מאזניים מאוזנים עם קוביות, כדורים ומשקולות"), m("x"), m("y"),
-    part("א", "איזו מערכת משוואות מתאימה לשני זוגות המאזניים?" + opts([
-        '<span class="sys" dir="ltr">2x + y = 17<br>x + 3y = 14</span>',
-        '<span class="sys" dir="ltr">2x + y = 14<br>x + 3y = 17</span>',
-        '<span class="sys" dir="ltr">x + 2y = 14<br>3x + y = 17</span>',
-        '<span class="sys" dir="ltr">3x = 14<br>4y = 17</span>'], 2)),
-    part("ב", "מהו המשקל של קובייה אחת ומהו המשקל של כדור אחד? הציגו את דרך הפתרון." + work(126) +
-         ans("קובייה: %s ק״ג &nbsp;&nbsp; כדור: %s ק״ג" % (BL_S, BL_S))),
-    part("ג", "במאזניים נוספים הניחו 3 קוביות ועוד כמה כדורים. המשקולת בכף השנייה שוקלת 23 ק״ג, והמאזניים מאוזנים.<br>כמה כדורים הניחו?" +
-         svg(320, 186, b3, "מאזניים שלישיים עם 3 קוביות ומספר לא ידוע של כדורים") + ans("תשובה: %s כדורים" % BLANK))))
+p = Plane(5, 5, 46, 46)
+b = p.b + t(p.sx(5) + 38, p.sy(0) + 5, "x", 15, ltr=True, w=600) + t(p.sx(0), p.sy(5) - 32, "y", 15, ltr=True, w=600)
+b += p.path([(2 / 3, 0), (7 / 3, 5)], BLUE) + p.path([(0, 4), (4, 0)], G3)
+b += p.dot(1.5, 2.5, NAVY, 5) + t(p.sx(1.5) + 18, p.sy(2.5) + 6, "P", 16, ltr=True, w=700)
+for lab, x, y, c in (("a", 2.5, 4.5, BLUE), ("b", 3.5, 1.5, G3)):
+    b += t(p.sx(x), p.sy(y) + 6, lab, 17, ltr=True, w=700, c=c)
+Q.append("""<p>במערכת הצירים שלפניכם מסורטטים הישרים %s ו־%s, הנחתכים בנקודה %s.</p>
+<p>משוואת הישר %s היא %s.</p>%s%s%s""" % (
+    m("a"), m("b"), m("P"), m("a"), m("y = 3x − 2"), svg(int(p.W), int(p.H), b, "שני ישרים נחתכים במערכת צירים"),
+    part("א", "איזו מהמשוואות הבאות היא משוואת הישר %s?" % m("b") +
+         opts([m("y = x + 4"), m("y = −x − 4"), m("y = −x + 4"), m("y = 4x − 1")], 2)),
+    part("ב", "מצאו את שיעורי הנקודה %s. הציגו את דרך הפתרון." % m("P") + work(145) +
+         ans('תשובה: &nbsp;<bdi dir="ltr" class="math">P ( %s , %s )</bdi>' % (BL_S, BL_S)))))
 
 # ---------- Q10 ----------
-Lx, Pz, Sc, cy = 590, 470, 230, 112
-b = poly([(Lx, cy), (Sc, cy - 60), (Sc, cy + 60)], YEL, extra='opacity=".7"')
-b += line(Lx, cy, Sc, cy - 60, AMBER, 1.3, 'stroke-dasharray="6 4"') + line(Lx, cy, Sc, cy + 60, AMBER, 1.3, 'stroke-dasharray="6 4"')
-b += rect(Sc - 13, cy - 92, 13, 184, PALE2, G3, 1.2) + line(Sc, cy - 60, Sc, cy + 60, NAVY, 6)
-b += line(Pz, cy - 20, Pz, cy + 20, BLUE, 5)
-b += circ(Lx, cy, 11, "#f2c230", AMBER, 1.6) + t(Lx + 22, cy + 5, "L", 16, ltr=True, w=700)
-b += t(Pz, cy - 30, "A", 16, ltr=True, w=700) + t(Pz, cy + 42, "B", 16, ltr=True, w=700)
-b += t(Sc + 14, cy - 66, "C", 16, ltr=True, w=700) + t(Sc + 14, cy + 78, "D", 16, ltr=True, w=700)
-b += t(Pz - 34, cy + 5, "20 ס״מ", 13, w=600) + t(Sc - 44, cy + 5, "הצל", 14, w=700)
-b += t(Sc - 6, cy - 100, "מסך", 13, c=MUTE)
-for y_, x1, lab in ((222, Pz, "60 ס״מ"), (252, Sc, "180 ס״מ")):
-    b += line(x1, y_, Lx, y_, MUTE, 1) + line(x1, y_ - 5, x1, y_ + 5, MUTE, 1) + line(Lx, y_ - 5, Lx, y_ + 5, MUTE, 1)
-    mid = (x1 + Lx) / 2
-    b += rect(mid - 30, y_ - 9, 60, 18, "#fff") + t(mid, y_ + 5, lab, 13, w=600)
-Q.append("""<p>בתיאטרון צלליות, פנס %s מאיר את הבובה %s, המוצבת במקביל למסך. על המסך נוצר הצל %s.</p>
-<p>הסרטוט שלפניכם מתאר את המצב במבט מהצד.</p>%s%s%s%s""" % (
-    m("L"), m("AB"), m("CD"), svg(630, 264, b, "פנס, בובה וצל על מסך במבט מהצד"),
-    part("א", "הסבירו מדוע המשולשים %s ו־%s דומים." % (m("LAB"), m("LCD")) + work(84)),
-    part("ב", "מהו הגובה של הצל %s? הציגו את דרך הפתרון." % m("CD") + work(70) + ans("תשובה: %s ס״מ" % BLANK)),
-    part("ג", "הבמאית רוצה שגובה הצל יהיה 80 ס״מ. הפנס והמסך נשארים במקומם, והיא מזיזה רק את הבובה.<br>באיזה מרחק מהפנס יש להציב את הבובה? הציגו את דרך הפתרון." + work(84) + ans("תשובה: %s ס״מ" % BLANK))))
+A_, B_, C_, D_, E_ = (180, 40), (60, 200), (360, 200), (132, 104), (252, 104)
+assert math.dist(A_, D_) == 80 and math.dist(D_, B_) == 120 and D_[1] == E_[1] and E_[0] - D_[0] == 120
+b = poly([D_, E_, C_, B_], PALE2) + poly([A_, D_, E_], PALE)
+b += poly([A_, B_, C_], "none", NAVY, 2.2) + line(D_[0], D_[1], E_[0], E_[1], G3, 2.4)
+b += head(198, 104, 0, G3, 9) + head(216, 200, 0, NAVY, 9)
+for lab, pt, dx, dy in (("A", A_, 0, -10), ("B", B_, -14, 8), ("C", C_, 14, 8), ("D", D_, -14, 2), ("E", E_, 14, 2)):
+    b += t(pt[0] + dx, pt[1] + dy, lab, 16, ltr=True, w=700)
+b += t(127, 68, "4 ס״מ", 14, w=600) + t(58, 148, "6 ס״מ", 14, w=600) + t(192, 95, "6 ס״מ", 14, w=600)
+b += t(210, 224, "?", 20, ltr=True, w=700, c=AMBER)
+Q.append("""<p>במשולש %s הנקודה %s נמצאת על הצלע %s, והנקודה %s נמצאת על הצלע %s, כך ש־%s.</p>
+<p>אורך הקטע %s הוא 4 ס״מ, אורך הקטע %s הוא 6 ס״מ, ואורך הקטע %s הוא 6 ס״מ.</p>%s%s%s""" % (
+    m("ABC"), m("D"), m("AB"), m("E"), m("AC"), m("DE ∥ BC"), m("AD"), m("DB"), m("DE"),
+    svg(420, 236, b, "משולש ובתוכו קטע המקביל לבסיס"),
+    part("א", "הסבירו מדוע המשולשים %s ו־%s דומים." % (m("ADE"), m("ABC")) + work(97)),
+    part("ב", "מהו האורך של הצלע %s? הציגו את דרך הפתרון." % m("BC") + work(97) + ans("תשובה: %s ס״מ" % BLANK))))
 
 # ---------- Q11 ----------
-fx0, fx1, fy0, fy1, dx_, dy_ = 110, 410, 90, 220, 70, -50
-b = poly([(fx0, fy0), (fx1, fy0), (fx1 + dx_, fy0 + dy_), (fx0 + dx_, fy0 + dy_)], PALE2, G3, 1.6)
-b += poly([(fx1, fy0), (fx1 + dx_, fy0 + dy_), (fx1 + dx_, fy1 + dy_), (fx1, fy1)], G1, G3, 1.6)
-b += rect(fx0, fy0, fx1 - fx0, fy1 - fy0, PALE, G3, 1.8)
-for x in range(fx0 + 15, fx1, 15):
-    b += line(x, fy0 + 7, x, fy1 - 7, G1, 1.2)
-for i in range(1, 5):
-    x = fx1 + dx_ * i / 5; y = fy0 + dy_ * i / 5
-    b += line(x, y + 7, x, y + fy1 - fy0 - 7, G3, 1)
-b += t((fx0 + fx1) / 2, fy1 + 24, "15 ס״מ", 14, w=600) + t(fx0 - 42, (fy0 + fy1) / 2 + 5, "6.5 ס״מ", 14, w=600)
-b += t(fx1 + dx_ / 2 + 36, fy1 + dy_ / 2 + 10, "6 ס״מ", 14, w=600)
-Q.append("""<p>מכולה להובלת סחורות היא בצורת תיבה.</p>
-<p>לפניכם סרטוט של דגם המכולה. קנה המידה של הדגם הוא %s. מידות הדגם רשומות בסרטוט.</p>%s%s%s%s""" % (
-    m("1:40"), svg(560, 252, b, "דגם של מכולה בצורת תיבה ומידותיו"),
-    part("א", "מהו האורך האמיתי של המכולה, במטרים?" + ans("תשובה: %s מטרים" % BLANK)),
-    part("ב", "מהו הנפח האמיתי של המכולה, במטרים מעוקבים? הציגו את דרך הפתרון." + work(84) + ans("תשובה: %s מ״ק" % BLANK)),
-    part("ג", "פי כמה גדול הנפח של המכולה האמיתית מהנפח של הדגם?" + opts(["פי 40", "פי 120", "פי 1,600", "פי 64,000"], 2) + "<p>נמקו את תשובתכם.</p>" + work(70))))
-
+b = line(24, 62, 616, 62, INK, 1.7) + head(24, 62, 180, INK, 9) + head(616, 62, 0, INK, 9)
+for i in range(0, 9):
+    x = 40 + i * 70
+    b += line(x, 55, x, 69, INK, 1.4) + t(x, 90, i, 14, ltr=True, w=600)
+for lab, v in (("A", 3.5), ("B", 4.5), ("C", 5.5), ("D", 6.5)):
+    x = 40 + v * 70
+    b += circ(x, 62, 5.5, BLUE, "#fff", 1.4) + t(x, 42, lab, 16, ltr=True, w=700, c=BLUE)
+Q.append("""<p>על ישר המספרים שלפניכם מסומנות ארבע נקודות.</p>%s<p>איזו מהנקודות יכולה לייצג את המספר %s?</p>%s""" % (
+    svg(640, 100, b, "ישר מספרים מ-0 עד 8 ועליו ארבע נקודות"), m("√30"),
+    opts([m("A"), m("B"), m("C"), m("D")], 2)))
 
 # ---------- Q12 ----------
 def numline(at, right):
@@ -404,22 +357,8 @@ def numline(at, right):
     return '<svg class="nl" viewBox="0 0 240 52" role="img" aria-label="ישר מספרים">%s</svg>' % b
 
 
-b = rect(130, 14, 150, 150, PALE, NAVY, 3, 3)
-# worker
-b += circ(162, 76, 11, BLUE) + rect(150, 89, 24, 44, BLUE, rx=6) + rect(151, 131, 9, 30, BLUE, rx=3) + rect(164, 131, 9, 30, BLUE, rx=3)
-# crates
-for (x, y) in ((218, 134), (246, 134), (218, 106)):
-    b += rect(x, y, 27, 27, "#d4a15e", "#8a5a23", 1.4, 2) + line(x, y, x + 27, y + 27, "#8a5a23", 1) + line(x + 27, y, x, y + 27, "#8a5a23", 1)
-b += rect(296, 34, 118, 60, NAVY, rx=6) + t(355, 58, "משקל מרבי", 13, w=600, c="#fff") + t(355, 81, "630 ק״ג", 18, w=700, c="#fff")
-b += t(162, 56, "80 ק״ג", 13, w=700, c=BLUE) + t(355, 122, "כל ארגז: 25 ק״ג", 14, w=600, c="#6e4519")
-Q.append("""<p>מעלית משא יכולה לשאת לכל היותר 630 ק״ג.</p>
-<p>עובד שמשקלו 80 ק״ג נכנס למעלית עם ארגזים זהים. המשקל של כל ארגז הוא 25 ק״ג.</p>%s%s%s%s""" % (
-    svg(430, 176, b, "מעלית משא ובה עובד וארגזים"),
-    part("א", "נסמן ב־%s את מספר הארגזים. איזה מאי־השוויונות הבאים מתאר את המצב?" % m("x") +
-         opts([m("80x + 25 ≤ 630"), m("80 + 25x ≥ 630"), m("80 + 25x ≤ 630"), m("25 + 80x ≥ 630")], 2)),
-    part("ב", "מהו המספר הגדול ביותר של ארגזים שהעובד יכול להעלות למעלית? הציגו את דרך הפתרון." + work(84) + ans("תשובה: %s ארגזים" % BLANK)),
-    part("ג", "נתון אי־השוויון: &nbsp; %s<br>איזה מהסרטוטים שלפניכם מציג את כל הפתרונות של אי־השוויון?" % m("3 − 2x &gt; −5") +
-         opts([numline(4, True), numline(-4, False), numline(4, False), numline(-4, True)], 2) + "<p>הציגו את דרך הפתרון.</p>" + work(84))))
+Q.append("""<p>נתון אי־השוויון: &nbsp; %s</p><p>איזה מהסרטוטים שלפניכם מציג את כל הפתרונות של אי־השוויון?</p>%s<p>הציגו את דרך הפתרון.</p>%s""" % (
+    m("3 − 2x &gt; −5"), opts([numline(4, True), numline(-4, False), numline(4, False), numline(-4, True)], 2), work(97)))
 
 # ---------- Q13 ----------
 cats = [("ברגל", "walk"), ("באוטובוס", "bus"), ("באופניים", "bike"), ("ברכב פרטי", "car")]
@@ -558,7 +497,7 @@ Q.append("""<div style="display:flex;gap:14px;align-items:flex-start"><div style
          ans("נר %s כבה בשעה %s" % (BL_S, BL_S)))))
 
 # ---------- sub-part load: keep close to the reference exam (17 questions, about 35 items) ----------
-DROP = {3: "ג", 5: "ב", 6: "א", 7: "ב", 8: "א", 9: "ג", 10: "ב", 11: "א", 12: "א", 13: "א", 16: "א", 17: "ד"}
+DROP = {3: "ג", 6: "א", 7: "ב", 8: "א", 13: "א", 16: "א", 17: "ד"}
 OPEN = '<div class="part"><b class="pl">'
 HEB = "אבגדה"
 for i, html_ in enumerate(Q):
@@ -567,7 +506,7 @@ for i, html_ in enumerate(Q):
     assert len(kept) == len(segs[1:]) - (1 if (i + 1) in DROP else 0), i + 1
     Q[i] = segs[0] + "".join(OPEN + HEB[j] + x[1:] for j, x in enumerate(kept))
 ITEMS = sum(max(1, x.count(OPEN)) for x in Q)
-assert ITEMS == 40, ITEMS
+assert ITEMS == 37, ITEMS
 
 # ---------- print layout ----------
 CSS = """
