@@ -5,7 +5,7 @@ Run:  python tools/build_exam.py
 Needs: playwright (Chromium) and pymupdf. The answer key is deliberately not kept
 in this public repository.
 """
-import math, os
+import math, os, statistics
 import fitz
 from playwright.sync_api import sync_playwright
 
@@ -285,7 +285,7 @@ for cx, lines_ in boxes:
     b += t(cx, 57, lines_[0], 15, w=600, c="#fff") + t(cx, 78, lines_[1], 15, w=600, c="#fff")
 b += arrow(568, 62, 534, 62, INK, 2) + arrow(408, 62, 384, 62, INK, 2) + arrow(258, 62, 234, 62, INK, 2) + arrow(108, 62, 74, 62, INK, 2)
 b += circ(40, 62, 30, PALE, G3, 2) + t(40, 67, "תוצאה", 13, w=600, c=G3)
-Q.append("""<p>במכונת המספרים שלפניכם מכניסים מספר. המכונה מבצעת עליו שלוש פעולות לפי הסדר, ומציגה את התוצאה.</p>%s%s%s%s%s""" % (
+Q.append("""<p>למכונת המספרים שלפניכם מכניסים מספר. המכונה מבצעת עליו שלוש פעולות לפי הסדר, ומציגה את התוצאה.</p>%s%s%s%s%s""" % (
     svg(640, 124, b, "שלבי מכונת המספרים"),
     part("א", "תמר הכניסה למכונה את המספר 5. מהי התוצאה שהציגה המכונה? הציגו את דרך הפתרון." + work(56) + ans("תשובה: %s" % BLANK)),
     part("ב", "ישנו מספר נוסף, שונה מ־5, שעבורו מציגה המכונה אותה תוצאה. מהו המספר הזה?" + ans("תשובה: %s" % BLANK)),
@@ -336,7 +336,7 @@ assert math.dist(A_, D_) == 80 and math.dist(D_, B_) == 120 and D_[1] == E_[1] a
 # the lower part is hatched with real vector lines, the small triangle stays solid
 trap = " ".join("%d,%d" % q for q in (D_, E_, C_, B_))
 b = '<defs><clipPath id="trapQ10"><polygon points="%s"/></clipPath></defs>' % trap
-b += '<g clip-path="url(#trapQ10)">' + "".join(line(c, 96, c + 112, 208, G3, 1.2) for c in range(-60, 380, 11)) + "</g>"
+b += '<g clip-path="url(#trapQ10)">' + "".join(line(c, 96, c + 224, 208, G3, 1.2) for c in range(-240, 380, 17)) + "</g>"
 b += poly([A_, D_, E_], PALE2)
 b += poly([A_, B_, C_], "none", NAVY, 2.2) + line(D_[0], D_[1], E_[0], E_[1], G3, 2.4)
 b += head(198, 104, 0, G3, 9) + head(216, 200, 0, NAVY, 9)
@@ -429,7 +429,7 @@ for sgn in (-1, 1):
     b += line(mx - nx, my - ny, mx + nx, my + ny, INK, 1.8)
 b += t(Ax, Ay - 9, "A", 16, ltr=True, w=700) + t(Ax + half + 13, Dy + 5, "B", 16, ltr=True, w=700)
 b += t(Ax - half - 13, Dy + 5, "C", 16, ltr=True, w=700) + t(Ax, Dy + 19, "D", 16, ltr=True, w=700)
-b += t(Ax, Dy + 42, "4 מטרים", 14, w=600) + t(Ax + 42, (Ay + Dy) / 2 + 22, "1.5 מטרים", 13, w=600)
+b += t(Ax, Dy + 42, "4 מטרים", 14, w=600) + t(Ax + 38, Dy - 14, "1.5 מטרים", 13, w=600)
 b += line(Ax - half, Dy + 29, Ax - 36, Dy + 29, MUTE, 1) + line(Ax + 36, Dy + 29, Ax + half, Dy + 29, MUTE, 1)
 b += line(Ax - half, Dy + 24, Ax - half, Dy + 34, MUTE, 1) + line(Ax + half, Dy + 24, Ax + half, Dy + 34, MUTE, 1)
 b += t(Ax, Dy + 66, "חזית האוהל", 14, c=MUTE)
@@ -490,7 +490,7 @@ Q.append("""<p>בפיצרייה אפשר להזמין פיצה גדולה אחת
 # ---------- Q17 ----------
 p = Plane(12, 22, 38, 13, xlab=1, ylab=2, xgrid=1, ygrid=2, mr=44, mt=56, mb=62)
 b = p.b + p.path([(0, 20), (10, 0)])
-b += t(p.sx(4.5), p.sy(15) + 5, "נר א", 14, w=700, c=BLUE)
+b += t(p.sx(4.5), p.sy(15) + 5, "נר א׳", 14, w=700, c=BLUE)
 b += t(p.sx(0) - 34, p.sy(22) - 36, "גובה הנר (בס״מ)", 13, "end", w=600)
 b += t(p.sx(6), p.sy(0) + 46, "זמן (בשעות)", 13, w=600)
 
@@ -505,17 +505,17 @@ def candle(cx, base, hcm, lab):
     return out
 
 
-bc = candle(170, 136, 20, "נר א: 20 ס״מ") + candle(60, 136, 12, "נר ב: 12 ס״מ")
+bc = candle(170, 136, 20, "נר א׳: 20 ס״מ") + candle(60, 136, 12, "נר ב׳: 12 ס״מ")
 Q.append("""<div style="display:flex;gap:14px;align-items:flex-start"><div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:7px">
 <p>שני נרות נדלקו באותו רגע, וכל אחד מהם נשרף בקצב קבוע.</p>
-<p>נר א: הגובה ההתחלתי שלו 20 ס״מ, והוא מתקצר ב־2 ס״מ בכל שעה.</p>
-<p>נר ב: הגובה ההתחלתי שלו 12 ס״מ, והוא מתקצר ב־1 ס״מ בכל שעה.</p></div><div style="flex:0 0 176px">%s</div></div>
-<p>במערכת הצירים שלפניכם מסורטט הגרף של נר א.</p>%s%s%s%s%s""" % (
+<p>נר א׳: הגובה ההתחלתי שלו 20 ס״מ, והוא מתקצר ב־2 ס״מ בכל שעה.</p>
+<p>נר ב׳: הגובה ההתחלתי שלו 12 ס״מ, והוא מתקצר ב־1 ס״מ בכל שעה.</p></div><div style="flex:0 0 176px">%s</div></div>
+<p>במערכת הצירים שלפניכם מסורטט הגרף של נר א׳.</p>%s%s%s%s%s""" % (
     svg(240, 162, bc, "שני נרות בגבהים 20 ו-12 סנטימטרים"),
-    svg(int(p.W), int(p.H), b, "מערכת צירים ובה גרף גובה נר א"),
-    part("א", "איזו מהמשוואות הבאות מתארת את הגרף של נר א? (%s — הזמן בשעות, %s — הגובה בס״מ)" % (m("x"), m("y")) +
+    svg(int(p.W), int(p.H), b, "מערכת צירים ובה גרף גובה נר א׳"),
+    part("א", "איזו מהמשוואות הבאות מתארת את הגרף של נר א׳? (%s — הזמן בשעות, %s — הגובה בס״מ)" % (m("x"), m("y")) +
          opts([m("y = 2x + 20"), m("y = 20 − 2x"), m("y = 20x − 2"), m("y = 2x − 20")], 2)),
-    part("ב", "סרטטו באותה מערכת צירים את הגרף של נר ב."),
+    part("ב", "סרטטו באותה מערכת צירים את הגרף של נר ב׳."),
     part("ג", "כעבור כמה שעות יהיו שני הנרות באותו הגובה? מהו הגובה הזה? הציגו את דרך הפתרון." + work(98) +
          ans("כעבור %s שעות, בגובה %s ס״מ" % (BL_S, BL_S))),
     part("ד", "הנרות נדלקו בשעה 18:00. באיזו שעה כבה הנר הראשון, ואיזה מהנרות זה היה?" +
@@ -532,6 +532,102 @@ for i, html_ in enumerate(Q):
     Q[i] = segs[0] + "".join(OPEN + HEB[j] + x[1:] for j, x in enumerate(kept))
 ITEMS = sum(max(1, x.count(OPEN)) for x in Q)
 assert ITEMS == 37, ITEMS
+
+# ---------- answer key: last pages of the booklet ----------
+# Every value in the key is computed here, so the build fails if one is wrong.
+assert (11 + 7) / (5 - 2) == 6                                       # Q1
+assert math.hypot(3 - 1, 5 - 2) == math.hypot(3 - 5, 5 - 2)          # Q2
+assert math.hypot(1 - 1, 6 - 2) == math.hypot(5 - 1, 2 - 2) == 4     # Q2
+assert 150 * 1.2 == 180 and round(180 * 0.8, 6) == 144               # Q3
+assert [5 * n + 1 for n in (3, 4, 10)] == [16, 21, 51] and (100 - 1) % 5 != 0  # Q4
+assert 35 + 50 == 85                                                 # Q5
+_goals = sorted(k for k, v in games.items() for _ in range(v))
+assert len(_goals) == 20 and sum(_goals) == 30 and (30 + 12) / 21 == 2  # Q6
+assert statistics.median(_goals) == 1 and all(statistics.median(_goals + [g]) == 1 for g in range(40))  # Q6
+assert statistics.multimode(_goals) == [1] and statistics.multimode(_goals + [2, 2, 2]) == [2]  # Q6
+assert math.sqrt(5 * 5 - 9) == 4 and math.sqrt(3 * 3 - 9) == 0 and 2 * 2 - 9 == -5  # Q7
+assert (40 - 20) / 2 == 10 and (20 - 0) / 4 == 5                     # Q8
+assert 3 * 1.5 - 2 == -1.5 + 4 == 2.5                                # Q9
+assert 6 * (4 + 6) / 4 == 15 and 25 < 30 < 36                        # Q10, Q11
+assert all((3 - 2 * x > -5) == (x < 4) for x in (-3, 0, 3.9, 4, 4.1, 9))  # Q12
+assert 400 * .25 == 100 and 900 * .15 == 135 and 400 * .3 + 900 * .45 == 525 and round(525 / 1300 * 100) == 40  # Q13
+assert math.hypot(2, 1.5) == 2.5 and 2 * 2.5 * 3 + 2 * (4 * 1.5 / 2) == 21  # Q14
+for _x in (1, 2, 4, 7.5):
+    assert (_x + 5) * (_x + 3) == _x * _x + 8 * _x + 15 and (_x + 4) ** 2 - (_x + 5) * (_x + 3) == 1  # Q15
+assert round(3.14 * 15 ** 2, 1) == 706.5 and round(2 * 3.14 * 10 ** 2) == 628  # Q16
+assert round(50 / 628, 3) == .08 and round(60 / 706.5, 3) == .085    # Q16
+assert 20 - 2 * 8 == 12 - 8 == 4                                     # Q17
+
+# question: topic, then (part, answer, how to check)
+KEY = [
+    ("משוואה ממעלה ראשונה", [("", m("y = 6"), "%s, ולכן %s." % (m("5y − 2y = 11 + 7"), m("3y = 18")))]),
+    ("משולש שווה־שוקיים, מערכת צירים", [
+        ("א", "למשל %s" % m("P(3,5)"), "מתקבלת כל נקודה על הישר %s פרט ל־%s, וכל נקודה שמרחקה 4 מ־M או מ־A ואינה על הישר MA, כמו %s או %s." % (m("x = 3"), m("(3,2)"), m("(1,6)"), m("(5,6)"))),
+        ("ב", "כן", "יש כמה נקודות כאלה, למשל %s ו־%s." % (m("(3,5)"), m("(3,1)")))]),
+    ("אחוזים, ביקורת טענה", [
+        ("א", "180 שקלים", m("150 · 1.2 = 180")),
+        ("ב", "לא", "%s: ההוזלה מחושבת מהמחיר החדש, ולכן המחיר אינו חוזר ל־150." % m("180 · 0.8 = 144"))]),
+    ("הכללה של תופעה מספרית", [
+        ("א", "16, 21, 51", "בכל צורה נוספים 5 מוטות."),
+        ("ב", m("5n + 1"), "בצורה 1 יש 6 מוטות, ובכל צורה נוספים 5."),
+        ("ג", "לא", "%s נותן %s, ומספר הצורה חייב להיות שלם." % (m("5n + 1 = 100"), m("n = 19.8")))]),
+    ("ישרים מקבילים, זוויות מתחלפות", [("", m("∡BED = 85°"), "מעבירים דרך E ישר מקביל לשני הישרים, ולפי זוויות מתחלפות %s." % m("35° + 50° = 85°"))]),
+    ("דיאגרמה, ממוצע, שכיח, חציון", [
+        ("א", "1.5 שערים", "30 שערים ב־20 משחקים."),
+        ("ב", "היגד 1: נכון<br>היגד 2: לא נכון<br>היגד 3: אי אפשר לדעת", "1: בכל תוצאה של המשחק הנוסף החציון נשאר 1. 2: אחרי שלושה משחקים של 2 שערים השכיח הוא 2. 3: לא נתון כמה שערים הבקיעה הקבוצה היריבה."),
+        ("ג", "12 שערים", m("(30 + x) / 21 = 2"))]),
+    ("חזקות, שורש, מספרים שליליים", [
+        ("א", "4", "%s, ו־%s." % (m("25 − 9 = 16"), m("√16 = 4"))),
+        ("ב", "%s ו־%s" % (m("−3"), m("3")), "%s, ולכן התוצאה 0." % m("(±3)² − 9 = 0")),
+        ("ג", "אין שורש למספר שלילי", "%s, ולמספר שלילי אין שורש ריבועי." % m("4 − 9 = −5"))]),
+    ("מבוא לפונקציות, קריאת גרף", [
+        ("א", "10 שניות", "6 שניות בגובה 40 מטרים, ו־4 שניות בגובה 20 מטרים."),
+        ("ב", "3 ו־11 שניות", "קוראים מהגרף את הזמנים שבהם הגובה 30 מטרים."),
+        ("ג", "בין השנייה ה־10 לשנייה ה־12", "10 מטרים בשנייה, לעומת 5 מטרים בשנייה.")]),
+    ("משוואת ישר, מערכת משוואות", [
+        ("א", "ג: %s" % m("y = −x + 4"), "קוראים מהגרף את שיפוע הישר ואת נקודת החיתוך עם ציר y."),
+        ("ב", m("P(1.5,2.5)"), "פותרים %s." % m("3x − 2 = −x + 4"))]),
+    ("דמיון משולשים", [
+        ("א", "דומים לפי ז.ז.", "%s, ולכן זוויות מתאימות שוות. הזווית A משותפת." % m("DE ∥ BC")),
+        ("ב", "15 ס״מ", "%s, ולכן %s." % (m("AB = 4 + 6 = 10"), m("DE / BC = 4 / 10")))]),
+    ("שורש ריבועי, ישר המספרים", [("", "ג: C", "%s ו־%s, ולכן המספר בין 5 ל־6." % (m("5² = 25"), m("6² = 36")))]),
+    ("אי־שוויון קווי", [("", "ג: %s" % m("x &lt; 4"), "%s, וכשמחלקים במספר שלילי כיוון אי־השוויון מתהפך. מעגל ריק ב־4 וחץ שמאלה." % m("−2x &gt; −8"))]),
+    ("שכיחות יחסית, אחוזים, ביקורת טענה", [
+        ("א", "לא", "באורן %s תלמידים, ובברוש %s תלמידים." % (m("400 · 0.25 = 100"), m("900 · 0.15 = 135"))),
+        ("ב", "ג: בערך 40%", "%s, ו־%s." % (m("120 + 405 = 525"), m("525 / 1300 ≈ 0.40")))]),
+    ("חפיפה, משפט פיתגורס, שטחים", [
+        ("א", "הוכחה", "למשל צ.צ.ז: AD צלע משותפת, %s, %s. מתקבלת כל הוכחה תקפה." % (m("AB = AC"), m("∡ADB = ∡ADC = 90°"))),
+        ("ב", "2.5 מטרים", "%s (מהחפיפה), ולפי פיתגורס %s." % (m("BD = 2"), m("AB² = 2² + 1.5²"))),
+        ("ג", "21 מ״ר", "צידי הגג %s, החזית והגב %s." % (m("2 · 2.5 · 3 = 15"), m("2 · (4 · 1.5 / 2) = 6")))]),
+    ("חוק הפילוג המורחב", [
+        ("א", "%s ו־%s" % (m("3x"), m("15")), "%s מתחת ל־%s, ו־%s מתחת ל־%s." % (m("3x"), m("x²"), m("15"), m("5x"))),
+        ("ב", "ג: %s" % m("x² + 8x + 15"), m("(x + 5)(x + 3)")),
+        ("ג", "כן", "%s, וההפרש תמיד 1." % m("(x + 4)² = x² + 8x + 16"))]),
+    ("שטח עיגול, חשיבה ביקורתית", [
+        ("א", "לא", "הגדולה 706.5 סמ״ר, ושתי הקטנות יחד 628 סמ״ר (עם %s)." % m("π = 3.14")),
+        ("ב", "שתי פיצות קטנות", "בערך 0.080 ש״ח לסמ״ר, לעומת בערך 0.085 ש״ח לסמ״ר.")]),
+    ("פונקציה קווית, סרטוט גרף", [
+        ("א", "ב: %s" % m("y = 20 − 2x"), "גובה התחלתי 20, ובכל שעה מתקצר ב־2."),
+        ("ב", "ישר מ־%s ל־%s" % (m("(0,12)"), m("(12,0)")), "נר ב׳ מתקצר ב־1 ס״מ בכל שעה."),
+        ("ג", "8 שעות, 4 ס״מ", "פותרים %s." % m("20 − 2x = 12 − x"))]),
+]
+assert len(KEY) == len(Q) and sum(len(r) for _, r in KEY) == ITEMS
+
+
+def key_group(n):
+    topic, rows = KEY[n]
+    out = ""
+    for i, (pl, ans_, how) in enumerate(rows):
+        lead = ('<td class="kq" rowspan="%d"><span class="num">%d</span></td><td class="kt" rowspan="%d">%s</td>' % (len(rows), n + 1, len(rows), topic)) if i == 0 else ""
+        out += '<tr>%s<td class="kp">%s</td><td class="ka">%s</td><td>%s</td></tr>' % (lead, pl or "—", ans_, how)
+    return "<tbody>%s</tbody>" % out
+
+
+def key_sheet(groups, first=True):
+    head = '<h1 class="kh">מחוון תשובות%s</h1>%s' % ("" if first else " — המשך", '<p class="ks">מבחן במתמטיקה לכיתה ט׳ לקראת תנופה · למורה</p>' if first else "")
+    return head + ('<table class="key"><thead><tr><th class="kq">שאלה</th><th class="kt">נושא</th><th class="kp">סעיף</th><th class="ka">תשובה</th>'
+                   '<th>דרך הפתרון</th></tr></thead>%s</table>' % "".join(key_group(g) for g in groups))
+
 
 # ---------- print layout ----------
 CSS = """
@@ -561,6 +657,19 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .fimg{flex:1 1 auto;min-height:0;position:relative}
 .fimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:53% 100%;display:block}
 .fimg::after{content:"";position:absolute;inset:0 0 auto 0;height:150px;background:linear-gradient(to bottom,#0a2550,rgba(10,37,80,0))}
+.kh{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#15386e;font-size:25px;line-height:1.2;margin:0}
+.ks{color:var(--mute);font-size:14px;margin:3px 0 0}
+.key{border-collapse:collapse;width:100%;margin-top:12px;font-size:12.6px;line-height:1.38}
+.key th{background:var(--g3);color:#fff;font-weight:600;padding:5px 7px;text-align:right;border:1px solid var(--g3)}
+.key td{border:1px solid var(--line);padding:4px 7px;vertical-align:middle}
+.key tbody{break-inside:avoid;border-top:1.6px solid #6d7a84}
+.key tbody:nth-of-type(even) td{background:#f3f8f5}
+.key .kq{width:42px;text-align:center;padding-inline:3px}
+.key .num{display:inline-flex;width:25px;height:25px;font-size:13px}
+.key .kt{width:92px;color:var(--mute);font-size:11.6px}
+.key th.kt{color:#fff;font-size:12.6px}
+.key .kp{width:36px;text-align:center;font-weight:800}
+.key .ka{width:136px;font-weight:700}
 .q{padding-block:14px 16px;border-top:1.5px solid var(--line)}
 .q:first-child{border-top:0;padding-top:0}
 .qh{display:flex;gap:12px;align-items:flex-start}
@@ -575,7 +684,7 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .pb{flex:1 1 auto;min-width:0}
 .pb>p,.pb>.opts,.pb>.work,.pb>.ans,.pb>.fig,.pb>.tw{margin-top:7px;margin-bottom:0}
 .math{font-family:Arial,"Heebo",sans-serif;white-space:nowrap;unicode-bidi:isolate}
-.rad{display:inline-flex;direction:ltr;unicode-bidi:isolate;align-items:stretch;vertical-align:-.3em;margin-inline:3px;font-family:Arial,"Heebo",sans-serif;font-size:1.08em;line-height:1.3}
+.rad{display:inline-flex;direction:ltr;unicode-bidi:isolate;align-items:stretch;vertical-align:-.3em;margin-inline:0 3px;font-family:Arial,"Heebo",sans-serif;font-size:1.08em;line-height:1.3}
 .rad svg{display:block;width:.68em;height:auto;flex:0 0 auto}
 .rad .rc{border-top:1.5px solid #16202c;padding:.02em .14em 0 .08em}
 .opts{display:grid;gap:7px 22px;margin-block:3px}
@@ -724,13 +833,29 @@ with sync_playwright() as p:
         sheets.append(cur)
         print("sheets:", [[i + 1 for i in s] for s in sheets])
 
-        # 3. final document: instructions, question sheets, two draft sheets, closing page
+        # 3. the key: a question's rows never split across sheets
+        write(HEAD + sheet(key_sheet(range(len(KEY)))).replace('class="page"', 'class="page" style="height:auto;overflow:visible"') + "</body></html>")
+        pg.goto(uri, wait_until="networkidle")
+        pg.evaluate("document.fonts.ready.then(()=>1)")
+        kh = pg.evaluate("[...document.querySelectorAll('.key tbody')].map(e => e.getBoundingClientRect().height)")
+        ktop = pg.evaluate("document.querySelector('.key tbody').getBoundingClientRect().top - document.querySelector('.content').getBoundingClientRect().top")
+        key_pages, cur, used = [], [], ktop
+        for i, h in enumerate(kh):
+            if cur and used + h > avail - 6:
+                key_pages.append(cur); cur, used = [], ktop - 34
+            cur.append(i); used += h
+        key_pages.append(cur)
+        print("key sheets:", [[i + 1 for i in s_] for s_ in key_pages])
+
+        # 4. final document: instructions, question sheets, two draft sheets, closing page, key
         body = sheet(INTRO)
         for s in sheets:
             body += sheet("".join(q(i + 1, Q[i]) for i in s))
         for n in (1, 2):
             body += sheet('<div class="fill"></div><h2 class="draft">דף טיוטה %d — לא ייבדק</h2>' % n)
         body += sheet(FINALE).replace('class="foot"', 'class="foot fin"')
+        for i, groups in enumerate(key_pages):
+            body += sheet(key_sheet(groups, i == 0))
         write(HEAD + body + "</body></html>")
         pg.goto(uri, wait_until="networkidle")
         pg.evaluate("document.fonts.ready.then(()=>1)")
@@ -742,7 +867,7 @@ with sync_playwright() as p:
         assert not errs, errs
         raw = PDF + ".raw"
         pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        expected = len(sheets) + 4
+        expected = len(sheets) + 4 + len(key_pages)
     finally:
         br.close()
         if os.path.exists(TMP):
