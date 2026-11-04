@@ -900,6 +900,12 @@ with sync_playwright() as p:
 
 doc = fitz.open(raw)
 assert doc.page_count == expected, (doc.page_count, expected)
+toc = [[1, "הוראות", 1]]
+for i, s_ in enumerate(sheets):
+    toc += [[1, "שאלה %d" % (q_ + 1), i + 2] for q_ in s_]
+_n = len(sheets) + 2
+toc += [[1, "דף טיוטה 1", _n], [1, "דף טיוטה 2", _n + 1], [1, "עמוד סיום", _n + 2], [1, "מחוון תשובות", _n + 3]]
+doc.set_toc(toc)
 doc.set_metadata({"title": "מבחן במתמטיקה לכיתה ט׳", "author": "יניב רז", "subject": "לקראת תנופה"})
 doc.save(PDF, garbage=4, deflate=True)
 doc.close()

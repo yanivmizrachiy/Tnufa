@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "לקראת תנופה: מבחן במתמטיקה לכיתה ט׳",
+  "short_name": "לקראת תנופה",
+  "description": "חוברת מבחן לקראת תנופה במתמטיקה לכיתה ט׳: צפייה בעמודים והורדת PDF, גם בלי אינטרנט.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1729",
+  "theme_color": "#161f31",
+  "categories": ["education"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
