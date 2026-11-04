@@ -554,8 +554,9 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .work svg,.fill svg{position:absolute;inset:0;display:block}
 .fill{flex:1 1 auto;min-height:0;margin-top:6px;margin-bottom:10px}
 .ans{font-weight:500}
-.blank{display:inline-block;min-width:104px;border-bottom:1.4px solid var(--ink);height:1.1em;vertical-align:baseline}
-.blank.s{min-width:56px}
+.blank{display:inline-block;position:relative;width:97px;height:25px;margin-inline:3px;vertical-align:middle}
+.blank svg{position:absolute;inset:0;display:block}
+.blank.s{width:61px}
 .tw{overflow:hidden}
 .t{border-collapse:collapse;width:100%;font-size:14px;text-align:center}
 .t th{background:var(--g3);color:#fff;font-weight:600;padding:6px 10px;border:1px solid var(--g3);white-space:nowrap}
@@ -569,21 +570,34 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 """
 
 GRID_JS = """
-document.querySelectorAll('.work,.fill').forEach(el => {
+/* Notebook windows: even squares, soft frame, a pencil tab, and a small green cross every five squares. */
+const S = 18, IN = 3;
+const pencil = (cx, cy) => `<g transform="translate(${cx} ${cy}) rotate(135)"><rect x="-8.2" y="-2.3" width="3" height="4.6" rx="0.8" fill="#cfe4da"/><rect x="-4.6" y="-2.3" width="8.6" height="4.6" fill="#fff"/><polygon points="4.4,-2.3 8.4,0 4.4,2.3" fill="#fff"/></g>`;
+document.querySelectorAll('.work,.fill').forEach((el, n) => {
   const w = Math.floor(el.clientWidth), h = Math.floor(el.clientHeight);
-  const s = 16, cols = Math.floor((w - 1) / s), rows = Math.floor((h - 1) / s);
-  const W = cols * s, H = rows * s, x0 = Math.floor((w - W - 1) / 2) + 0.5;
+  const cols = Math.floor((w - 2 * IN) / S), rows = Math.floor((h - 2 * IN) / S);
+  const W = cols * S, H = rows * S, x0 = Math.floor((w - W) / 2), y0 = IN, xr = x0 + W, R = 11, id = 'win' + n;
   let g = '';
-  for (let i = 0; i <= cols; i++) {
-    const m = i % 5 === 0, x = x0 + i * s;
-    g += `<line x1="${x}" y1="0.5" x2="${x}" y2="${H + 0.5}" stroke="${m ? '#a9bfdc' : '#d3dfee'}" stroke-width="${m ? 0.7 : 0.45}"/>`;
+  for (let i = 1; i < cols; i++) g += `<line x1="${x0 + i * S}" y1="${y0}" x2="${x0 + i * S}" y2="${y0 + H}"/>`;
+  for (let j = 1; j < rows; j++) g += `<line x1="${x0}" y1="${y0 + j * S}" x2="${xr}" y2="${y0 + j * S}"/>`;
+  let c = '';
+  for (let i = 5; i < cols; i += 5) for (let j = 5; j < rows; j += 5) {
+    const x = xr - i * S, y = y0 + j * S;
+    c += `<path d="M${x - 3.5} ${y}H${x + 3.5}M${x} ${y - 3.5}V${y + 3.5}"/>`;
   }
-  for (let j = 0; j <= rows; j++) {
-    const m = j % 5 === 0, y = j * s + 0.5;
-    g += `<line x1="${x0}" y1="${y}" x2="${x0 + W}" y2="${y}" stroke="${m ? '#a9bfdc' : '#d3dfee'}" stroke-width="${m ? 0.7 : 0.45}"/>`;
-  }
-  g += `<rect x="${x0}" y="0.5" width="${W}" height="${H}" fill="none" stroke="#a9bfdc" stroke-width="0.7"/>`;
-  el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${g}</svg>`);
+  const tab = `<path d="M${xr - 38} ${y0}H${xr - R}A${R} ${R} 0 0 1 ${xr} ${y0 + R}V${y0 + 27}H${xr - 30}A8 8 0 0 1 ${xr - 38} ${y0 + 19}Z" fill="#276149"/>` + pencil(xr - 19, y0 + 13.5);
+  el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="${id}"><rect x="${x0}" y="${y0}" width="${W}" height="${H}" rx="${R}"/></clipPath></defs>
+    <rect x="${x0}" y="${y0}" width="${W}" height="${H}" rx="${R}" fill="#f8fbfa" stroke="#cfe4da" stroke-width="5"/>
+    <g clip-path="url(#${id})"><g stroke="#bcd2e4" stroke-width="0.65">${g}</g><g stroke="#5ca585" stroke-width="1" fill="none">${c}</g>${tab}</g>
+    <rect x="${x0}" y="${y0}" width="${W}" height="${H}" rx="${R}" fill="none" stroke="#276149" stroke-width="1.3"/></svg>`);
+});
+document.querySelectorAll('.blank').forEach(el => {
+  const W = el.clientWidth - 1, H = el.clientHeight - 1, s = 12;
+  let g = '';
+  for (let x = s; x < W; x += s) g += `<line x1="${x + 0.5}" y1="0.5" x2="${x + 0.5}" y2="${H + 0.5}"/>`;
+  for (let y = s; y < H; y += s) g += `<line x1="0.5" y1="${y + 0.5}" x2="${W + 0.5}" y2="${y + 0.5}"/>`;
+  el.innerHTML = `<svg width="${W + 1}" height="${H + 1}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="${W}" height="${H}" rx="4" fill="#f8fbfa"/><g stroke="#bcd2e4" stroke-width="0.6">${g}</g><rect x="0.5" y="0.5" width="${W}" height="${H}" rx="4" fill="none" stroke="#276149" stroke-width="1.1"/></svg>`;
 });
 """
 
@@ -625,16 +639,16 @@ FIT_JS = """
 document.querySelectorAll('.page').forEach(pg => {
   const c = pg.querySelector('.content'), boxes = [...c.querySelectorAll('.work')];
   if (!boxes.length) return;
-  const S = 16, CAP = 20;
-  const hs = boxes.map(b => Math.floor((b.offsetHeight - 1) / S));
-  boxes.forEach((b, i) => { b.style.height = hs[i] * S + 1 + 'px'; });
+  const S = 18, CAP = 18;
+  const hs = boxes.map(b => Math.floor((b.offsetHeight - 6) / S));
+  boxes.forEach((b, i) => { b.style.height = hs[i] * S + 6 + 'px'; });
   let spare = c.getBoundingClientRect().bottom - c.lastElementChild.getBoundingClientRect().bottom;
   while (spare >= S) {
     const low = Math.min(...hs);
     if (low >= CAP) break;
     const i = hs.indexOf(low);
     hs[i]++; spare -= S;
-    boxes[i].style.height = hs[i] * S + 1 + 'px';
+    boxes[i].style.height = hs[i] * S + 6 + 'px';
   }
 });
 """
