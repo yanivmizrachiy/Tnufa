@@ -119,6 +119,13 @@ def m(s):
     return '<bdi class="math" dir="ltr">%s</bdi>' % s
 
 
+def root(n):
+    """Square root drawn as a sign joined to the bar over the number."""
+    return ('<span class="rad" role="img" aria-label="שורש של %s"><svg viewBox="0 0 13 24" preserveAspectRatio="none" aria-hidden="true">'
+            '<path d="M0.6 14.2 L3.4 12.6 L7 22.6 L12.2 0.75 H13" fill="none" stroke="#16202c" stroke-width="1.5" stroke-linejoin="miter"/></svg>'
+            '<span class="rc">%s</span></span>' % (n, n))
+
+
 def part(letter, html):
     return '<div class="part"><b class="pl">%s.</b><div class="pb">%s</div></div>' % (letter, html)
 
@@ -129,6 +136,13 @@ def opts(items, cols=1):
     for i, it in enumerate(items):
         out += '<div class="opt"><span class="let">%s</span><span class="box"></span><span>%s</span></div>' % (letters[i], it)
     return '<div class="opts c%d">%s</div>' % (cols, out)
+
+
+def statements(items):
+    cell = '<td class="m"><span class="box"></span></td>'
+    rows = "".join('<tr><td class="s">%s</td>%s</tr>' % (it, cell * 3) for it in items)
+    return ('<div class="tw"><table class="t st"><thead><tr><th class="s">היגד</th><th>נכון</th><th>לא נכון</th>'
+            '<th>אי אפשר לדעת</th></tr></thead><tbody>%s</tbody></table></div>' % rows)
 
 
 def yesno():
@@ -256,7 +270,11 @@ Q.append("""<p>קבוצת הכדורגל של בית הספר שיחקה בלי�
     svg(490, 280, b, "דיאגרמת נקודות של מספר השערים במשחק"),
     part("א", "כמה משחקים שיחקה הקבוצה בסך הכול?" + ans("תשובה: %s משחקים" % BLANK)),
     part("ב", "מהו המספר הממוצע של שערים למשחק? הציגו את דרך הפתרון." + work(70) + ans("תשובה: %s שערים" % BLANK)),
-    part("ג", "השלימו את החסר במשפט: &nbsp; השכיח של מספר השערים הוא %s, והחציון הוא %s." % (BL_S, BL_S)),
+    part("ג", "לפניכם שלושה היגדים על הקבוצה. לכל היגד, סמנו X בעמודה המתאימה." + statements([
+        "אם הקבוצה תשחק עוד משחק אחד, החציון של מספר השערים בהכרח לא ישתנה.",
+        "אם הקבוצה תשחק עוד שלושה משחקים, לא ייתכן שהשכיח של מספר השערים ישתנה.",
+        "במשחק שבו הבקיעה הקבוצה 4 שערים, היא ניצחה.",
+    ])),
     part("ד", "כמה שערים צריכה הקבוצה להבקיע במשחק הבא, כדי שהממוצע של כל המשחקים יהיה בדיוק 2&nbsp;שערים למשחק? הציגו את דרך הפתרון." + work(84) + ans("תשובה: %s שערים" % BLANK))))
 
 # ---------- Q7 ----------
@@ -315,7 +333,11 @@ Q.append("""<p>במערכת הצירים שלפניכם מסורטטים היש�
 # ---------- Q10 ----------
 A_, B_, C_, D_, E_ = (180, 40), (60, 200), (360, 200), (132, 104), (252, 104)
 assert math.dist(A_, D_) == 80 and math.dist(D_, B_) == 120 and D_[1] == E_[1] and E_[0] - D_[0] == 120
-b = poly([D_, E_, C_, B_], PALE2) + poly([A_, D_, E_], PALE)
+# the lower part is hatched with real vector lines, the small triangle stays solid
+trap = " ".join("%d,%d" % q for q in (D_, E_, C_, B_))
+b = '<defs><clipPath id="trapQ10"><polygon points="%s"/></clipPath></defs>' % trap
+b += '<g clip-path="url(#trapQ10)">' + "".join(line(c, 96, c + 112, 208, G3, 1.2) for c in range(-60, 380, 11)) + "</g>"
+b += poly([A_, D_, E_], PALE2)
 b += poly([A_, B_, C_], "none", NAVY, 2.2) + line(D_[0], D_[1], E_[0], E_[1], G3, 2.4)
 b += head(198, 104, 0, G3, 9) + head(216, 200, 0, NAVY, 9)
 for lab, pt, dx, dy in (("A", A_, 0, -10), ("B", B_, -14, 8), ("C", C_, 14, 8), ("D", D_, -14, 2), ("E", E_, 14, 2)):
@@ -338,27 +360,30 @@ for lab, v in (("A", 3.5), ("B", 4.5), ("C", 5.5), ("D", 6.5)):
     x = 40 + v * 70
     b += circ(x, 62, 5.5, BLUE, "#fff", 1.4) + t(x, 42, lab, 16, ltr=True, w=700, c=BLUE)
 Q.append("""<p>על ישר המספרים שלפניכם מסומנות ארבע נקודות.</p>%s<p>איזו מהנקודות יכולה לייצג את המספר %s?</p>%s""" % (
-    svg(640, 100, b, "ישר מספרים מ-0 עד 8 ועליו ארבע נקודות"), m("√30"),
+    svg(640, 100, b, "ישר מספרים מ-0 עד 8 ועליו ארבע נקודות"), root("30"),
     opts([m("A"), m("B"), m("C"), m("D")], 2)))
 
 # ---------- Q12 ----------
 def numline(at, right):
-    u = 15
-    cx = 120
-    b = line(14, 24, 226, 24, INK, 1.4) + head(14, 24, 180, INK, 7) + head(226, 24, 0, INK, 7)
-    for i in range(-6, 7):
-        b += line(cx + i * u, 20, cx + i * u, 28, INK, 1)
+    """Plain axis without arrow heads, so the only arrow in the drawing is the solution ray."""
+    u, cx, y = 26, 240, 26
+    x0, x1 = cx - 8 * u, cx + 8 * u
+    b = line(x0, y, x1, y, INK, 1.4)
+    for i in range(-8, 9):
+        b += line(cx + i * u, y - 6, cx + i * u, y + 6, INK, 1.2)
     for v in sorted({0, at}):
-        b += t(cx + v * u, 45, str(v).replace("-", "−"), 13, ltr=True, w=600)
+        b += t(cx + v * u, y + 30, str(v).replace("-", "−"), 16, ltr=True, w=700)
     x = cx + at * u
-    end = 222 if right else 18
-    b += line(x, 24, end, 24, G3, 4)
-    b += circ(x, 24, 5, "#fff", G3, 2.4)
-    return '<svg class="nl" viewBox="0 0 240 52" role="img" aria-label="ישר מספרים">%s</svg>' % b
+    tip, sign = (x1 + 22, 1) if right else (x0 - 22, -1)
+    base = tip - sign * 20
+    b += line(x, y, base, y, G3, 6)
+    b += '<polygon points="%d,%d %d,%d %d,%d" fill="%s"/>' % (tip, y, base, y - 11, base, y + 11, G3)
+    b += circ(x, y, 7.5, "#fff", G3, 3)
+    return '<svg class="nl" viewBox="0 0 480 66" role="img" aria-label="ישר מספרים">%s</svg>' % b
 
 
 Q.append("""<p>נתון אי־השוויון: &nbsp; %s</p><p>איזה מהסרטוטים שלפניכם מציג את כל הפתרונות של אי־השוויון?</p>%s<p>הציגו את דרך הפתרון.</p>%s""" % (
-    m("3 − 2x &gt; −5"), opts([numline(4, True), numline(-4, False), numline(4, False), numline(-4, True)], 2), work(97)))
+    m("3 − 2x &gt; −5"), opts([numline(4, True), numline(-4, False), numline(4, False), numline(-4, True)], 1), work(97)))
 
 # ---------- Q13 ----------
 cats = [("ברגל", "walk"), ("באוטובוס", "bus"), ("באופניים", "bike"), ("ברכב פרטי", "car")]
@@ -521,12 +546,18 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .page:last-child{break-after:auto}
 .content{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 .foot{position:absolute;inset-inline:0;bottom:0;height:var(--foot);background:#fff}
-.foot .rule{position:absolute;top:0;inset-inline:0;height:2.5px;background:var(--navy)}
-.foot .row{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;padding-top:3px}
-.foot img{width:40px;height:40px;border-radius:50%}
+.foot .rule{position:absolute;top:0;inset-inline:0;height:4px;background:#0a2550}
+.foot .row{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;padding-top:4px}
+.foot img{width:52px;height:52px;border-radius:50%}
 .foot .lines{display:flex;flex-direction:column;text-align:center;line-height:1.3}
 .foot b{font-weight:800;font-size:12.5px;color:#122f4c}
 .foot span{font-size:11px;color:#3a5168}
+.finale{position:absolute;inset:0 0 var(--foot) 0;background:#0a2550;display:flex;flex-direction:column;overflow:hidden}
+.fsky{flex:0 0 auto;padding:52px 20px 10px;text-align:center;color:#fff;font-family:"Rubik","Heebo",sans-serif;font-weight:900;font-size:176px;line-height:1.04}
+.fsky p{margin:0}
+.fimg{flex:1 1 auto;min-height:0;position:relative}
+.fimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:53% 100%;display:block}
+.fimg::after{content:"";position:absolute;inset:0 0 auto 0;height:150px;background:linear-gradient(to bottom,#0a2550,rgba(10,37,80,0))}
 .q{padding-block:14px 16px;border-top:1.5px solid var(--line)}
 .q:first-child{border-top:0;padding-top:0}
 .qh{display:flex;gap:12px;align-items:flex-start}
@@ -541,6 +572,9 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .pb{flex:1 1 auto;min-width:0}
 .pb>p,.pb>.opts,.pb>.work,.pb>.ans,.pb>.fig,.pb>.tw{margin-top:7px;margin-bottom:0}
 .math{font-family:Arial,"Heebo",sans-serif;white-space:nowrap;unicode-bidi:isolate}
+.rad{display:inline-flex;direction:ltr;unicode-bidi:isolate;align-items:stretch;vertical-align:-.3em;margin-inline:3px;font-family:Arial,"Heebo",sans-serif;font-size:1.08em;line-height:1.3}
+.rad svg{display:block;width:.68em;height:auto;flex:0 0 auto}
+.rad .rc{border-top:1.5px solid #16202c;padding:.02em .14em 0 .08em}
 .opts{display:grid;gap:7px 22px;margin-block:3px}
 .opts.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .opts.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -549,10 +583,10 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .let{font-size:11px;color:var(--mute);width:10px;flex:0 0 auto}
 .box{flex:0 0 auto;width:16px;height:16px;border:1.3px solid #6d7a84;border-radius:3px;background:#fff}
 .sys{display:inline-block;font-family:Arial,"Heebo",sans-serif;border-inline-start:2px solid var(--ink);padding-inline-start:8px;line-height:1.4;text-align:left}
-.nl{display:block;width:100%;max-width:240px;height:auto;font-family:"Heebo",Arial,sans-serif}
+.nl{display:block;width:100%;max-width:470px;height:auto;font-family:"Heebo",Arial,sans-serif}
 .work,.fill{position:relative;overflow:hidden}
 .work svg,.fill svg{position:absolute;inset:0;display:block}
-.fill{flex:1 1 auto;min-height:0;margin-top:6px;margin-bottom:10px}
+.fill{position:absolute;inset:0 0 var(--foot) 0}
 .ans{font-weight:500}
 .blank{display:inline-block;position:relative;width:97px;height:25px;margin-inline:3px;vertical-align:middle}
 .blank svg{position:absolute;inset:0;display:block}
@@ -561,43 +595,41 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .t{border-collapse:collapse;width:100%;font-size:14px;text-align:center}
 .t th{background:var(--g3);color:#fff;font-weight:600;padding:6px 10px;border:1px solid var(--g3);white-space:nowrap}
 .t td{border:1px solid #6d7a84;padding:6px 10px;min-width:50px;height:34px;font-variant-numeric:tabular-nums}
+.st td.s,.st th.s{text-align:right;white-space:normal}
+.st td.m{width:62px;min-width:0;padding-inline:4px}
+.st .box{display:inline-block;vertical-align:middle;width:18px;height:18px}
 .intro{color:#2b4080;display:flex;flex-direction:column;flex:1 1 auto}
-.intro .meta{color:#121721;text-align:center;margin:96px 0 40px}
+.intro .meta{align-self:center;display:flex;align-items:center;gap:18px;margin:58px 0 30px;padding:11px 30px;background:#2d4799;color:#fff;border-radius:999px;font-size:15.5px;font-weight:500}
+.intro .meta b{font-weight:800}
+.intro .meta i{width:1.5px;height:20px;background:#fff;opacity:.6}
 .intro h2{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#2d4799;font-size:22.5px;text-align:center;margin:28px 0 12px}
 .intro p.l{margin:0 0 13px}
 .intro .luck{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#2d4799;font-size:24px;text-align:center;margin-top:44px}
-.draft{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#1d4ed8;font-size:18.5px;text-align:center;margin:0}
+h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align:center;font-family:"Rubik","Heebo",sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:#15386e}
 """
 
 GRID_JS = """
-/* Notebook windows: even squares, soft frame, a pencil tab, and a small green cross every five squares. */
-const S = 18, IN = 3;
-const pencil = (cx, cy) => `<g transform="translate(${cx} ${cy}) rotate(135)"><rect x="-8.2" y="-2.3" width="3" height="4.6" rx="0.8" fill="#cfe4da"/><rect x="-4.6" y="-2.3" width="8.6" height="4.6" fill="#fff"/><polygon points="4.4,-2.3 8.4,0 4.4,2.3" fill="#fff"/></g>`;
-document.querySelectorAll('.work,.fill').forEach((el, n) => {
-  const w = Math.floor(el.clientWidth), h = Math.floor(el.clientHeight);
-  const cols = Math.floor((w - 2 * IN) / S), rows = Math.floor((h - 2 * IN) / S);
-  const W = cols * S, H = rows * S, x0 = Math.floor((w - W) / 2), y0 = IN, xr = x0 + W, R = 11, id = 'win' + n;
+/* Writing windows: plain whole squares only. No frame, no icon, no marks. */
+const LINE = 'stroke="#b5cce0" stroke-width="0.7"';
+const squares = (cols, rows, S, x0, y0) => {
   let g = '';
-  for (let i = 1; i < cols; i++) g += `<line x1="${x0 + i * S}" y1="${y0}" x2="${x0 + i * S}" y2="${y0 + H}"/>`;
-  for (let j = 1; j < rows; j++) g += `<line x1="${x0}" y1="${y0 + j * S}" x2="${xr}" y2="${y0 + j * S}"/>`;
-  let c = '';
-  for (let i = 5; i < cols; i += 5) for (let j = 5; j < rows; j += 5) {
-    const x = xr - i * S, y = y0 + j * S;
-    c += `<path d="M${x - 3.5} ${y}H${x + 3.5}M${x} ${y - 3.5}V${y + 3.5}"/>`;
-  }
-  const tab = `<path d="M${xr - 38} ${y0}H${xr - R}A${R} ${R} 0 0 1 ${xr} ${y0 + R}V${y0 + 27}H${xr - 30}A8 8 0 0 1 ${xr - 38} ${y0 + 19}Z" fill="#276149"/>` + pencil(xr - 19, y0 + 13.5);
-  el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-    <defs><clipPath id="${id}"><rect x="${x0}" y="${y0}" width="${W}" height="${H}" rx="${R}"/></clipPath></defs>
-    <rect x="${x0}" y="${y0}" width="${W}" height="${H}" rx="${R}" fill="#f8fbfa" stroke="#cfe4da" stroke-width="5"/>
-    <g clip-path="url(#${id})"><g stroke="#bcd2e4" stroke-width="0.65">${g}</g><g stroke="#5ca585" stroke-width="1" fill="none">${c}</g>${tab}</g>
-    <rect x="${x0}" y="${y0}" width="${W}" height="${H}" rx="${R}" fill="none" stroke="#276149" stroke-width="1.3"/></svg>`);
+  for (let i = 0; i <= cols; i++) g += `<line x1="${x0 + i * S}" y1="${y0}" x2="${x0 + i * S}" y2="${y0 + rows * S}"/>`;
+  for (let j = 0; j <= rows; j++) g += `<line x1="${x0}" y1="${y0 + j * S}" x2="${x0 + cols * S}" y2="${y0 + j * S}"/>`;
+  return `<g ${LINE}>${g}</g>`;
+};
+document.querySelectorAll('.fill').forEach(el => {
+  const S = 18, w = Math.ceil(el.clientWidth), h = Math.ceil(el.clientHeight);
+  el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${squares(Math.ceil(w / S), Math.ceil(h / S), S, 0, 0)}</svg>`);
+});
+document.querySelectorAll('.work').forEach(el => {
+  const S = 18, IN = 3, w = Math.floor(el.clientWidth), h = Math.floor(el.clientHeight);
+  const cols = Math.floor((w - 2 * IN) / S), rows = Math.floor((h - 2 * IN) / S);
+  el.insertAdjacentHTML('afterbegin', `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${squares(cols, rows, S, Math.floor((w - cols * S) / 2), IN)}</svg>`);
 });
 document.querySelectorAll('.blank').forEach(el => {
-  const W = el.clientWidth - 1, H = el.clientHeight - 1, s = 12;
-  let g = '';
-  for (let x = s; x < W; x += s) g += `<line x1="${x + 0.5}" y1="0.5" x2="${x + 0.5}" y2="${H + 0.5}"/>`;
-  for (let y = s; y < H; y += s) g += `<line x1="0.5" y1="${y + 0.5}" x2="${W + 0.5}" y2="${y + 0.5}"/>`;
-  el.innerHTML = `<svg width="${W + 1}" height="${H + 1}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="${W}" height="${H}" rx="4" fill="#f8fbfa"/><g stroke="#bcd2e4" stroke-width="0.6">${g}</g><rect x="0.5" y="0.5" width="${W}" height="${H}" rx="4" fill="none" stroke="#276149" stroke-width="1.1"/></svg>`;
+  const S = 12, w = el.clientWidth, h = el.clientHeight;
+  const cols = Math.floor((w - 1) / S), rows = Math.floor((h - 1) / S);
+  el.innerHTML = `<svg width="${w}" height="${h}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${squares(cols, rows, S, 0.5, 0.5)}</svg>`;
 });
 """
 
@@ -606,7 +638,7 @@ FOOT = ('<div class="foot"><span class="rule"></span><div class="row"><img src="
         '<span>הדרכה במחוז ירושלים והעיר ירושלים — מנח״י, בהובלת איילת קריספין</span></div></div></div>')
 
 INTRO = """<div class="intro">
-<p class="meta">זמן: 90 דקות | מותר להשתמש במחשבון ובסרגל</p>
+<p class="meta"><span>זמן: <b>90 דקות</b></span><i></i><span>מותר להשתמש במחשבון ובסרגל</span></p>
 <h2>אז מה צריך לעשות?</h2>
 <p class="l">יש לפתור את המבחן ברצינות.</p>
 <p class="l">המבחן נועד לאפשר לנו במערכת החינוך להבין במה הצלחנו ובמה אנחנו צריכים להשתפר.</p>
@@ -620,8 +652,11 @@ INTRO = """<div class="intro">
 <p class="luck">בהצלחה!</p>
 </div>"""
 
+FINALE = """<div class="finale"><div class="fsky"><p>ירושלים</p><p>תצליח!</p></div>
+<div class="fimg"><img src="../assets/jerusalem.jpg" alt=""></div></div>"""
+
 HEAD = ('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>מבחן במתמטיקה לכיתה ט׳</title>'
-        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@700&display=swap">'
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@700;900&display=swap">'
         '<style>' + CSS + '</style></head><body>')
 
 
@@ -686,12 +721,13 @@ with sync_playwright() as p:
         sheets.append(cur)
         print("sheets:", [[i + 1 for i in s] for s in sheets])
 
-        # 3. final document: instructions, question sheets, two draft sheets
+        # 3. final document: instructions, question sheets, two draft sheets, closing page
         body = sheet(INTRO)
         for s in sheets:
             body += sheet("".join(q(i + 1, Q[i]) for i in s))
         for n in (1, 2):
-            body += sheet('<h2 class="draft">דף טיוטה %d — לא ייבדק</h2><div class="fill" style="margin-top:10px"></div>' % n)
+            body += sheet('<div class="fill"></div><h2 class="draft">דף טיוטה %d — לא ייבדק</h2>' % n)
+        body += sheet(FINALE)
         write(HEAD + body + "</body></html>")
         pg.goto(uri, wait_until="networkidle")
         pg.evaluate("document.fonts.ready.then(()=>1)")
@@ -703,7 +739,7 @@ with sync_playwright() as p:
         assert not errs, errs
         raw = PDF + ".raw"
         pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        expected = len(sheets) + 3
+        expected = len(sheets) + 4
     finally:
         br.close()
         if os.path.exists(TMP):
