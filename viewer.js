@@ -190,22 +190,15 @@
   function goToPage(n, smooth) {
     const p = state.pages[n - 1];
     if (!p) return;
-    const bar = document.body.classList.contains("bar-hidden") ? 0 : $("topbar").offsetHeight;
-    const top = p.el.getBoundingClientRect().top + window.scrollY - (n === 1 ? bar : 0);
+    const top = p.el.getBoundingClientRect().top + window.scrollY - $("topbar").offsetHeight;
     const close = Math.abs(n - (state.current || 1)) <= 2;
     window.scrollTo({ top, behavior: smooth && close && !reducedMotion() ? "smooth" : "auto" });
-    if (n > 1) document.body.classList.add("bar-hidden");
   }
 
   function wireScrolling() {
-    let lastY = window.scrollY, queued = false, stopTimer;
+    let queued = false, stopTimer;
     const onFrame = () => {
       queued = false;
-      const y = window.scrollY;
-      if (Math.abs(y - lastY) > 6) {
-        document.body.classList.toggle("bar-hidden", y > lastY && y > 90);
-        lastY = y;
-      }
       showPosition();
     };
     window.addEventListener("scroll", () => {
