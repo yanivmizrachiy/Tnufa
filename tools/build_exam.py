@@ -251,10 +251,33 @@ b += arc(Dx, yB, 40, -50, 0) + t(Dx + 66 * math.cos(math.radians(25)), yB - 66 *
 b += arc(Ex, Ey, 26, 130, 215, AMBER, 1.8) + t(Ex - 44, Ey + 11, "?", 20, ltr=True, w=700, c=AMBER)
 for lab, x, y, dx, dy in (("B", Bx, yT, 0, -13), ("A", 500, yT, 0, -13), ("D", Dx, yB, 0, 25), ("C", 500, yB, 0, 25), ("E", Ex, Ey, 18, 6)):
     b += circ(x, y, 3.8, NAVY) + t(x + dx, y + dy, lab, 16, ltr=True, w=700)
+# part b: drawn to scale with the solution's angles, 30 and 60 degrees, so the right angle at E is exact
+B2x = 190
+E2x, E2y = B2x + 90 / math.tan(math.radians(30)), yT + 90
+D2x = E2x - 90 / math.tan(math.radians(60))
+_u = (B2x - E2x, yT - E2y)
+_v = (D2x - E2x, yB - E2y)
+assert abs(_u[0] * _v[0] + _u[1] * _v[1]) < 1e-9
+_ul, _vl = math.hypot(*_u), math.hypot(*_v)
+_ux, _uy, _vx, _vy = _u[0] / _ul * 13, _u[1] / _ul * 13, _v[0] / _vl * 13, _v[1] / _vl * 13
+b2 = line(120, yT, 560, yT, NAVY, 2.6) + line(120, yB, 560, yB, NAVY, 2.6)
+b2 += head(452, yT, 0, NAVY, 10) + head(452, yB, 0, NAVY, 10)
+b2 += line(B2x, yT, E2x, E2y, G3, 2.6) + line(E2x, E2y, D2x, yB, G3, 2.6)
+b2 += '<path d="M%.2f %.2f L%.2f %.2f L%.2f %.2f" fill="none" stroke="%s" stroke-width="1.6"/>' % (
+    E2x + _ux, E2y + _uy, E2x + _ux + _vx, E2y + _uy + _vy, E2x + _vx, E2y + _vy, INK)
+b2 += arc(B2x, yT, 44, 0, 30, AMBER, 1.8) + t(B2x + 66 * math.cos(math.radians(15)), yT + 66 * math.sin(math.radians(15)) + 8, "?", 20, ltr=True, w=700, c=AMBER)
+for lab, x, y, dx, dy in (("B", B2x, yT, 0, -13), ("A", 500, yT, 0, -13), ("D", D2x, yB, 0, 25), ("C", 500, yB, 0, 25), ("E", E2x, E2y, 18, 6)):
+    b2 += circ(x, y, 3.8, NAVY) + t(x + dx, y + dy, lab, 16, ltr=True, w=700)
+FIG5B = svg(620, 256, b2, "שני ישרים מקבילים ונקודה E ביניהם, ובה זווית ישרה").replace("max-width:620px", "max-width:410px")
 Q.append("""<p>בסרטוט שלפניכם הישרים %s ו־%s מקבילים. הנקודה %s נמצאת בין שני הישרים.</p>
-<p>נתון: %s, &nbsp; %s.</p>%s<p>מהו הגודל של הזווית %s? הציגו את דרך הפתרון.</p>%s%s""" % (
+<p>נתון: %s, &nbsp; %s.</p>%s%s%s""" % (
     m("AB"), m("CD"), m("E"), m("∢ABE = 35°"), m("∢CDE = 50°"), svg(620, 256, b, "שני ישרים מקבילים ונקודה E ביניהם"),
-    m("BED"), work(145), ans('תשובה: &nbsp;<bdi dir="ltr" class="math">∢BED = %s°</bdi>' % BLANK)))
+    part("א", "מהו הגודל של הזווית %s? הציגו את דרך הפתרון." % m("BED") + work(90) +
+         ans('תשובה: &nbsp;<bdi dir="ltr" class="math">∢BED = %s°</bdi>' % BLANK)),
+    part("ב", "בסרטוט השני שלפניכם הישרים %s ו־%s מקבילים, הנקודה %s נמצאת בין שני הישרים, ו־%s.<br>"
+         "הזווית %s גדולה פי 2 מהזווית %s. מהו הגודל של הזווית %s? הציגו את דרך הפתרון." % (
+             m("AB"), m("CD"), m("E"), m("BE ⊥ DE"), m("CDE"), m("ABE"), m("ABE")) + FIG5B + work(90) +
+         ans('תשובה: &nbsp;<bdi dir="ltr" class="math">∢ABE = %s°</bdi>' % BLANK))))
 
 # ---------- Q6 ----------
 b = ""
@@ -531,7 +554,7 @@ for i, html_ in enumerate(Q):
     assert len(kept) == len(segs[1:]) - (1 if (i + 1) in DROP else 0), i + 1
     Q[i] = segs[0] + "".join(OPEN + HEB[j] + x[1:] for j, x in enumerate(kept))
 ITEMS = sum(max(1, x.count(OPEN)) for x in Q)
-assert ITEMS == 37, ITEMS
+assert ITEMS == 38, ITEMS
 
 # ---------- answer key: last pages of the booklet ----------
 # Every value in the key is computed here, so the build fails if one is wrong.
@@ -540,7 +563,7 @@ assert math.hypot(3 - 1, 5 - 2) == math.hypot(3 - 5, 5 - 2)          # Q2
 assert math.hypot(1 - 1, 6 - 2) == math.hypot(5 - 1, 2 - 2) == 4     # Q2
 assert 150 * 1.2 == 180 and round(180 * 0.8, 6) == 144               # Q3
 assert [5 * n + 1 for n in (3, 4, 10)] == [16, 21, 51] and (100 - 1) % 5 != 0  # Q4
-assert 35 + 50 == 85                                                 # Q5
+assert 35 + 50 == 85 and 30 + 2 * 30 == 90                            # Q5
 _goals = sorted(k for k, v in games.items() for _ in range(v))
 assert len(_goals) == 20 and sum(_goals) == 30 and (30 + 12) / 21 == 2  # Q6
 assert statistics.median(_goals) == 1 and all(statistics.median(_goals + [g]) == 1 for g in range(40))  # Q6
@@ -571,7 +594,9 @@ KEY = [
         ("א", "16, 21, 51", "בכל צורה נוספים 5 מוטות."),
         ("ב", m("5n + 1"), "בצורה 1 יש 6 מוטות, ובכל צורה נוספים 5."),
         ("ג", "לא", "%s נותן %s, ומספר הצורה חייב להיות שלם." % (m("5n + 1 = 100"), m("n = 19.8")))]),
-    ("ישרים מקבילים, זוויות מתחלפות", [("", m("∡BED = 85°"), "מעבירים דרך E ישר מקביל לשני הישרים, ולפי זוויות מתחלפות %s." % m("35° + 50° = 85°"))]),
+    ("ישרים מקבילים, ניצבות, זוויות מתחלפות", [
+        ("א", m("∢BED = 85°"), "מעבירים דרך E ישר מקביל לשני הישרים, ולפי זוויות מתחלפות %s." % m("35° + 50° = 85°")),
+        ("ב", m("∢ABE = 30°"), "%s, ולפי סעיף א %s. לכן %s, ו־%s." % (m("∢BED = 90°"), m("∢BED = ∢ABE + ∢CDE"), m("x + 2x = 90°"), m("x = 30°")))]),
     ("דיאגרמה, ממוצע, שכיח, חציון", [
         ("א", "1.5 שערים", "30 שערים ב־20 משחקים."),
         ("ב", "היגד 1: נכון<br>היגד 2: לא נכון<br>היגד 3: אי אפשר לדעת", "1: בכל תוצאה של המשחק הנוסף החציון נשאר 1. 2: אחרי שלושה משחקים של 2 שערים השכיח הוא 2. 3: לא נתון כמה שערים הבקיעה הקבוצה היריבה."),
@@ -596,7 +621,7 @@ KEY = [
         ("א", "לא", "באורן %s תלמידים, ובברוש %s תלמידים." % (m("400 · 0.25 = 100"), m("900 · 0.15 = 135"))),
         ("ב", "ג: בערך 40%", "%s, ו־%s." % (m("120 + 405 = 525"), m("525 / 1300 ≈ 0.40")))]),
     ("חפיפה, משפט פיתגורס, שטחים", [
-        ("א", "הוכחה", "למשל צ.צ.ז: AD צלע משותפת, %s, %s. מתקבלת כל הוכחה תקפה." % (m("AB = AC"), m("∡ADB = ∡ADC = 90°"))),
+        ("א", "הוכחה", "למשל צ.צ.ז: AD צלע משותפת, %s, %s. מתקבלת כל הוכחה תקפה." % (m("AB = AC"), m("∢ADB = ∢ADC = 90°"))),
         ("ב", "2.5 מטרים", "%s (מהחפיפה), ולפי פיתגורס %s." % (m("BD = 2"), m("AB² = 2² + 1.5²"))),
         ("ג", "21 מ״ר", "צידי הגג %s, החזית והגב %s." % (m("2 · 2.5 · 3 = 15"), m("2 · (4 · 1.5 / 2) = 6")))]),
     ("חוק הפילוג המורחב", [
