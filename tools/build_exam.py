@@ -225,9 +225,10 @@ def hexchain(n, rcx, cy, r=30):
     return out
 
 
-b = hexchain(1, 556, 52) + t(556, 112, "צורה 1", 14, w=600)
-b += hexchain(2, 438, 52) + t(412, 112, "צורה 2", 14, w=600)
-b += hexchain(3, 240, 52) + t(188, 112, "צורה 3", 14, w=600)
+# the shapes read from left to right: shape 1 is the leftmost
+b = hexchain(1, 103, 52) + t(103, 112, "צורה 1", 14, w=600)
+b += hexchain(2, 284, 52) + t(258, 112, "צורה 2", 14, w=600)
+b += hexchain(3, 517, 52) + t(465, 112, "צורה 3", 14, w=600)
 tbl = """<div class="tw"><table class="t"><thead><tr><th>מספר הצורה</th><td>1</td><td>2</td><td>3</td><td>4</td><td>10</td></tr></thead>
 <tbody><tr><th>מספר המוטות</th><td>6</td><td>11</td><td></td><td></td><td></td></tr></tbody></table></div>"""
 Q.append("""<p>נועה בונה צורות של חלת דבש ממוטות זהים, לפי החוקיות המוצגת בסרטוט שלפניכם.</p>%s%s%s%s""" % (

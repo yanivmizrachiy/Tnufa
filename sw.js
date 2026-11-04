@@ -2,7 +2,7 @@
 /* Offline support for the phone app.
    The page is fetched from the network first, so a new exam reaches teachers at once.
    Versioned files never change, so they come from the cache. */
-const VERSION = "18";
+const VERSION = "19";
 const CACHE = "tnufa-" + VERSION;
 const FONTS = "tnufa-fonts";
 const SHELL = [
@@ -10,7 +10,7 @@ const SHELL = [
   "manifest.webmanifest",
   "viewer.css?v=18",
   "viewer.js?v=18",
-  "exam.pdf?v=10",
+  "exam.pdf?v=11",
   "vendor/pdfjs-3.11.174/pdf.min.js",
   "vendor/pdfjs-3.11.174/pdf.worker.min.js",
   "assets/logo.svg",
