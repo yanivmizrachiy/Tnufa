@@ -552,6 +552,9 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .foot .lines{display:flex;flex-direction:column;text-align:center;line-height:1.3}
 .foot b{font-weight:800;font-size:12.5px;color:#122f4c}
 .foot span{font-size:11px;color:#3a5168}
+.foot.fin{background:#15386e}
+.foot.fin b{color:#fff}
+.foot.fin span{color:#dbe7f5}
 .finale{position:absolute;inset:0 0 var(--foot) 0;background:#0a2550;display:flex;flex-direction:column;overflow:hidden}
 .fsky{flex:0 0 auto;padding:52px 20px 10px;text-align:center;color:#fff;font-family:"Rubik","Heebo",sans-serif;font-weight:900;font-size:176px;line-height:1.04}
 .fsky p{margin:0}
@@ -727,7 +730,7 @@ with sync_playwright() as p:
             body += sheet("".join(q(i + 1, Q[i]) for i in s))
         for n in (1, 2):
             body += sheet('<div class="fill"></div><h2 class="draft">דף טיוטה %d — לא ייבדק</h2>' % n)
-        body += sheet(FINALE)
+        body += sheet(FINALE).replace('class="foot"', 'class="foot fin"')
         write(HEAD + body + "</body></html>")
         pg.goto(uri, wait_until="networkidle")
         pg.evaluate("document.fonts.ready.then(()=>1)")
