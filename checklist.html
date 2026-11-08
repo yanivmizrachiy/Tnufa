@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="משימות לביצוע לקראת מבחן תנופה במתמטיקה לכיתות ט׳.">
+  <title>לקראת מבחן תנופה — משימות לביצוע</title>
+  <style>
+    :root { color-scheme: light; font-family: "Heebo", "Arial", system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    html { background: #fff; }
+    body { margin: 0; background: #fff; color: #1a2739; line-height: 1.7; }
+    main { max-width: 800px; margin-inline: auto; padding: clamp(30px, 7vw, 76px) clamp(22px, 6vw, 48px) 80px; }
+    .eyebrow { color: #506178; font-size: .94rem; font-weight: 600; letter-spacing: .01em; }
+    h1 { margin: 16px 0 8px; font-size: clamp(2.0rem, 6vw, 3rem); font-weight: 800; line-height: 1.27; }
+    .updated { margin: 0 0 34px; color: #607087; font-size: .96rem; }
+    h2 { margin: 0 0 10px; font-size: 1.22rem; font-weight: 700; }
+    ol { margin: 0; padding: 0; list-style: none; }
+    li { display: flex; align-items: flex-start; gap: 18px; padding: 23px 0; border-bottom: 1px solid #e5e9ef; font-size: clamp(1.06rem, 2.8vw, 1.23rem); font-weight: 500; }
+    li:first-child { border-top: 1px solid #e5e9ef; }
+    .check { flex: 0 0 29px; width: 29px; height: 29px; margin-top: 4px; color: #15803d; }
+    .task { flex: 1; }
+    footer { margin-top: 46px; color: #738096; font-size: .86rem; }
+    @media print {
+      main { max-width: none; padding: 20px; }
+      h1 { font-size: 30px; }
+      li { break-inside: avoid; }
+      footer { margin-top: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow">מתמטיקה · כיתות ט׳</div>
+      <h1>לקראת מבחן תנופה</h1>
+      <p class="updated">עודכן בתאריך <time datetime="2026-11-08T15:09:00+02:00">8.11.2026, בשעה 15:09</time></p>
+    </header>
+
+    <section aria-labelledby="tasks-title">
+      <h2 id="tasks-title">משימות לביצוע</h2>
+      <ol>
+        <li>
+          <svg class="check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="task">לוודא שכל המורים המלמדים בכיתות ט׳ נמצאים בקבוצת הוואטסאפ לעדכונים לקראת מבחן תנופה.</span>
+        </li>
+        <li>
+          <svg class="check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="task">מומלץ לקיים בבית הספר מבחן דמה לקראת מבחן תנופה, על בסיס המבחנים הזמינים באתר המחוז.</span>
+        </li>
+      </ol>
+    </section>
+
+    <footer>יניב רז · הדרכה במתמטיקה, מחוז ירושלים והעיר ירושלים</footer>
+  </main>
+  <script>
+    if ("serviceWorker" in navigator) {
+      addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>

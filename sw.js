@@ -2,11 +2,12 @@
 /* Offline support for the phone app.
    The page is fetched from the network first, so a new exam reaches teachers at once.
    Versioned files never change, so they come from the cache. */
-const VERSION = "22";
+const VERSION = "23";
 const CACHE = "tnufa-" + VERSION;
 const FONTS = "tnufa-fonts";
 const SHELL = [
   "./",
+  "checklist.html",
   "manifest.webmanifest",
   "viewer.css?v=21",
   "viewer.js?v=20",
@@ -35,10 +36,10 @@ async function networkFirstPage(request) {
   const cache = await caches.open(CACHE);
   try {
     const res = await fetch(request);
-    if (res.ok) await cache.put("./", res.clone());
+    if (res.ok) await cache.put(request, res.clone());
     return res;
   } catch (err) {
-    const hit = await cache.match("./");
+    const hit = await cache.match(request);
     if (hit) return hit;
     throw err;
   }
