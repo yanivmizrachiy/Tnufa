@@ -117,13 +117,13 @@
     {
       "file": "page-17.html",
       "workbookNumber": 17,
-      "chapterId": "draft",
+      "chapterId": "questions",
       "title": "דף טיוטה 1"
     },
     {
       "file": "page-18.html",
       "workbookNumber": 18,
-      "chapterId": "draft",
+      "chapterId": "questions",
       "title": "דף טיוטה 2"
     },
     {
@@ -146,17 +146,9 @@
       "id": "questions",
       "title": "שאלות 1–17",
       "startPage": 2,
-      "endPage": 16,
+      "endPage": 18,
       "color": "#276149",
       "tint": "#e9f3ee"
-    },
-    {
-      "id": "draft",
-      "title": "דפי טיוטה",
-      "startPage": 17,
-      "endPage": 18,
-      "color": "#8a6d1a",
-      "tint": "#fbf4e0"
     },
     {
       "id": "finale",
@@ -178,6 +170,6 @@
     ]
   },
   "contentHash": "sha256-751f453827fa65a894c326627659cd02926b17a356dc6796a9c50fb204ea6dab",
-  "builtAt": "2026-11-09T05:03:38Z",
+  "builtAt": "2026-11-09T11:08:23Z",
   "version": "3"
 }
