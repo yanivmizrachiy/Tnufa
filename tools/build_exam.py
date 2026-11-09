@@ -860,7 +860,7 @@ def emit_native_reader(pages_html, sheets_):
         if 1 <= i <= nsheets:
             return "questions"
         if i in (nsheets + 1, nsheets + 2):
-            return "draft"
+            return "questions"  # draft sheets stay in the reader, but get no TOC entry (owner 09/11/2026)
         return "finale"
 
     # In the district reader each page is a <div> inside a Shadow root, where the source CSS's
@@ -887,8 +887,9 @@ def emit_native_reader(pages_html, sheets_):
 
     chapters = [
         {"id": "intro", "title": "הוראות המבחן", "startPage": 1, "endPage": 1, "color": "#2d4799", "tint": "#eef1fb"},
-        {"id": "questions", "title": "שאלות 1–17", "startPage": 2, "endPage": 1 + nsheets, "color": "#276149", "tint": "#e9f3ee"},
-        {"id": "draft", "title": "דפי טיוטה", "startPage": 2 + nsheets, "endPage": 3 + nsheets, "color": "#8a6d1a", "tint": "#fbf4e0"},
+        # The two draft sheets stay in the reader but are not listed in its table of contents
+        # (owner 09/11/2026): the questions chapter runs through them up to the closing page.
+        {"id": "questions", "title": "שאלות 1–17", "startPage": 2, "endPage": 3 + nsheets, "color": "#276149", "tint": "#e9f3ee"},
         {"id": "finale", "title": "עמוד סיום", "startPage": 4 + nsheets, "endPage": 4 + nsheets, "color": "#15386e", "tint": "#e7eef7"},
     ]
     manifest = {
