@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 3,
+  "id": "tnufa",
+  "name": "מבחן תנופה — מתמטיקה לכיתה ט׳",
+  "author": "יניב רז",
+  "credit": [
+    "יניב רז — מדריך מחוזי חט״ב בעיר ירושלים",
+    "הדרכה במחוז ירושלים והעיר ירושלים — מנח״י, בהובלת איילת קריספין"
+  ],
+  "totalPages": 19,
+  "cover": null,
+  "pageSelector": ".a4-page",
+  "assets": {
+    "css": null,
+    "pageCssPattern": null,
+    "fontsCss": "https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@700;900&display=swap",
+    "mathjax": null,
+    "mathjaxFontRoot": null
+  },
+  "pages": [
+    {
+      "file": "page-1.html",
+      "workbookNumber": 1,
+      "chapterId": "intro",
+      "title": "הוראות המבחן"
+    },
+    {
+      "file": "page-2.html",
+      "workbookNumber": 2,
+      "chapterId": "questions",
+      "title": "שאלות 1–2"
+    },
+    {
+      "file": "page-3.html",
+      "workbookNumber": 3,
+      "chapterId": "questions",
+      "title": "שאלה 3"
+    },
+    {
+      "file": "page-4.html",
+      "workbookNumber": 4,
+      "chapterId": "questions",
+      "title": "שאלה 4"
+    },
+    {
+      "file": "page-5.html",
+      "workbookNumber": 5,
+      "chapterId": "questions",
+      "title": "שאלה 5"
+    },
+    {
+      "file": "page-6.html",
+      "workbookNumber": 6,
+      "chapterId": "questions",
+      "title": "שאלה 6"
+    },
+    {
+      "file": "page-7.html",
+      "workbookNumber": 7,
+      "chapterId": "questions",
+      "title": "שאלה 7"
+    },
+    {
+      "file": "page-8.html",
+      "workbookNumber": 8,
+      "chapterId": "questions",
+      "title": "שאלה 8"
+    },
+    {
+      "file": "page-9.html",
+      "workbookNumber": 9,
+      "chapterId": "questions",
+      "title": "שאלה 9"
+    },
+    {
+      "file": "page-10.html",
+      "workbookNumber": 10,
+      "chapterId": "questions",
+      "title": "שאלות 10–11"
+    },
+    {
+      "file": "page-11.html",
+      "workbookNumber": 11,
+      "chapterId": "questions",
+      "title": "שאלה 12"
+    },
+    {
+      "file": "page-12.html",
+      "workbookNumber": 12,
+      "chapterId": "questions",
+      "title": "שאלה 13"
+    },
+    {
+      "file": "page-13.html",
+      "workbookNumber": 13,
+      "chapterId": "questions",
+      "title": "שאלה 14"
+    },
+    {
+      "file": "page-14.html",
+      "workbookNumber": 14,
+      "chapterId": "questions",
+      "title": "שאלה 15"
+    },
+    {
+      "file": "page-15.html",
+      "workbookNumber": 15,
+      "chapterId": "questions",
+      "title": "שאלה 16"
+    },
+    {
+      "file": "page-16.html",
+      "workbookNumber": 16,
+      "chapterId": "questions",
+      "title": "שאלה 17"
+    },
+    {
+      "file": "page-17.html",
+      "workbookNumber": 17,
+      "chapterId": "draft",
+      "title": "דף טיוטה 1"
+    },
+    {
+      "file": "page-18.html",
+      "workbookNumber": 18,
+      "chapterId": "draft",
+      "title": "דף טיוטה 2"
+    },
+    {
+      "file": "page-19.html",
+      "workbookNumber": 19,
+      "chapterId": "finale",
+      "title": "עמוד סיום"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "intro",
+      "title": "הוראות המבחן",
+      "startPage": 1,
+      "endPage": 1,
+      "color": "#2d4799",
+      "tint": "#eef1fb"
+    },
+    {
+      "id": "questions",
+      "title": "שאלות 1–17",
+      "startPage": 2,
+      "endPage": 16,
+      "color": "#276149",
+      "tint": "#e9f3ee"
+    },
+    {
+      "id": "draft",
+      "title": "דפי טיוטה",
+      "startPage": 17,
+      "endPage": 18,
+      "color": "#8a6d1a",
+      "tint": "#fbf4e0"
+    },
+    {
+      "id": "finale",
+      "title": "עמוד סיום",
+      "startPage": 19,
+      "endPage": 19,
+      "color": "#15386e",
+      "tint": "#e7eef7"
+    }
+  ],
+  "pdf": {
+    "file": "exam.pdf",
+    "pageCount": 20,
+    "sha256": "sha256-175e61e82d0c8ec6f95da1a0706856d2b22d5140d41b850091dabf6f619636f5",
+    "coverPages": 0,
+    "studentRange": [
+      1,
+      19
+    ]
+  },
+  "contentHash": "sha256-751f453827fa65a894c326627659cd02926b17a356dc6796a9c50fb204ea6dab",
+  "builtAt": "2026-11-09T05:03:38Z",
+  "version": "3"
+}

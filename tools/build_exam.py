@@ -5,13 +5,17 @@ Run:  python tools/build_exam.py
 Needs: playwright (Chromium) and pymupdf. The answer key is deliberately not kept
 in this public repository.
 """
-import math, os, statistics
+import math, os, statistics, sys, json, hashlib, datetime
 import fitz
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PDF = os.path.join(ROOT, "exam.pdf")
 TMP = os.path.join(ROOT, "tools", ".exam_print.html")
+# --emit-only: render the same A4 pages into page-N.html + WORKBOOK_MANIFEST.json for the
+# native web reader WITHOUT rebuilding exam.pdf (the manifest is tied to the committed PDF by
+# sha256). A normal run rebuilds exam.pdf AND re-emits the pages, so one build feeds both.
+EMIT_ONLY = "--emit-only" in sys.argv
 
 games = {0: 4, 1: 7, 2: 5, 3: 3, 4: 1}
 oren = dict(walk=40, bus=30, bike=25, car=5)
@@ -826,6 +830,105 @@ document.querySelectorAll('.page').forEach(pg => {
 });
 """
 
+def emit_native_reader(pages_html, sheets_):
+    """Single source: write the SAME rendered A4 content pages as page-N.html + a v3
+    WORKBOOK_MANIFEST.json for the shared NativeWorkbookReader in jerusalem2. The answer key
+    stays the one long PDF page (page 20) — reader shows the 19 exam pages; downloads give
+    students pages 1-19 and 'with key' the whole PDF."""
+    nsheets = len(sheets_)
+    assert len(pages_html) == nsheets + 4, ("content pages != intro+sheets+2draft+finale", len(pages_html), nsheets + 4)
+    d = fitz.open(PDF)
+    pdf_pages = d.page_count
+    d.close()
+    assert pdf_pages == len(pages_html) + 1, ("exam.pdf must be the 19 content pages + 1 key page", pdf_pages, len(pages_html))
+
+    def page_title(i):
+        if i == 0:
+            return "הוראות המבחן"
+        if 1 <= i <= nsheets:
+            qs = [qi + 1 for qi in sheets_[i - 1]]
+            return "שאלה %d" % qs[0] if len(qs) == 1 else "שאלות %d–%d" % (qs[0], qs[-1])
+        if i == nsheets + 1:
+            return "דף טיוטה 1"
+        if i == nsheets + 2:
+            return "דף טיוטה 2"
+        return "עמוד סיום"
+
+    def chapter_of(i):
+        if i == 0:
+            return "intro"
+        if 1 <= i <= nsheets:
+            return "questions"
+        if i in (nsheets + 1, nsheets + 2):
+            return "draft"
+        return "finale"
+
+    # In the district reader each page is a <div> inside a Shadow root, where the source CSS's
+    # :root custom properties and body base typography do not apply. Re-declare them on the page
+    # root so the A4 layout (footer height var(--foot), colors, Heebo base font) survives intact.
+    reader_base = ('<style>.a4-page{--ink:#16202c;--mute:#4f5f6b;--navy:#15386e;--g3:#276149;'
+                   '--line:#cdd8d4;--foot:92px;color:#16202c;font-family:"Heebo",Arial,sans-serif;'
+                   'font-size:14.8px;line-height:1.55}</style>')
+    reader_head = HEAD.replace('</head>', reader_base + '</head>')
+    pages, content = [], hashlib.sha256()
+    for i, raw_html in enumerate(pages_html):
+        body = raw_html.replace('<section class="page"', '<section class="a4-page page"', 1).replace('../assets/', 'assets/')
+        doc_html = reader_head + body + "</body></html>"
+        fname = "page-%d.html" % (i + 1)
+        with open(os.path.join(ROOT, fname), "w", encoding="utf-8", newline="") as f:
+            f.write(doc_html)
+        content.update(doc_html.encode("utf-8"))
+        pages.append({"file": fname, "workbookNumber": i + 1, "chapterId": chapter_of(i), "title": page_title(i)})
+
+    pdf_hash = hashlib.sha256()
+    with open(PDF, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            pdf_hash.update(chunk)
+
+    chapters = [
+        {"id": "intro", "title": "הוראות המבחן", "startPage": 1, "endPage": 1, "color": "#2d4799", "tint": "#eef1fb"},
+        {"id": "questions", "title": "שאלות 1–17", "startPage": 2, "endPage": 1 + nsheets, "color": "#276149", "tint": "#e9f3ee"},
+        {"id": "draft", "title": "דפי טיוטה", "startPage": 2 + nsheets, "endPage": 3 + nsheets, "color": "#8a6d1a", "tint": "#fbf4e0"},
+        {"id": "finale", "title": "עמוד סיום", "startPage": 4 + nsheets, "endPage": 4 + nsheets, "color": "#15386e", "tint": "#e7eef7"},
+    ]
+    manifest = {
+        "schemaVersion": 3,
+        "id": "tnufa",
+        "name": "מבחן תנופה — מתמטיקה לכיתה ט׳",
+        "author": "יניב רז",
+        "credit": [
+            "יניב רז — מדריך מחוזי חט״ב בעיר ירושלים",
+            "הדרכה במחוז ירושלים והעיר ירושלים — מנח״י, בהובלת איילת קריספין",
+        ],
+        "totalPages": len(pages),
+        "cover": None,
+        "pageSelector": ".a4-page",
+        "assets": {
+            "css": None,
+            "pageCssPattern": None,
+            "fontsCss": "https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@700;900&display=swap",
+            "mathjax": None,
+            "mathjaxFontRoot": None,
+        },
+        "pages": pages,
+        "chapters": chapters,
+        "pdf": {
+            "file": "exam.pdf",
+            "pageCount": pdf_pages,
+            "sha256": "sha256-" + pdf_hash.hexdigest(),
+            "coverPages": 0,
+            "studentRange": [1, len(pages)],
+        },
+        "contentHash": "sha256-" + content.hexdigest(),
+        "builtAt": os.environ.get("SOURCE_DATE_EPOCH") or datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "version": "3",
+    }
+    with open(os.path.join(ROOT, "WORKBOOK_MANIFEST.json"), "w", encoding="utf-8", newline="") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    print("emitted %d native pages + WORKBOOK_MANIFEST.json (studentRange [1,%d], pdf %d pages)" % (len(pages), len(pages), pdf_pages))
+
+
 with sync_playwright() as p:
     br = p.chromium.launch(headless=True, timeout=60000)
     try:
@@ -875,42 +978,50 @@ with sync_playwright() as p:
         assert not over, "overflowing sheets: %s" % over
         assert pg.evaluate("document.fonts.check('15px Heebo') && document.fonts.check('700 22px Rubik')"), "fonts did not load"
         assert not errs, errs
-        raw = PDF + ".raw"
-        pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        expected = len(sheets) + 4
+        # Single source: capture the rendered A4 content pages (intro + question sheets + 2 draft
+        # + closing) for the native web reader, before the key render replaces the DOM.
+        content_pages_html = pg.evaluate("Array.from(document.querySelectorAll('.page')).map(s => s.outerHTML)")
+        if not EMIT_ONLY:
+            raw = PDF + ".raw"
+            pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+            expected = len(sheets) + 4
 
-        # 4. the key: one long page as tall as its content, so a phone scrolls through it without a break
-        write(HEAD + sheet(key_sheet()).replace('class="page"', 'class="page" style="height:auto;overflow:visible"') + "</body></html>")
-        pg.goto(uri, wait_until="networkidle")
-        pg.evaluate("document.fonts.ready.then(()=>1)")
-        key_h = math.ceil(pg.evaluate("document.querySelector('.page').getBoundingClientRect().height")) + 48
-        pg.evaluate("h => { const s = document.querySelector('.page').style; s.height = h + 'px'; s.overflow = 'hidden'; }", key_h)
-        assert not errs, errs
-        key_raw = PDF + ".key"
-        pg.add_style_tag(content="@page{size:210mm %dpx;margin:0}.page{break-after:auto}.key tbody{break-inside:auto}" % key_h)
-        pg.pdf(path=key_raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        print("key page height: %d px" % key_h)
+            # 4. the key: one long page as tall as its content, so a phone scrolls through it without a break
+            write(HEAD + sheet(key_sheet()).replace('class="page"', 'class="page" style="height:auto;overflow:visible"') + "</body></html>")
+            pg.goto(uri, wait_until="networkidle")
+            pg.evaluate("document.fonts.ready.then(()=>1)")
+            key_h = math.ceil(pg.evaluate("document.querySelector('.page').getBoundingClientRect().height")) + 48
+            pg.evaluate("h => { const s = document.querySelector('.page').style; s.height = h + 'px'; s.overflow = 'hidden'; }", key_h)
+            assert not errs, errs
+            key_raw = PDF + ".key"
+            pg.add_style_tag(content="@page{size:210mm %dpx;margin:0}.page{break-after:auto}.key tbody{break-inside:auto}" % key_h)
+            pg.pdf(path=key_raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+            print("key page height: %d px" % key_h)
     finally:
         br.close()
         if os.path.exists(TMP):
             os.remove(TMP)
 
-doc = fitz.open(raw)
-assert doc.page_count == expected, (doc.page_count, expected)
-key_doc = fitz.open(key_raw)
-assert key_doc.page_count == 1, key_doc.page_count
-doc.insert_pdf(key_doc)
-key_doc.close()
-os.remove(key_raw)
-expected += 1
-toc = [[1, "הוראות", 1]]
-for i, s_ in enumerate(sheets):
-    toc += [[1, "שאלה %d" % (q_ + 1), i + 2] for q_ in s_]
-_n = len(sheets) + 2
-toc += [[1, "דף טיוטה 1", _n], [1, "דף טיוטה 2", _n + 1], [1, "עמוד סיום", _n + 2], [1, "מחוון תשובות", _n + 3]]
-doc.set_toc(toc)
-doc.set_metadata({"title": "מבחן במתמטיקה לכיתה ט׳", "author": "יניב רז", "subject": "לקראת תנופה"})
-doc.save(PDF, garbage=4, deflate=True)
-doc.close()
-os.remove(raw)
-print("wrote exam.pdf: %d pages, %d KB" % (expected, os.path.getsize(PDF) // 1024))
+if not EMIT_ONLY:
+    doc = fitz.open(raw)
+    assert doc.page_count == expected, (doc.page_count, expected)
+    key_doc = fitz.open(key_raw)
+    assert key_doc.page_count == 1, key_doc.page_count
+    doc.insert_pdf(key_doc)
+    key_doc.close()
+    os.remove(key_raw)
+    expected += 1
+    toc = [[1, "הוראות", 1]]
+    for i, s_ in enumerate(sheets):
+        toc += [[1, "שאלה %d" % (q_ + 1), i + 2] for q_ in s_]
+    _n = len(sheets) + 2
+    toc += [[1, "דף טיוטה 1", _n], [1, "דף טיוטה 2", _n + 1], [1, "עמוד סיום", _n + 2], [1, "מחוון תשובות", _n + 3]]
+    doc.set_toc(toc)
+    doc.set_metadata({"title": "מבחן במתמטיקה לכיתה ט׳", "author": "יניב רז", "subject": "לקראת תנופה"})
+    doc.save(PDF, garbage=4, deflate=True)
+    doc.close()
+    os.remove(raw)
+    print("wrote exam.pdf: %d pages, %d KB" % (expected, os.path.getsize(PDF) // 1024))
+
+# Native web reader: same render → page-N.html + WORKBOOK_MANIFEST.json (both modes).
+emit_native_reader(content_pages_html, sheets)
