@@ -52,12 +52,23 @@ src/exam2/checks.py      QA אוטומטי + hash רגרסיה לכל שאלה
 src/exam2/blueprint.py   היעדים הנעולים (תחומים, רמות חשיבה, אוריינות, זמן)
 tests/question-hashes.json  בסיס הרגרסיה
 tools/sha_guard.py       הוכחת אי־שינוי המבחן המקורי (SHA-256 לפני/אחרי)
+tools/publish.py         פרסום public/ לריפו אתר ה־GitHub Pages (תוצר בנייה בלבד)
 qa/                      דוח QA, צילומי עמודים, רשומת ה־SHA של המקור
 public/                  תוצרי התלמיד (מוכנים לפריסה כאתר סטטי נפרד)
 private/                 תוצרי המורה (לא ב־git)
 ```
 
-## קישור חיצוני נפרד (לא בוצע — ממתין לאישור)
+## קישור חיצוני נפרד — GitHub Pages
 
-`public/` הוא אתר סטטי שלם ועצמאי (`index.html`, `STUDENT.pdf`, `assets/`). ההצעה: פרויקט Vercel חדש ונפרד שה־Root Directory שלו הוא
-`exams/tnufa-exam-2/public`, עם דומיין משלו. אין לגעת ב־`tnufa.vercel.app`. הפריסה עצמה רק לאחר אישור מפורש.
+האתר החי: **https://yanivmizrachiy.github.io/tnufa-exam-2/** (ריפו `yanivmizrachiy/tnufa-exam-2`, ציבורי, Pages מ־`main`).
+הריפו הזה הוא תוצר בנייה בלבד — אין לערוך בו ידנית. מקור האמת היחיד הוא התיקייה הזו.
+
+עדכון האתר אחרי שינוי במבחן:
+
+```powershell
+Set-Location C:\Users\yaniv\Documents\GitHub\Tnufa
+python exams/tnufa-exam-2/build.py
+python exams/tnufa-exam-2/tools/publish.py
+```
+
+`publish.py` מרוקן את ה־clone של אתר הפרסום (`..\tnufa-exam-2`, או `SITE_DIR`), מעתיק אליו את `public/` + `SOURCE.json` (ה־commit במקור), דוחף ענף `publish-<תאריך>-<sha>` ופותח PR; מיזוג ה־PR מעדכן את האתר. `tnufa.vercel.app` והמבחן המקורי אינם נוגעים בכך.

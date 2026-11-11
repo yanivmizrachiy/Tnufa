@@ -52,6 +52,13 @@
 - אין פותר אנושי שני; "פתרון עיוור" בוצע על ידי סוכן אחד (ושני על הפריטים ששונו), לא על ידי מורה.
 - לא נערך ניסוי עם תלמידים; הערכות הזמן הן הערכות.
 - לא נבדקה הדפסה פיזית; נבדק רק PDF ותצוגת print של הקורא.
-- אין URL חיצוני: לא בוצעה פריסה, לא הוקצה דומיין, ולא נבדק HTTP. ה־preview היחיד הוא `public/index.html` מקומי (file://). שרת מקומי על 127.0.0.1 נחסם על המחשב (WinError 10013).
+- קישור חיצוני: https://yanivmizrachiy.github.io/tnufa-exam-2/ (GitHub Pages מריפו הפרסום `yanivmizrachiy/tnufa-exam-2`, באישור יניב). ראו סעיף "אימות האתר החי" בסוף. שרת מקומי על 127.0.0.1 נחסם על המחשב (WinError 10013).
 - הריפו **ציבורי**: הפתרונות והמחוונים חיים בקובצי המקור `src/exam2/questions/qNN.py` (הכרחי לסנכרון נוסח–מחוון). `private/` לא נכנס ל־git, אבל מי שקורא את המקור ב־GitHub רואה את הפתרונות. אם זה לא מקובל — יש להפוך את הריפו לפרטי או להעביר את שכבת הפתרונות למקור נפרד.
 - `.vercelignore` בשורש לא שונה (לפי הכלל "אין לגעת בקבצים קיימים"); אם הענף ימוזג כמות שהוא, `exams/tnufa-exam-2/public` יוגש גם תחת `tnufa.vercel.app/exams/...`. ההצעה: פרויקט Vercel נפרד ש־Root Directory שלו `exams/tnufa-exam-2/public`.
+
+## אימות האתר החי (11.11.2026)
+
+- https://yanivmizrachiy.github.io/tnufa-exam-2/ — HTTP 200 לדף, ל־`STUDENT.pdf`, ל־`manifest.json` ולנכסים (לוגו, תמונת שער).
+- Chromium (Playwright) במחשב 1280×900 ובנייד 390×844: 17 עמודים, `dir=rtl`, גופני Heebo ו־Suez One נטענו, 0 שגיאות קונסול, 0 תגובות HTTP ≥ 400, 0 תמונות שבורות, ללא גלילה אופקית.
+- ריפו הפרסום `yanivmizrachiy/tnufa-exam-2` (ציבורי): תוכן = `public/` + `.nojekyll` + `README.md` + `SOURCE.json` (commit המקור `80643b0`). ruleset `protect-main` פעיל. Pages מ־`main`, שורש.
+- לא נגעו: `tnufa.vercel.app`, אתר ה־Pages של Tnufa (`yanivmizrachiy.github.io/Tnufa`, עדיין מגיש את המקורי מ־main), ענף `main` של Tnufa.
