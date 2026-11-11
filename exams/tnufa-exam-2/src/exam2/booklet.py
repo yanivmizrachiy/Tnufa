@@ -236,10 +236,10 @@ def head(title, extra_css=""):
 
 
 def foot(page_no=None, fin=False, assets="assets/"):
-    pn = '<span class="pn">%d</span>' % page_no if page_no else ""
+    """Student footer: credit line only (no page number, no booklet name — Yaniv's request, 11.11.2026)."""
     return ('<div class="foot%s"><span class="rule"></span><div class="row"><img src="%slogo.svg" alt="">'
-            '<div class="lines"><b>%s</b><span>%s</span></div></div>%s<span class="tag">%s</span></div>'
-            % (" fin" if fin else "", assets, CREDIT_1, CREDIT_2, pn, TITLE))
+            '<div class="lines"><b>%s</b><span>%s</span></div></div></div>'
+            % (" fin" if fin else "", assets, CREDIT_1, CREDIT_2))
 
 
 def sheet(inner, page_no=None, fin=False, cls="", assets="assets/"):
