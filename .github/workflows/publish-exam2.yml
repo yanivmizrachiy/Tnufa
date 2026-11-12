@@ -1,0 +1,93 @@
+name: Publish Exam 2 (student site)
+
+# Automatic publishing for the Tnufa sample exam (exams/tnufa-exam-2).
+#
+# One source of truth: src/exam2/questions/*.py -> build.py -> public/ (STUDENT.pdf, reader
+# manifest, district pages + WORKBOOK_MANIFEST.json). A push to the publishing branch (main) that
+# touches the exam rebuilds the student version, runs the fail-closed checks and the version gate,
+# then publishes public/ straight to the GitHub Pages repo (yanivmizrachiy/tnufa-exam-2, served from
+# its main). The district Tnufa reader fetches that origin at runtime, so the update reaches the
+# district site without redeploying it. A pull request runs the same build + verification but never
+# publishes, so the live site keeps its last good version until the change lands on main.
+#
+# One-time activation: add a repository secret PAGES_DEPLOY_TOKEN — a token with contents:write on
+# yanivmizrachiy/tnufa-exam-2 (a fine-grained PAT scoped to that one repo is enough). Without it the
+# build/verify still run on every push and PR; only the publish step needs the token.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'exams/tnufa-exam-2/**'
+      - '.github/workflows/publish-exam2.yml'
+  pull_request:
+    paths:
+      - 'exams/tnufa-exam-2/**'
+      - '.github/workflows/publish-exam2.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: publish-exam2-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      # 'true' once the PAGES_DEPLOY_TOKEN secret exists; until then main still builds and verifies,
+      # publishing is skipped with a visible warning, and the last good version stays live.
+      HAS_PAGES_TOKEN: ${{ secrets.PAGES_DEPLOY_TOKEN != '' }}
+    steps:
+      - name: Checkout Tnufa (single source of truth)
+        uses: actions/checkout@v4
+        with:
+          path: Tnufa
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies (Chromium + PyMuPDF)
+        working-directory: Tnufa
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright pymupdf
+          python -m playwright install --with-deps chromium
+
+      - name: Build student booklet, reader and district pages
+        working-directory: Tnufa
+        run: python exams/tnufa-exam-2/build.py --student --snapshots
+
+      - name: Upload the built student outputs (for review)
+        uses: actions/upload-artifact@v4
+        with:
+          name: tnufa-exam-2-public
+          path: Tnufa/exams/tnufa-exam-2/public
+          if-no-files-found: error
+
+      # ---- Publish only from main / manual runs. A pull request stops after build + verify. ----
+      - name: Publishing skipped — PAGES_DEPLOY_TOKEN not set
+        if: github.event_name != 'pull_request' && env.HAS_PAGES_TOKEN != 'true'
+        run: echo "::warning title=Publish skipped::Add the repository secret PAGES_DEPLOY_TOKEN (contents:write on yanivmizrachiy/tnufa-exam-2) to publish automatically. The build and version gate passed; the live site keeps its last good version."
+
+      - name: Check out the GitHub Pages repo
+        if: github.event_name != 'pull_request' && env.HAS_PAGES_TOKEN == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: yanivmizrachiy/tnufa-exam-2
+          path: tnufa-exam-2
+          token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+
+      - name: Publish student outputs to GitHub Pages (verified, direct to main)
+        if: github.event_name != 'pull_request' && env.HAS_PAGES_TOKEN == 'true'
+        working-directory: Tnufa
+        env:
+          SITE_DIR: ${{ github.workspace }}/tnufa-exam-2
+        run: |
+          git config --global user.name "tnufa-exam-2 publisher"
+          git config --global user.email "noreply@github.com"
+          python exams/tnufa-exam-2/tools/publish.py --push-main
