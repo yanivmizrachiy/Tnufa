@@ -73,6 +73,10 @@ def run(qs, update_hashes=False):
             if not p.key.strip() or not p.how.strip():
                 fail("q%d%s: answer-key row (KEY) is empty" % (q.n, p.letter))
             pts = [r[0] for r in p.rubric]
+            if pts[-1] != 0 or len(pts) != len(set(pts)) or any(x < 0 or x > p.points for x in pts):
+                fail("q%d%s: invalid or repeated rubric score levels" % (q.n, p.letter))
+            if any(not isinstance(c, str) or not c.strip() for _, c in p.rubric):
+                fail("q%d%s: rubric has empty criterion" % (q.n, p.letter))
             if pts != sorted(pts, reverse=True) or pts[0] != p.points:
                 fail("q%d%s: rubric rows must descend from %d to 0" % (q.n, p.letter, p.points))
             if ("הציגו את דרך הפתרון" in p.html or "נמקו" in p.html) and '<div class="work"' not in p.html:
