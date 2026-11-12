@@ -150,7 +150,7 @@ def verify_public():
             if combined_a4.page_count != student_a4.page_count + nkey:
                 errors.append("A4 combined actual page count mismatch")
             full_text = "".join(pg.get_text() for pg in key_a4)
-            if len(re.findall(r'כללי\s+ניקוד', full_text)) != 41:
+            if len(re.findall(r'(?:כללי\s+ניקוד|ניקוד\s+כללי)', full_text)) != 41:
                 errors.append("A4 printable key is missing scoring criteria")
             if combined_a4.page_count == student_a4.page_count + nkey:
                 for page_index in range(student_a4.page_count):
