@@ -24,7 +24,7 @@ REPO = os.path.abspath(os.path.join(EXAM2, "..", ".."))
 PUBLIC = os.path.join(EXAM2, "public")
 SITE = os.environ.get("SITE_DIR") or os.path.abspath(os.path.join(REPO, "..", "tnufa-exam-2"))
 SITE_REPO = "yanivmizrachiy/tnufa-exam-2"
-KEEP = {".git"}                      # everything else in the site repo is regenerated
+KEEP = {".git", ".github"}           # preserve GitHub release workflow; regenerate the site content
 SKIP = {".print.html", ".preview.html", ".answer-key-print.html"}
 
 README = """# מבחן תנופה לדוגמה — אתר הפרסום (נוצר אוטומטית)
