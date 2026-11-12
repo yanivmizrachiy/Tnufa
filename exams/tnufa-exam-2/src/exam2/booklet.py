@@ -355,9 +355,19 @@ def draft_sheet(n):
 
 
 def key_group(q):
-    """Rows and scoring criteria from the SAME Part objects used by the teacher booklet."""
+    """Preserve the previous exam's five-column layout and merged question/topic cells.
+
+    Keep the new exam's validated per-part scoring inside the solution column.
+    Desktop: one numbered question/topic cell spanning all parts, exactly as in
+    tools/build_exam.py. Mobile: the whole <tbody> remains one grouped card.
+    """
     rows = ""
-    for p in q.parts:
+    for index, p in enumerate(q.parts):
+        lead = (
+            '<td class="kq" rowspan="%d" data-label="שאלה"><span class="num">%d</span></td>'
+            '<td class="kt" rowspan="%d" data-label="נושא">%s</td>'
+            % (len(q.parts), q.n, len(q.parts), q.topic)
+        ) if index == 0 else ""
         rubric = "".join(
             '<div class="krl"><span class="krp">%d נק׳</span> — %s</div>' % (points, criterion)
             for points, criterion in p.rubric
@@ -365,12 +375,11 @@ def key_group(q):
         scoring = ('<div class="rubric-breakdown"><div class="krh">כללי ניקוד (מתוך %d נק׳)</div>%s</div>'
                    % (p.points, rubric))
         rows += (
-            '<tr><td class="kq" data-label="שאלה"><span class="num">%d</span></td>'
-            '<td class="kt" data-label="נושא">%s</td>'
+            '<tr>%s'
             '<td class="kp" data-label="סעיף">%s</td>'
             '<td class="ka" data-label="תשובה">%s</td>'
             '<td class="khow" data-label="דרך הפתרון וכללי ניקוד">%s%s</td></tr>'
-        ) % (q.n, q.topic, p.letter or "—", p.key, p.how, scoring)
+        ) % (lead, p.letter or "—", p.key, p.how, scoring)
     return "<tbody>%s</tbody>" % rows
 
 
