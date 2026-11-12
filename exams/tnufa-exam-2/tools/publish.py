@@ -2,12 +2,15 @@
 """Publish the student outputs (public/) to the GitHub Pages repo yanivmizrachiy/tnufa-exam-2.
 
 The site repo is a pure build artifact of this folder: it is wiped and re-filled from public/ on every run,
-so the single source of truth stays here (src/exam2/questions/*.py → build.py → public/). The generated
-student outputs (STUDENT.pdf, index.html, manifest.json) are not committed in Tnufa; this script rebuilds them
-from the committed source and the site repo is the only place they are stored.
+so the single source of truth stays here (src/exam2/questions/*.py → build.py → public/).
 
-    python exams/tnufa-exam-2/tools/publish.py            # copy, commit on a branch, push, open a PR
-    python exams/tnufa-exam-2/tools/publish.py --dry-run  # only show what would change
+    python exams/tnufa-exam-2/tools/publish.py             # copy, commit on a branch, push, open a PR
+    python exams/tnufa-exam-2/tools/publish.py --push-main # verify + copy, commit and push site main directly (CI path)
+    python exams/tnufa-exam-2/tools/publish.py --dry-run   # only show what would change
+
+Every publish first runs a fail-closed version gate (verify_public): the reader manifest, the district
+workbook manifest and STUDENT.pdf must describe one version and all referenced pages/assets must exist,
+so a half-built or mismatched tree is never published and the last good version stays live.
 
 Requires: a clone of the site repo next to the Tnufa checkout (../tnufa-exam-2), or SITE_DIR env var; gh logged in.
 """
@@ -53,6 +56,31 @@ def sha(p):
     return h.hexdigest()
 
 
+def verify_public():
+    """Fail-closed version gate: the reader manifest, the district workbook manifest and STUDENT.pdf
+    must describe ONE version, and every page/asset they reference must exist. Returns (version, errors).
+    Only student outputs may be published — a teacher PDF in public/ is an error."""
+    rm = json.load(open(os.path.join(PUBLIC, "manifest.json"), encoding="utf-8"))
+    wm = json.load(open(os.path.join(PUBLIC, "WORKBOOK_MANIFEST.json"), encoding="utf-8"))
+    pdf_sha = "sha256-" + sha(os.path.join(PUBLIC, "STUDENT.pdf"))
+    errors = []
+    if not (rm["pdf"]["sha256"] == wm["pdf"]["sha256"] == pdf_sha):
+        errors.append("PDF sha differs across version: reader=%s workbook=%s actual=%s"
+                      % (rm["pdf"]["sha256"][:21], wm["pdf"]["sha256"][:21], pdf_sha[:21]))
+    counts = {rm["pages"], wm["totalPages"], len(wm["pages"]), rm["pdf"]["pageCount"], wm["pdf"]["pageCount"]}
+    if len(counts) != 1:
+        errors.append("page count differs across version: %s" % sorted(counts))
+    for page in wm["pages"]:
+        if not os.path.exists(os.path.join(PUBLIC, page["file"])):
+            errors.append("district page referenced by manifest is missing: %s" % page["file"])
+    for href in (wm.get("assets", {}).get("css") or []):
+        if not os.path.exists(os.path.join(PUBLIC, href)):
+            errors.append("stylesheet referenced by manifest is missing: %s" % href)
+    if os.path.exists(os.path.join(PUBLIC, "TEACHER.pdf")) or os.path.isdir(os.path.join(PUBLIC, "private")):
+        errors.append("teacher material must never reach the published folder")
+    return pdf_sha, errors
+
+
 def refill(src_sha, dry=False):
     """Wipe the site clone (except .git) and copy public/ + README + SOURCE.json into it."""
     for name in os.listdir(SITE):
@@ -87,13 +115,21 @@ def main(argv):
     if not os.path.isdir(os.path.join(SITE, ".git")):
         print("site clone not found at %s — run: gh repo clone %s %s" % (SITE, SITE_REPO, SITE))
         return 1
+    if not os.path.exists(os.path.join(PUBLIC, "STUDENT.pdf")):
+        print("public/STUDENT.pdf missing — run build.py first")
+        return 1
+    # Fail-closed: never publish a half-built or mismatched version (keeps the last good one live).
+    version, verr = verify_public()
+    if verr:
+        print("REFUSING to publish — version verification failed:")
+        for e in verr:
+            print("  -", e)
+        return 1
+    print("version verified: %s — manifest, district pages and PDF agree" % version[:21])
     src_sha = run(["git", "rev-parse", "HEAD"], REPO).stdout.strip()
     dirty = run(["git", "status", "--porcelain", "--", "exams/tnufa-exam-2"], REPO).stdout.strip()
-    if dirty and not dry:
-        print("exams/tnufa-exam-2 has uncommitted changes — commit first, so the site is built from a real source commit.")
-        return 1
-    # the student outputs are not kept in git: always rebuild them from the committed source before publishing
-    run([sys.executable, os.path.join(EXAM2, "build.py"), "--student"], REPO)
+    if dirty:
+        print("WARNING: exams/tnufa-exam-2 has uncommitted changes; SOURCE.json will point at HEAD, not at these files.")
 
     refill(src_sha, dry)
 
@@ -104,10 +140,21 @@ def main(argv):
     if not status:
         print("site already up to date with public/")
         return 0
+    msg = "Publish exam outputs from Tnufa@%s\n\nversion %s\nGenerated by exams/tnufa-exam-2/tools/publish.py" % (src_sha[:10], version[:21])
+    # The site repo is a build artifact served straight from main (Pages, deploy-from-branch), so the
+    # automated path commits to main directly — no review PR to merge, which is what makes the update
+    # automatic. --push-main is used by CI and by local publishes once the build is verified above.
+    if "--push-main" in argv:
+        run(["git", "checkout", "-q", "main"], SITE, check=False)
+        run(["git", "add", "-A"], SITE)
+        run(["git", "commit", "-q", "-m", msg], SITE)
+        run(["git", "push", "-q", "origin", "HEAD:main"], SITE)
+        print("published to %s main (source %s) → GitHub Pages will serve https://yanivmizrachiy.github.io/tnufa-exam-2/" % (SITE_REPO, src_sha[:10]))
+        return 0
     branch = "publish-%s-%s" % (datetime.date.today().strftime("%Y%m%d"), src_sha[:7])
     run(["git", "checkout", "-q", "-B", branch], SITE)
     run(["git", "add", "-A"], SITE)
-    run(["git", "commit", "-q", "-m", "Publish exam outputs from Tnufa@%s\n\nGenerated by exams/tnufa-exam-2/tools/publish.py" % src_sha[:10]], SITE)
+    run(["git", "commit", "-q", "-m", msg], SITE)
     run(["git", "push", "-u", "origin", branch, "--force-with-lease"], SITE)
     r = run(["gh", "pr", "create", "--repo", SITE_REPO, "--base", "main", "--head", branch, "--fill"], SITE, check=False)
     if r.returncode != 0:

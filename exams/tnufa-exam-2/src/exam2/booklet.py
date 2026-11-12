@@ -37,7 +37,11 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .foot.fin span{color:#dbe7f5}
 /* questions */
 .q{padding-block:14px 16px;border-top:1.5px solid var(--line)}
-.q:first-child{border-top:0;padding-top:0}
+.q:first-child,.student-fields + .q{border-top:0;padding-top:0}
+.student-fields{display:grid;grid-template-columns:1.5fr 1fr;gap:22px;margin:0 0 18px;padding:10px 15px;border:1px solid #cdd8e4;border-radius:8px;color:var(--ink);direction:rtl;font-size:14px}
+.student-fields .entry{display:flex;align-items:baseline;gap:10px;min-width:0}
+.student-fields .entry b{white-space:nowrap;font-weight:600}
+.student-fields .entry span{flex:1;height:22px;border-bottom:1.3px solid #647789}
 .qh{display:flex;gap:12px;align-items:flex-start}
 .num{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:var(--g3);color:#fff;font-weight:700;font-size:18px;
   display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
@@ -203,6 +207,10 @@ ul.rules{margin:4px 0;padding-inline-start:20px}
 ul.rules li{margin:3px 0}
 """
 
+STUDENT_FIELDS = ('<div class="student-fields" aria-label="פרטי התלמיד">'
+    '<div class="entry"><b>שם התלמיד/ה:</b><span></span></div>'
+    '<div class="entry"><b>כיתה:</b><span></span></div></div>')
+
 GRID_JS = r"""
 /* Writing windows: plain whole squares only. */
 const LINE = 'stroke="#b5cce0" stroke-width="0.7"';
@@ -274,7 +282,7 @@ GEO = ('<div class="bg" aria-hidden="true"><span class="blob b1"></span><span cl
 
 
 def cover(teacher=False, assets="assets/"):
-    """Same branding as the existing site cover (index.html of the original exam): photo banner with the note,
+    """Keeps the existing cover structure but uses original vector mathematics/Jerusalem artwork with the note,
     Suez One title, grade circle, 'ישראל תצליח' badge, credit line with the round logo."""
     note = ('<figure class="note"><span class="tape" aria-hidden="true"></span><p><span class="hl">מירושלים תצא התנופה</span> '
             'ויפרצו המצליחים את הגבולות, ויגיעו <b>לאינסוף ∞</b></p></figure>')
@@ -286,13 +294,12 @@ def cover(teacher=False, assets="assets/"):
             '<g fill="none" stroke="#0038b8" stroke-width="2.4" stroke-linejoin="round"><path d="M33 15.5l6.1 10.6H26.9z"/><path d="M33 28.5l-6.1-10.6h12.2z"/></g></svg>')
     badges = ('<div class="cv-badges"><span class="grade" aria-label="כיתה ט׳"><small>כיתה</small><b>ט׳</b></span>'
               '<span class="israel" aria-label="ישראל תצליח">%s<b>ישראל תצליח</b></span></div>' % flag)
-    fields = ('<div class="fields"><div class="field"><label>שם התלמיד/ה:</label><span class="line"></span></div>'
-              '<div class="field"><label>כיתה:</label><span class="line"></span></div></div>')
+    fields = ""  # Student identification is at the top of the first questions page.
     badge = '<span class="badge">חוברת מורה — פתרונות ומחוון</span>' if teacher else ""
     if teacher:
         fields = '<div class="fields"><div class="field"><label>שם המורה:</label><span class="line"></span></div><div class="field"><label>כיתה:</label><span class="line"></span></div></div>'
     return ('<section class="page cover%s">'
-            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover.jpg" alt="תלמיד ושתי תלמידות לומדים מתמטיקה על מרפסת אבן מול חומות העיר העתיקה בירושלים בשקיעה">'
+            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover-math.svg" alt="שלושה תלמידים לומדים מתמטיקה מול נוף ירושלים, אחד מהם חובש כיפה">'
             '<p class="kicker">לקראת תנופה</p>%s</figure>'
             '<div class="cv-body">%s'
             '<div class="head"><h1 class="title">%s</h1><p class="sub">%s</p>%s%s</div>%s'

@@ -54,8 +54,16 @@ class Browser:
 
     def open(self, path):
         self.pg.goto(_uri(path), wait_until="networkidle")
-        self.pg.evaluate("document.fonts.ready.then(()=>1)")
-        self.pg.wait_for_timeout(150)
+        # Force every declared @font-face to download, then wait for the set to settle. Relying on
+        # document.fonts.ready alone is flaky: it can resolve before swap-loaded faces are requested,
+        # so the check below would fail. Loading each face (plus the two asserted specs) explicitly
+        # makes the render deterministic and guarantees the cover's display fonts are ready for the PDF.
+        self.pg.evaluate(
+            "() => Promise.all(["
+            "  document.fonts.load('15px Heebo'), document.fonts.load('700 22px Rubik'),"
+            "  ...[...document.fonts].map(f => f.load())"
+            "].map(p => Promise.resolve(p).catch(() => null))).then(() => document.fonts.ready)"
+        )
         assert self.pg.evaluate("document.fonts.check('15px Heebo') && document.fonts.check('700 22px Rubik')"), "fonts did not load"
         assert not self.errs, self.errs
 
@@ -71,13 +79,28 @@ def paginate(bw, qs, tmp):
     avail = bw.pg.evaluate("""() => { const c = document.createElement('section'); c.className='page';
         c.innerHTML='<div class="content"></div>'; document.body.append(c);
         const h = c.querySelector('.content').getBoundingClientRect().height; c.remove(); return h; }""")
+    # Reserve the measured student-name/class header only on the FIRST question sheet.
+    header_h = bw.pg.evaluate("""(markup) => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = markup;
+        const header = wrapper.firstElementChild;
+        const content = document.querySelector('.content');
+        content.prepend(header);
+        const computed = getComputedStyle(header);
+        const height = header.getBoundingClientRect().height + parseFloat(computed.marginBottom || '0');
+        header.remove();
+        return height;
+    }""", B.STUDENT_FIELDS)
+    assert heights[0] <= avail - header_h, "question 1 cannot fit under student details"
     too_tall = [qs[i].n for i, h in enumerate(heights) if h > avail]
     assert not too_tall, "questions taller than one sheet: %s" % too_tall
     sheets, cur, used = [], [], 0.0
+    page_avail = avail - header_h
     for i, h in enumerate(heights):
-        if cur and used + h > avail:
+        if cur and used + h > page_avail:
             sheets.append(cur)
             cur, used = [], 0.0
+            page_avail = avail
         cur.append(i)
         used += h
     sheets.append(cur)
@@ -91,7 +114,8 @@ def student_pages(qs, sheets):
     pages.append(B.sheet(B.INTRO, n))
     for s in sheets:
         n += 1
-        pages.append(B.sheet("".join(qs[i].student_html for i in s), n))
+        question_body = "".join(qs[i].student_html for i in s)
+        pages.append(B.sheet((B.STUDENT_FIELDS if n == 3 else "") + question_body, n))
     for d in (1, 2):
         n += 1
         pages.append(B.sheet(B.draft_sheet(d), n))
@@ -117,40 +141,22 @@ def render_student(bw, qs, log=print):
         rendered = bw.pg.evaluate("Array.from(document.querySelectorAll('.page')).map(s => s.outerHTML)")
         raw = STUDENT_PDF + ".raw"
         bw.pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-
-        # the answer key: one long page as tall as its content (as in the previous exam), after the closing page
-        key_page = B.sheet(B.key_sheet(qs)).replace('class="page "', 'class="page key-page" style="height:auto;overflow:visible"', 1)
-        _write(tmp, B.head(B.TITLE) + key_page + "</body></html>")
-        bw.open(tmp)
-        key_h = math.ceil(bw.pg.evaluate("document.querySelector('.page').getBoundingClientRect().height")) + 48
-        bw.pg.evaluate("h => { const s = document.querySelector('.page').style; s.height = h + 'px'; s.overflow = 'hidden'; }", key_h)
-        assert not bw.errs, bw.errs
-        rendered.append(bw.pg.evaluate("document.querySelector('.page').outerHTML"))
-        key_raw = STUDENT_PDF + ".key"
-        bw.pg.add_style_tag(content="@page{size:210mm %dpx;margin:0}.page{break-after:auto}.key tbody{break-inside:auto}" % key_h)
-        bw.pg.pdf(path=key_raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
-        log("key page height: %d px" % key_h)
     finally:
         if os.path.exists(tmp):
             os.remove(tmp)
     doc = fitz.open(raw)
     assert doc.page_count == len(pages), (doc.page_count, len(pages))
-    key_doc = fitz.open(key_raw)
-    assert key_doc.page_count == 1, key_doc.page_count
-    doc.insert_pdf(key_doc)
-    key_doc.close()
-    os.remove(key_raw)
     toc = [[1, "עמוד שער", 1], [1, "הוראות", 2]]
     for i, s in enumerate(sheets):
         toc += [[1, "שאלה %d" % qs[k].n, i + 3] for k in s]
     n = len(sheets) + 3
-    toc += [[1, "דף טיוטה 1", n], [1, "דף טיוטה 2", n + 1], [1, "עמוד סיום", n + 2], [1, "מחוון תשובות", n + 3]]
+    toc += [[1, "דף טיוטה 1", n], [1, "דף טיוטה 2", n + 1], [1, "עמוד סיום", n + 2]]
     doc.set_toc(toc)
     doc.set_metadata({"title": B.TITLE + " — " + B.SUBTITLE, "author": "יניב רז", "subject": "לקראת תנופה — מבחן לדוגמה, נובמבר 2026"})
     doc.save(STUDENT_PDF, garbage=4, deflate=True)
     doc.close()
     os.remove(raw)
-    log("wrote public/STUDENT.pdf: %d pages (+ answer key), %d KB" % (len(pages) + 1, os.path.getsize(STUDENT_PDF) // 1024))
+    log("wrote public/STUDENT.pdf: %d pages, %d KB" % (len(pages), os.path.getsize(STUDENT_PDF) // 1024))
     emit_reader(qs, sheets, rendered)
     return sheets, rendered
 
@@ -166,12 +172,15 @@ body{background:#e3e9ef;margin:0}
 .brand small{font-size:11.5px;opacity:.8}
 .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0;max-width:100%}
 .btn{display:inline-flex;align-items:center;gap:6px;background:#276149;color:#fff;border:0;border-radius:999px;padding:8px 14px;font:600 14px Heebo,Arial,sans-serif;cursor:pointer;text-decoration:none}
+.btn.alt{background:#2d4799}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.4)}
+select.btn{appearance:none;padding-inline-end:22px}
 main{padding:18px 0 40px}
 main{overflow:hidden;direction:ltr}
 .wrap{width:794px;transform-origin:top left;direction:rtl;margin:0}
-.wrap .page{margin:0 auto;box-shadow:0 0 0 1px #c3ced8}
-.sep{width:210mm;max-width:100%;height:2px;background:#126c6a;margin:0 auto}
-@media screen and (max-width:860px){.brand small{display:none}}
+.wrap .page{box-shadow:0 10px 30px rgba(10,30,50,.18);margin:0 auto 18px}
+.sep{width:210mm;max-width:100%;height:3px;background:#126c6a;margin:0 auto 18px;border-radius:2px}
+@media screen and (max-width:860px){.brand small{display:none}.btn span.l{display:none}select.btn{max-width:150px;font-size:13px}}
 @media print{body{background:#fff}.topbar,.sep{display:none}main{padding:0}.wrap{transform:none!important;height:auto!important}.wrap .page{box-shadow:none;margin:0}}
 """
 
@@ -186,15 +195,24 @@ READER_JS = r"""
     wrap.style.height=(wrap.scrollHeight*s)+'px';
   }
   window.addEventListener('resize',fit); window.addEventListener('load',fit); fit();
+  document.getElementById('goto').addEventListener('change',e=>{const id=e.target.value; if(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});e.target.value='';}});
+  document.getElementById('print').addEventListener('click',()=>window.print());
 })();
 """
 
 
 def emit_reader(qs, sheets, rendered):
     """public/index.html: the cover and every A4 sheet, inline, from the same render as the PDF."""
+    opts = ['<option value="">מעבר בחוברת…</option>', '<option value="p1">עמוד שער</option>', '<option value="p2">הוראות</option>']
+    for q in qs:
+        opts.append('<option value="q%d">שאלה %d — %s</option>' % (q.n, q.n, q.topic))
+    n = len(sheets) + 3
+    opts += ['<option value="p%d">דף טיוטה 1</option>' % n, '<option value="p%d">דף טיוטה 2</option>' % (n + 1), '<option value="p%d">עמוד סיום</option>' % (n + 2)]
     body = ('<header class="topbar"><div class="in"><a class="brand" href="#p1"><img src="assets/logo.svg" alt=""><span><strong>%s</strong><small>%s</small></span></a>'
-            '<div class="acts"><a class="btn" href="STUDENT.pdf" download="מבחן-תנופה-לדוגמה.pdf">⬇ הורדה</a></div></div></header>'
-            '<main><div id="wrap" class="wrap">' % (B.TITLE, B.SUBTITLE))
+            '<div class="acts"><select id="goto" class="btn ghost" aria-label="מעבר בחוברת">%s</select>'
+            '<button id="print" class="btn alt" type="button">🖨 <span class="l">הדפסה</span></button>'
+            '<a class="btn" href="STUDENT.pdf" download="מבחן-תנופה-לדוגמה.pdf">⬇ <span class="l">הורדה</span></a></div></div></header>'
+            '<main><div id="wrap" class="wrap">' % (B.TITLE, B.SUBTITLE, "".join(opts)))
     for i, html in enumerate(rendered):
         page = html.replace('<section class="page', '<section id="p%d" class="page' % (i + 1), 1)
         body += page + ('<div class="sep"></div>' if i < len(rendered) - 1 else "")
@@ -209,6 +227,42 @@ def emit_reader(qs, sheets, rendered):
     }
     _write(os.path.join(PUBLIC, "manifest.json"), json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     print("wrote public/index.html + manifest.json (%d pages)" % len(rendered))
+    emit_district_reader(rendered, manifest)
+
+
+def emit_district_reader(rendered, manifest):
+    """Expose the same student sheets through the district's native workbook format."""
+    css = B.CSS.replace(":root{", ":host,:root{", 1).replace("body{color:", "body,.a4-page{color:", 1)
+    pages = []
+    digest = hashlib.sha256()
+    for number, sheet in enumerate(rendered, start=1):
+        assert sheet.startswith('<section class="page'), "unexpected student sheet root"
+        sheet = sheet.replace('<section class="page', '<section dir="rtl" class="page a4-page', 1)
+        html = (
+            '<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">'
+            '<base href="../"><link rel="stylesheet" href="district/pages.css">'
+            '<link rel="stylesheet" href="%s"></head><body>%s</body></html>\n'
+            % (B.FONTS, sheet)
+        )
+        digest.update(html.encode("utf-8"))
+        filename = "district/page-%d.html" % number
+        pages.append({"file": filename, "workbookNumber": number})
+        _write(os.path.join(PUBLIC, filename), html)
+    _write(os.path.join(PUBLIC, "district/pages.css"), css)
+    workbook = {
+        "schemaVersion": 3,
+        "id": manifest["id"],
+        "name": manifest["name"],
+        "pageSelector": ".a4-page",
+        "totalPages": len(pages),
+        "cover": None,
+        "pages": pages,
+        "assets": {"css": ["district/pages.css"], "fontsCss": B.FONTS},
+        "contentHash": "sha256-" + digest.hexdigest(),
+        "pdf": {**manifest["pdf"], "coverPages": 0},
+    }
+    _write(os.path.join(PUBLIC, "WORKBOOK_MANIFEST.json"), json.dumps(workbook, ensure_ascii=False, indent=2) + "\n")
+
 
 
 # ---------------- teacher ----------------
@@ -218,21 +272,8 @@ def render_teacher(bw, qs, plan, log=print):
     _write(html_path, B.teacher_doc(qs, plan, assets="../public/assets/"))
     bw.open(html_path)
     raw = TEACHER_PDF + ".raw"
-    bw.pg.pdf(path=raw, prefer_css_page_size=True, print_background=True)
-    # footer: rendered once on its own 210mm × 92px sheet and stamped into the empty 92px bottom margin of every
-    # page except the cover, so rubric text can never slide under it
-    foot_html = os.path.join(PRIVATE, ".tfoot.html")
-    _write(foot_html, B.head("footer", "@page{size:210mm 92px;margin:0}html,body{margin:0}.tfoot{position:relative}") +
-           B.tfoot(assets="../public/assets/") + "</body></html>")
-    bw.open(foot_html)
-    foot_pdf = raw + ".foot"
-    bw.pg.pdf(path=foot_pdf, prefer_css_page_size=True, print_background=True)
-    os.remove(foot_html)
+    bw.pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
     doc = fitz.open(raw)
-    fdoc = fitz.open(foot_pdf)
-    for i in range(1, doc.page_count):
-        r = doc[i].rect
-        doc[i].show_pdf_page(fitz.Rect(0, r.height - fdoc[0].rect.height, r.width, r.height), fdoc, 0)
     toc = [[1, "שער", 1], [1, "מפת המבחן וכללי בדיקה", 2]]
     # find the page of every question by its heading text
     for q in qs:
@@ -246,9 +287,7 @@ def render_teacher(bw, qs, plan, log=print):
     doc.save(TEACHER_PDF, garbage=4, deflate=True)
     pc = doc.page_count
     doc.close()
-    fdoc.close()
     os.remove(raw)
-    os.remove(foot_pdf)
     log("wrote private/TEACHER.pdf: %d pages, %d KB" % (pc, os.path.getsize(TEACHER_PDF) // 1024))
     return pc
 
