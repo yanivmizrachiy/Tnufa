@@ -7,6 +7,7 @@ so the single source of truth stays here (src/exam2/questions/*.py → build.py 
     python exams/tnufa-exam-2/tools/publish.py             # copy, commit on a branch, push, open a PR
     python exams/tnufa-exam-2/tools/publish.py --push-main # verify + copy, commit and push site main directly (CI path)
     python exams/tnufa-exam-2/tools/publish.py --dry-run   # only show what would change
+    python exams/tnufa-exam-2/tools/publish.py --verify-only # CI preflight without site checkout
 
 Every publish first runs a fail-closed version gate (verify_public): the reader manifest, the district
 workbook manifest and STUDENT.pdf must describe one version and all referenced pages/assets must exist,
@@ -100,6 +101,30 @@ def verify_public():
         if ('id="answer-key"' not in index or
                 index.count('class="rubric-breakdown"') < 41):
             errors.append("public reader is missing the full 41-part scoring key")
+    # Inspect actual PDF bytes, not only manifest declarations and file hashes.
+    # Catch a truncated, swapped or mismatched PDF before release.
+    try:
+        import fitz
+        with fitz.open(os.path.join(PUBLIC, "STUDENT.pdf")) as student, \
+             fitz.open(os.path.join(PUBLIC, "ANSWER_KEY.pdf")) as key, \
+             fitz.open(os.path.join(PUBLIC, "EXAM_WITH_KEY.pdf")) as combined:
+            if student.page_count != rm["pdf"]["pageCount"]:
+                errors.append("STUDENT.pdf actual page count mismatch")
+            if key.page_count != 1:
+                errors.append("ANSWER_KEY.pdf must have one long page")
+            if combined.page_count != student.page_count + 1:
+                errors.append("EXAM_WITH_KEY.pdf must contain student pages plus one key page")
+            if key.page_count and len(key[0].get_text()) < 1000:
+                errors.append("ANSWER_KEY.pdf missing readable answer-key content")
+            if combined.page_count == student.page_count + 1 and key.page_count:
+                for page_index in range(student.page_count):
+                    if student[page_index].get_text() != combined[page_index].get_text():
+                        errors.append("combined PDF differs from student at page %d" % (page_index + 1))
+                        break
+                if combined[-1].get_text() != key[0].get_text():
+                    errors.append("combined PDF's last page differs from ANSWER_KEY.pdf")
+    except (OSError, ValueError, RuntimeError, KeyError, IndexError) as exc:
+        errors.append("PDF structural preflight failed: %s" % exc)
     if os.path.exists(os.path.join(PUBLIC, "TEACHER.pdf")) or os.path.isdir(os.path.join(PUBLIC, "private")):
         errors.append("teacher material must never reach the published folder")
     return pdf_sha, errors
@@ -136,6 +161,19 @@ def refill(src_sha, dry=False):
 
 def main(argv):
     dry = "--dry-run" in argv
+    if "--verify-only" in argv:
+        # CI preflight: no site clone, token, file modifications or release needed.
+        if not os.path.isfile(os.path.join(PUBLIC, "STUDENT.pdf")):
+            print("REFUSING release — public/STUDENT.pdf missing")
+            return 1
+        version, errors = verify_public()
+        if errors:
+            print("REFUSING release — preflight checks failed:")
+            for error in errors:
+                print("  -", error)
+            return 1
+        print("release preflight OK: manifest, 41 scoring rows, 17 student pages, key PDF and combined PDF")
+        return 0
     if not os.path.isdir(os.path.join(SITE, ".git")):
         print("site clone not found at %s — run: gh repo clone %s %s" % (SITE, SITE_REPO, SITE))
         return 1
