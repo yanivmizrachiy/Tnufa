@@ -13,6 +13,8 @@ PUBLIC = os.path.join(ROOT, "public")
 PRIVATE = os.path.join(ROOT, "private")
 BUILD = os.path.join(ROOT, "build")
 STUDENT_PDF = os.path.join(PUBLIC, "STUDENT.pdf")
+ANSWER_KEY_PDF = os.path.join(PUBLIC, "ANSWER_KEY.pdf")
+WITH_KEY_PDF = os.path.join(PUBLIC, "EXAM_WITH_KEY.pdf")
 TEACHER_PDF = os.path.join(PRIVATE, "TEACHER.pdf")
 
 
@@ -144,8 +146,61 @@ def render_student(bw, qs, log=print):
     doc.close()
     os.remove(raw)
     log("wrote public/STUDENT.pdf: %d pages (students-only, no key), %d KB" % (len(pages), os.path.getsize(STUDENT_PDF) // 1024))
-    emit_reader(qs, sheets, rendered)
+    key_markup = render_public_key(bw, qs, log=log)
+    emit_reader(qs, sheets, rendered, key_markup)
     return sheets, rendered
+
+
+def render_public_key(bw, qs, log=print):
+    """Render the checked scoring table once; append it to a separate teacher-download PDF.
+
+    Keep STUDENT.pdf and the district's 17 A4 question pages unchanged.
+    EXAM_WITH_KEY.pdf follows the previous exam's one-long-key-page convention.
+    """
+    key_html = B.key_sheet(qs)
+    part_count = sum(len(q.parts) for q in qs)
+    assert key_html.count('class="rubric-breakdown"') == part_count
+    assert key_html.count('class="khow"') == part_count
+    assert all(p.rubric[0][0] == p.points and p.rubric[-1][0] == 0
+               for q in qs for p in q.parts)
+    tmp = os.path.join(PUBLIC, ".answer-key-print.html")
+    styles = ('html,body{margin:0;background:#fff;width:210mm}'
+              '.key-print{width:210mm;box-sizing:border-box;padding:34px 46px 40px}'
+              '.key-print .key{font-size:11.4px;line-height:1.34}'
+              '.key-print .key .rubric-breakdown{font-size:10.6px}'
+              '.key-print .key td{vertical-align:top}'
+              '.key-print .key tbody{break-inside:avoid}')
+    try:
+        _write(tmp, B.head("מחוון תשובות — " + B.TITLE, styles) +
+               '<section class="key-print">' + key_html + '</section></body></html>')
+        bw.open(tmp)
+        height = math.ceil(bw.pg.evaluate(
+            "document.querySelector('.key-print').getBoundingClientRect().height")) + 32
+        assert 1100 < height < 14000, "unexpected key sheet height: %s" % height
+        bw.pg.add_style_tag(content="@page{size:210mm %dpx;margin:0}" % height)
+        bw.pg.pdf(path=ANSWER_KEY_PDF, prefer_css_page_size=True, print_background=True,
+                  margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+        assert not bw.errs, bw.errs
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+    key_doc = fitz.open(ANSWER_KEY_PDF)
+    try:
+        assert key_doc.page_count == 1, "key must be one long PDF page"
+        assert len(key_doc[0].get_text()) > 1000, "key PDF rendered without enough text"
+        with fitz.open(STUDENT_PDF) as combined:
+            n = combined.page_count
+            combined.insert_pdf(key_doc)
+            assert combined.page_count == n + 1
+            combined.set_toc(combined.get_toc() + [[1, "מחוון תשובות", n + 1]])
+            combined.save(WITH_KEY_PDF, garbage=4, deflate=True)
+        with fitz.open(WITH_KEY_PDF) as check:
+            assert check.page_count == n + 1
+            assert len(check[n].get_text()) > 1000
+    finally:
+        key_doc.close()
+    log("checked public scoring key: %d parts; ANSWER_KEY.pdf and EXAM_WITH_KEY.pdf" % part_count)
+    return key_html
 
 
 READER_CSS = r"""
@@ -161,6 +216,10 @@ body{background:#e3e9ef;margin:0}
 .btn{display:inline-flex;align-items:center;gap:6px;background:#276149;color:#fff;border:0;border-radius:999px;padding:8px 14px;font:600 14px Heebo,Arial,sans-serif;cursor:pointer;text-decoration:none}
 main{padding:18px 0 40px}
 main{overflow:hidden;direction:ltr}
+.answer-panel{direction:rtl;background:#fff;max-width:1100px;margin:24px auto;padding:30px 36px;box-sizing:border-box;border:1px solid #cdd8d4;border-radius:10px}
+.answer-panel .key{width:100%;font-size:12px;line-height:1.42}
+.answer-panel .key td{vertical-align:top}
+.answer-panel .key .rubric-breakdown{font-size:11.7px}
 .wrap{width:794px;transform-origin:top left;direction:rtl;margin:0}
 .wrap .page{margin:0 auto;box-shadow:0 0 0 1px #c3ced8}
 .sep{width:210mm;max-width:100%;height:2px;background:#126c6a;margin:0 auto}
@@ -183,21 +242,23 @@ READER_JS = r"""
 """
 
 
-def emit_reader(qs, sheets, rendered):
+def emit_reader(qs, sheets, rendered, key_markup):
     """public/index.html: the cover and every A4 sheet, inline, from the same render as the PDF."""
     body = ('<header class="topbar"><div class="in"><a class="brand" href="#p1"><img src="assets/logo.svg" alt=""><span><strong>%s</strong><small>%s</small></span></a>'
-            '<div class="acts"><a class="btn" href="STUDENT.pdf" download="מבחן-תנופה-לדוגמה.pdf">⬇ הורדה</a></div></div></header>'
+            '<div class="acts"><a class="btn" href="STUDENT.pdf" download="מבחן-תנופה-לדוגמה.pdf">הורדת מבחן</a><a class="btn" href="#answer-key">מחוון וניקוד</a><a class="btn" href="EXAM_WITH_KEY.pdf" download="מבחן-תנופה-כולל-מחוון.pdf">מבחן + מחוון</a></div></div></header>'
             '<main><div id="wrap" class="wrap">' % (B.TITLE, B.SUBTITLE))
     for i, html in enumerate(rendered):
         page = html.replace('<section class="page', '<section id="p%d" class="page' % (i + 1), 1)
         body += page + ('<div class="sep"></div>' if i < len(rendered) - 1 else "")
-    body += '</div></main><script>%s</script>' % READER_JS
+    body += '</div><section id="answer-key" class="answer-panel" aria-label="מחוון תשובות וניקוד">' + key_markup + '</section></main><script>%s</script>' % READER_JS
     doc = B.head(B.TITLE + " — " + B.SUBTITLE, READER_CSS) + body + "</body></html>"
     doc = doc.replace("<head>", '<head><meta name="description" content="מבחן תנופה לדוגמה (נובמבר 2026) — הכנה לכיתה ט׳ במתמטיקה: צפייה בחוברת, הדפסה והורדת PDF.">', 1)
     _write(os.path.join(PUBLIC, "index.html"), doc)
     manifest = {
         "id": "tnufa-exam-2", "name": B.TITLE + " — " + B.SUBTITLE, "pages": len(rendered),
         "sheets": [[qs[i].n for i in s] for s in sheets], "pdf": {"file": "STUDENT.pdf", "sha256": "sha256-" + _sha(STUDENT_PDF), "pageCount": len(rendered)},
+        "answerKey": {"file": "ANSWER_KEY.pdf", "sha256": "sha256-" + _sha(ANSWER_KEY_PDF), "pageCount": 1},
+        "examWithKey": {"file": "EXAM_WITH_KEY.pdf", "sha256": "sha256-" + _sha(WITH_KEY_PDF), "pageCount": len(rendered) + 1},
         "builtAt": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     _write(os.path.join(PUBLIC, "manifest.json"), json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
