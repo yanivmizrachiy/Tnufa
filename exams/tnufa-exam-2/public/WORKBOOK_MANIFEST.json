@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 3,
+  "id": "tnufa-exam-2",
+  "name": "מבחן תנופה לדוגמה — מתמטיקה · הכנה לכיתה ט׳ · נובמבר 2026",
+  "pageSelector": ".a4-page",
+  "totalPages": 17,
+  "cover": null,
+  "pages": [
+    {
+      "file": "district/page-1.html",
+      "workbookNumber": 1
+    },
+    {
+      "file": "district/page-2.html",
+      "workbookNumber": 2
+    },
+    {
+      "file": "district/page-3.html",
+      "workbookNumber": 3
+    },
+    {
+      "file": "district/page-4.html",
+      "workbookNumber": 4
+    },
+    {
+      "file": "district/page-5.html",
+      "workbookNumber": 5
+    },
+    {
+      "file": "district/page-6.html",
+      "workbookNumber": 6
+    },
+    {
+      "file": "district/page-7.html",
+      "workbookNumber": 7
+    },
+    {
+      "file": "district/page-8.html",
+      "workbookNumber": 8
+    },
+    {
+      "file": "district/page-9.html",
+      "workbookNumber": 9
+    },
+    {
+      "file": "district/page-10.html",
+      "workbookNumber": 10
+    },
+    {
+      "file": "district/page-11.html",
+      "workbookNumber": 11
+    },
+    {
+      "file": "district/page-12.html",
+      "workbookNumber": 12
+    },
+    {
+      "file": "district/page-13.html",
+      "workbookNumber": 13
+    },
+    {
+      "file": "district/page-14.html",
+      "workbookNumber": 14
+    },
+    {
+      "file": "district/page-15.html",
+      "workbookNumber": 15
+    },
+    {
+      "file": "district/page-16.html",
+      "workbookNumber": 16
+    },
+    {
+      "file": "district/page-17.html",
+      "workbookNumber": 17
+    }
+  ],
+  "assets": {
+    "css": [
+      "district/pages.css"
+    ],
+    "fontsCss": "https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@700;900&family=Suez+One&family=Gveret+Levin+AlefAlefAlef&display=swap"
+  },
+  "contentHash": "sha256-b82f1c321f273f6c4efa06c92c7a613f1ca1b3ea45038680893f6d886bfc9698",
+  "pdf": {
+    "file": "STUDENT.pdf",
+    "sha256": "sha256-8278b63fa1cf4912fa6248bdc69ee11e920a709a6ff6b27b160f0f252122535d",
+    "pageCount": 17,
+    "coverPages": 0
+  }
+}

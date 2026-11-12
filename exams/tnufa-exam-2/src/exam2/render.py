@@ -54,8 +54,16 @@ class Browser:
 
     def open(self, path):
         self.pg.goto(_uri(path), wait_until="networkidle")
-        self.pg.evaluate("document.fonts.ready.then(()=>1)")
-        self.pg.wait_for_timeout(150)
+        # Force every declared @font-face to download, then wait for the set to settle. Relying on
+        # document.fonts.ready alone is flaky: it can resolve before swap-loaded faces are requested,
+        # so the check below would fail. Loading each face (plus the two asserted specs) explicitly
+        # makes the render deterministic and guarantees the cover's display fonts are ready for the PDF.
+        self.pg.evaluate(
+            "() => Promise.all(["
+            "  document.fonts.load('15px Heebo'), document.fonts.load('700 22px Rubik'),"
+            "  ...[...document.fonts].map(f => f.load())"
+            "].map(p => Promise.resolve(p).catch(() => null))).then(() => document.fonts.ready)"
+        )
         assert self.pg.evaluate("document.fonts.check('15px Heebo') && document.fonts.check('700 22px Rubik')"), "fonts did not load"
         assert not self.errs, self.errs
 
