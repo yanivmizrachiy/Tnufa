@@ -54,8 +54,16 @@ class Browser:
 
     def open(self, path):
         self.pg.goto(_uri(path), wait_until="networkidle")
-        self.pg.evaluate("document.fonts.ready.then(()=>1)")
-        self.pg.wait_for_timeout(150)
+        # Force every declared @font-face to download, then wait for the set to settle. Relying on
+        # document.fonts.ready alone is flaky: it can resolve before swap-loaded faces are requested,
+        # so the check below would fail. Loading each face (plus the two asserted specs) explicitly
+        # makes the render deterministic and guarantees the cover's display fonts are ready for the PDF.
+        self.pg.evaluate(
+            "() => Promise.all(["
+            "  document.fonts.load('15px Heebo'), document.fonts.load('700 22px Rubik'),"
+            "  ...[...document.fonts].map(f => f.load())"
+            "].map(p => Promise.resolve(p).catch(() => null))).then(() => document.fonts.ready)"
+        )
         assert self.pg.evaluate("document.fonts.check('15px Heebo') && document.fonts.check('700 22px Rubik')"), "fonts did not load"
         assert not self.errs, self.errs
 
@@ -219,6 +227,42 @@ def emit_reader(qs, sheets, rendered):
     }
     _write(os.path.join(PUBLIC, "manifest.json"), json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     print("wrote public/index.html + manifest.json (%d pages)" % len(rendered))
+    emit_district_reader(rendered, manifest)
+
+
+def emit_district_reader(rendered, manifest):
+    """Expose the same student sheets through the district's native workbook format."""
+    css = B.CSS.replace(":root{", ":host,:root{", 1).replace("body{color:", "body,.a4-page{color:", 1)
+    pages = []
+    digest = hashlib.sha256()
+    for number, sheet in enumerate(rendered, start=1):
+        assert sheet.startswith('<section class="page'), "unexpected student sheet root"
+        sheet = sheet.replace('<section class="page', '<section dir="rtl" class="page a4-page', 1)
+        html = (
+            '<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">'
+            '<base href="../"><link rel="stylesheet" href="district/pages.css">'
+            '<link rel="stylesheet" href="%s"></head><body>%s</body></html>\n'
+            % (B.FONTS, sheet)
+        )
+        digest.update(html.encode("utf-8"))
+        filename = "district/page-%d.html" % number
+        pages.append({"file": filename, "workbookNumber": number})
+        _write(os.path.join(PUBLIC, filename), html)
+    _write(os.path.join(PUBLIC, "district/pages.css"), css)
+    workbook = {
+        "schemaVersion": 3,
+        "id": manifest["id"],
+        "name": manifest["name"],
+        "pageSelector": ".a4-page",
+        "totalPages": len(pages),
+        "cover": None,
+        "pages": pages,
+        "assets": {"css": ["district/pages.css"], "fontsCss": B.FONTS},
+        "contentHash": "sha256-" + digest.hexdigest(),
+        "pdf": {**manifest["pdf"], "coverPages": 0},
+    }
+    _write(os.path.join(PUBLIC, "WORKBOOK_MANIFEST.json"), json.dumps(workbook, ensure_ascii=False, indent=2) + "\n")
+
 
 
 # ---------------- teacher ----------------
