@@ -63,17 +63,18 @@ class Browser:
 # ---------------- student ----------------
 def paginate(bw, qs, tmp):
     """Measure every question at the final column width, then pack greedily (a question is never split)."""
-    html = B.head("measure") + B.sheet("".join(q.student_html for q in qs), assets="assets/").replace(
+    html = B.head("measure") + B.sheet(B.STUDENT_FIELDS + "".join(q.student_html for q in qs), assets="assets/").replace(
         'class="page "', 'class="page " style="height:auto;overflow:visible"') + "</body></html>"
     _write(tmp, html)
     bw.open(tmp)
     heights = bw.pg.evaluate("[...document.querySelectorAll('.q')].map(e => e.getBoundingClientRect().height)")
+    fields_h = bw.pg.evaluate("(e => e.getBoundingClientRect().height + parseFloat(getComputedStyle(e).marginBottom))(document.querySelector('.sfields'))")
     avail = bw.pg.evaluate("""() => { const c = document.createElement('section'); c.className='page';
         c.innerHTML='<div class="content"></div>'; document.body.append(c);
         const h = c.querySelector('.content').getBoundingClientRect().height; c.remove(); return h; }""")
     too_tall = [qs[i].n for i, h in enumerate(heights) if h > avail]
     assert not too_tall, "questions taller than one sheet: %s" % too_tall
-    sheets, cur, used = [], [], 0.0
+    sheets, cur, used = [], [], fields_h          # the first sheet also carries the name/class line
     for i, h in enumerate(heights):
         if cur and used + h > avail:
             sheets.append(cur)
@@ -89,9 +90,9 @@ def student_pages(qs, sheets):
     pages = [B.cover(assets="assets/")]
     n = 2
     pages.append(B.sheet(B.INTRO, n))
-    for s in sheets:
+    for k, s in enumerate(sheets):
         n += 1
-        pages.append(B.sheet("".join(qs[i].student_html for i in s), n))
+        pages.append(B.sheet((B.STUDENT_FIELDS if k == 0 else "") + "".join(qs[i].student_html for i in s), n))
     for d in (1, 2):
         n += 1
         pages.append(B.sheet(B.draft_sheet(d), n))

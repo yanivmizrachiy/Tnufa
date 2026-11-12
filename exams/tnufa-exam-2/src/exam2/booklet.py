@@ -106,7 +106,6 @@ h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align
 .cover .cv-banner-img{width:100%;height:100%;display:block;object-fit:cover}
 .cover .cv-banner::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(14,54,38,.30) 0%,transparent 24% 56%,rgba(39,97,73,.55) 85%,var(--g3) 100%)}
 .cover .kicker{position:absolute;z-index:2;top:18px;inset-inline-start:26px;margin:0;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.6);font-size:20px;font-weight:800;letter-spacing:.03em;display:inline-flex;align-items:center;gap:9px;line-height:1.2}
-.cover .kicker::before{content:"";width:34px;height:3px;border-radius:3px;background:#fff;opacity:.9}
 .cover .note{position:absolute;z-index:3;bottom:16px;inset-inline-start:16px;max-width:290px;margin:0;background:var(--cream);color:#0e3626;padding:13px 15px 11px;border-radius:7px;rotate:-2.4deg;box-shadow:0 14px 30px rgba(10,40,26,.5);font-family:"Gveret Levin AlefAlefAlef",Heebo,cursive;line-height:1.45}
 .cover .note .tape{position:absolute;top:-10px;inset-inline-end:20px;width:58px;height:20px;rotate:7deg;background:rgba(21,189,169,.7);border:1px solid rgba(255,255,255,.55);border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
 .cover .note p{margin:0;font-size:16px;line-height:1.45;font-weight:400}
@@ -134,6 +133,10 @@ h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align
 .cover .fields{position:relative;z-index:1;display:grid;grid-template-columns:1.4fr 1fr;gap:14px 28px;margin-top:8px;max-width:560px;color:#fff;font-weight:700;font-size:17px}
 .cover .field{display:flex;align-items:flex-end;gap:10px}
 .cover .field .line{flex:1;height:0;border-bottom:2.5px dashed rgba(251,247,234,.75);transform:translateY(-5px)}
+.sfields{display:flex;gap:34px;margin:0 0 16px;padding:10px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--pale);font-weight:700;font-size:16px;color:var(--navy)}
+.sfields .sf{display:flex;align-items:flex-end;gap:10px}
+.sfields .sf:first-child{flex:1.6}.sfields .sf:last-child{flex:1}
+.sfields .line{flex:1;height:0;border-bottom:2px solid #7d8f9c;transform:translateY(-4px)}
 .cover .credit{position:relative;z-index:1;margin-top:auto;padding-top:16px;border-top:3px solid #0e3626;display:flex;align-items:center;gap:12px;justify-content:center;text-align:center}
 .cover .credit img{width:56px;height:56px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(251,247,234,.25)}
 .cover .credit .lines{display:flex;flex-direction:column;gap:2px;font-size:13px;color:rgba(251,247,234,.95)}
@@ -286,8 +289,7 @@ def cover(teacher=False, assets="assets/"):
             '<g fill="none" stroke="#0038b8" stroke-width="2.4" stroke-linejoin="round"><path d="M33 15.5l6.1 10.6H26.9z"/><path d="M33 28.5l-6.1-10.6h12.2z"/></g></svg>')
     badges = ('<div class="cv-badges"><span class="grade" aria-label="כיתה ט׳"><small>כיתה</small><b>ט׳</b></span>'
               '<span class="israel" aria-label="ישראל תצליח">%s<b>ישראל תצליח</b></span></div>' % flag)
-    fields = ('<div class="fields"><div class="field"><label>שם התלמיד/ה:</label><span class="line"></span></div>'
-              '<div class="field"><label>כיתה:</label><span class="line"></span></div></div>')
+    fields = ""   # the student's name and class are written on the first questions page (STUDENT_FIELDS)
     badge = '<span class="badge">חוברת מורה — פתרונות ומחוון</span>' if teacher else ""
     if teacher:
         fields = '<div class="fields"><div class="field"><label>שם המורה:</label><span class="line"></span></div><div class="field"><label>כיתה:</label><span class="line"></span></div></div>'
@@ -317,6 +319,10 @@ INTRO = """<div class="intro">
 <p class="l" style="margin-top:20px">שימו לב, הסרטוטים במבחן מוקטנים.</p>
 <p class="luck">בהצלחה!</p>
 </div>"""
+
+
+STUDENT_FIELDS = ('<div class="sfields"><div class="sf"><label>שם התלמיד/ה:</label><span class="line"></span></div>'
+                  '<div class="sf"><label>כיתה:</label><span class="line"></span></div></div>')
 
 
 def draft_sheet(n):
