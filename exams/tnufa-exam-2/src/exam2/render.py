@@ -248,7 +248,7 @@ def render_printable_key(bw, key_html, log=print):
         assert all(abs(pg.rect.width - 595.28) < 1 and abs(pg.rect.height - 841.89) < 1
                    for pg in key_doc), "print key has non-A4 pages"
         key_text = "".join(pg.get_text() for pg in key_doc)
-        assert len(re.findall(r'כללי\s+ניקוד', key_text)) == 41, (
+        assert len(re.findall(r'(?:כללי\s+ניקוד|ניקוד\s+כללי)', key_text)) == 41, (
             "printable key is missing one of the 41 score rubrics")
         with fitz.open(STUDENT_PDF) as combined:
             student_count = combined.page_count
