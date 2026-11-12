@@ -15,6 +15,12 @@ def check():
     assert holds(4) and not holds(3.99)
 
 
+KEY = {   # answer key (מחוון תשובות): part → (answer, how)
+    "א": (H.m("x ≥ 4"), "%s, ולכן %s." % (H.m("2x + 6 ≤ 5x − 6"), H.m("12 ≤ 3x"))),
+    "ב": ("ג, ד, ה", "המספרים 4, 5.5 ו־10 מקיימים %s; המספר 4 כלול, כי אי־השוויון כולל שוויון." % H.m("x ≥ 4")),
+}
+
+
 def build():
     a = Part(
         "א", 3, "algorithmic",

@@ -9,6 +9,11 @@ def check():
     assert 3 * (x - 4) == 7 * x + 8
 
 
+KEY = {   # answer key (מחוון תשובות): part → (answer, how)
+    "": (H.m("x = −5"), "%s, ולכן %s." % (H.m("3x − 12 = 7x + 8"), H.m("−20 = 4x"))),
+}
+
+
 def build():
     p = Part(
         "", 5, "algorithmic",

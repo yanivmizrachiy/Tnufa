@@ -2,7 +2,9 @@
 """Publish the student outputs (public/) to the GitHub Pages repo yanivmizrachiy/tnufa-exam-2.
 
 The site repo is a pure build artifact of this folder: it is wiped and re-filled from public/ on every run,
-so the single source of truth stays here (src/exam2/questions/*.py → build.py → public/).
+so the single source of truth stays here (src/exam2/questions/*.py → build.py → public/). The generated
+student outputs (STUDENT.pdf, index.html, manifest.json) are not committed in Tnufa; this script rebuilds them
+from the committed source and the site repo is the only place they are stored.
 
     python exams/tnufa-exam-2/tools/publish.py            # copy, commit on a branch, push, open a PR
     python exams/tnufa-exam-2/tools/publish.py --dry-run  # only show what would change
@@ -85,13 +87,13 @@ def main(argv):
     if not os.path.isdir(os.path.join(SITE, ".git")):
         print("site clone not found at %s — run: gh repo clone %s %s" % (SITE, SITE_REPO, SITE))
         return 1
-    if not os.path.exists(os.path.join(PUBLIC, "STUDENT.pdf")):
-        print("public/STUDENT.pdf missing — run build.py first")
-        return 1
     src_sha = run(["git", "rev-parse", "HEAD"], REPO).stdout.strip()
     dirty = run(["git", "status", "--porcelain", "--", "exams/tnufa-exam-2"], REPO).stdout.strip()
-    if dirty:
-        print("WARNING: exams/tnufa-exam-2 has uncommitted changes; SOURCE.json will point at HEAD, not at these files.")
+    if dirty and not dry:
+        print("exams/tnufa-exam-2 has uncommitted changes — commit first, so the site is built from a real source commit.")
+        return 1
+    # the student outputs are not kept in git: always rebuild them from the committed source before publishing
+    run([sys.executable, os.path.join(EXAM2, "build.py"), "--student"], REPO)
 
     refill(src_sha, dry)
 

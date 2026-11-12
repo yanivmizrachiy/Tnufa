@@ -28,6 +28,8 @@ class Part:
     errors: str = ""                 # expected errors and what they diagnose
     carry: str = ""                  # follow-through rule when an earlier part is wrong
     reasoning_credit: bool = False   # points are given for the explanation / method itself
+    key: str = ""                    # answer-key row: the answer as printed in the key (set from the file's KEY)
+    how: str = ""                    # answer-key row: one-line method ("דרך הפתרון")
 
     def __post_init__(self):
         assert self.thinking in THINKING, self.thinking

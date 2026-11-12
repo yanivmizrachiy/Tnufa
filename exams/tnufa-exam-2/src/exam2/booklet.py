@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Booklet markup: shared CSS, cover, instructions, draft and closing sheets, and the teacher pages.
 Everything is print-first A4 (210×297 mm). The same sheets feed the PDF and the web reader."""
+from . import html as H
 from .model import DOMAIN_HE, THINKING_HE, DIFFICULTY_HE
 
 TITLE = "מבחן תנופה לדוגמה"
@@ -139,6 +140,20 @@ h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align
 .cover.teacher .grade{background:#071a3a}
 .cover.teacher .credit{border-top-color:#071a3a}
 .cover .badge{display:inline-block;background:#fff;color:#15386e;border-radius:999px;padding:6px 16px;font-weight:900;font-size:18px;margin-top:14px}
+/* answer key (מחוון תשובות) — same layout and styles as the key of the previous exam (tools/build_exam.py) */
+.kh{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#15386e;font-size:25px;line-height:1.2;margin:0}
+.ks{color:var(--mute);font-size:14px;margin:3px 0 0}
+.key{border-collapse:collapse;width:100%;margin-top:12px;font-size:12.6px;line-height:1.38}
+.key th{background:var(--g3);color:#fff;font-weight:600;padding:5px 7px;text-align:right;border:1px solid var(--g3)}
+.key td{border:1px solid var(--line);padding:4px 7px;vertical-align:middle}
+.key tbody{break-inside:avoid;border-top:1.6px solid #6d7a84}
+.key tbody:nth-of-type(even) td{background:#f3f8f5}
+.key .kq{width:42px;text-align:center;padding-inline:3px}
+.key .num{display:inline-flex;width:25px;height:25px;font-size:13px}
+.key .kt{width:92px;color:var(--mute);font-size:11.6px}
+.key th.kt{color:#fff;font-size:12.6px}
+.key .kp{width:36px;text-align:center;font-weight:800}
+.key .ka{width:136px;font-weight:700}
 /* teacher booklet */
 .tpage{width:210mm;min-height:297mm;padding:34px 60px var(--foot);position:relative}
 .tfoot{position:fixed;bottom:0;inset-inline:0;height:var(--foot);background:#fff}
@@ -149,7 +164,7 @@ h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align
 .tfoot b{font-weight:800;font-size:12.5px;color:#122f4c}
 .tfoot span{font-size:11px;color:#3a5168}
 .tfoot .tag{position:absolute;inset-inline-end:60px;top:10px;font-size:11px;color:#b03030;font-weight:700}
-.tbody{padding:34px 60px calc(var(--foot) + 10px)}
+.tbody{padding:0 60px 14px}
 .tsec{break-before:page}
 .tsec:first-child{break-before:auto}
 h1.th{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:var(--navy);font-size:26px;margin:0 0 6px}
@@ -293,15 +308,31 @@ INTRO = """<div class="intro">
 <p class="l">כאשר כתוב &quot;הציגו את דרך הפתרון&quot; או &quot;נמקו&quot; — הדרך וההסבר הם חלק מהתשובה, וגם הם נבדקים.</p>
 <h2>ומה אפשר לעשות?</h2>
 <p class="l">אפשר להיעזר במחשבון ובסרגל.</p>
-<p class="l">אפשר להיעזר בדפי הטיוטה המצורפים בסוף המבחן (דפים אלה לא ייבדקו).</p>
-<p class="l">אפשר לכתוב בתוך המשבצות שליד כל שאלה. אם חסר מקום — אפשר להמשיך בדף הטיוטה ולציין זאת.</p>
+<p class="l">אפשר להיעזר בדפי הטיוטה המצורפים בסוף המבחן. דפי הטיוטה לא ייבדקו, אלא אם ציינתם בשאלה שהמשכתם בהם.</p>
+<p class="l">אפשר לכתוב בשטח המשובץ שמתחת לכל שאלה. אם חסר מקום — אפשר להמשיך בדף הטיוטה ולציין זאת בשאלה.</p>
 <p class="l" style="margin-top:20px">שימו לב, הסרטוטים במבחן מוקטנים.</p>
 <p class="luck">בהצלחה!</p>
 </div>"""
 
 
 def draft_sheet(n):
-    return '<div class="fill"></div><h2 class="draft">דף טיוטה %d — לא ייבדק</h2>' % n
+    return '<div class="fill"></div><h2 class="draft">דף טיוטה %d — ייבדק רק אם צוין בשאלה</h2>' % n
+
+
+def key_group(q):
+    rows = ""
+    for i, p in enumerate(q.parts):
+        lead = ('<td class="kq" rowspan="%d"><span class="num">%d</span></td><td class="kt" rowspan="%d">%s</td>'
+                % (len(q.parts), q.n, len(q.parts), q.topic)) if i == 0 else ""
+        rows += '<tr>%s<td class="kp">%s</td><td class="ka">%s</td><td>%s</td></tr>' % (lead, p.letter or "—", p.key, p.how)
+    return "<tbody>%s</tbody>" % rows
+
+
+def key_sheet(qs):
+    """The answer key: one table, one row per part (answer + one-line method), as in the previous exam."""
+    head = '<h1 class="kh">מחוון תשובות</h1><p class="ks">%s במתמטיקה לכיתה ט׳ · %s · למורה</p>' % (TITLE, DATE)
+    return head + ('<table class="key"><thead><tr><th class="kq">שאלה</th><th class="kt">נושא</th><th class="kp">סעיף</th><th class="ka">תשובה</th>'
+                   '<th>דרך הפתרון</th></tr></thead>%s</table>' % H.auto_math("".join(key_group(q) for q in qs)))
 
 
 def finale(assets="assets/"):
@@ -309,6 +340,8 @@ def finale(assets="assets/"):
 
 
 # ---------------- teacher booklet ----------------
+TEACHER_PAGE_CSS = "@page{size:A4;margin:34px 0 92px 0}@page:first{margin:0}"
+
 def tfoot(assets="assets/"):
     return ('<div class="tfoot"><span class="rule"></span><div class="row"><img src="%slogo.svg" alt="">'
             '<div class="lines"><b>%s</b><span>%s</span></div></div><span class="tag">חוברת מורה — לא לפרסום לתלמידים</span></div>' % (assets, CREDIT_1, CREDIT_2))
@@ -320,7 +353,7 @@ def rubric_table(rows):
 
 
 def teacher_question(q):
-    meta = ('<div class="tmeta"><span class="pt">%d נקודות</span><span>תחום: %s</span><span>קושי: %s</span><span>זמן מתוכנן: %d דק׳</span>%s</div>' % (
+    meta = ('<div class="tmeta"><span class="pt">%d נקודות</span><span>תחום: %s</span><span>רמת קושי: %s</span><span>זמן מתוכנן: %d דק׳</span>%s</div>' % (
         q.points, DOMAIN_HE[q.domain], DIFFICULTY_HE[q.difficulty], q.minutes,
         "".join('<span>%s</span>' % r for r in q.representations)))
     out = '<section class="tsec"><h1 class="th">שאלה %d — %s</h1><p class="tsub">%s</p>%s' % (q.n, q.topic, q.skill, meta)
@@ -373,14 +406,14 @@ def teacher_summary(qs, plan):
 
 
 RULES = """<ul class="rules">
-<li>יש לבדוק חישובים שנכתבו בצד או בדף הטיוטה, ולקבל תשובות נכונות גם אם לא נכתבו במקום המיועד.</li>
+<li>יש לבדוק חישובים שנכתבו בצד, או בדף הטיוטה כשהתלמיד ציין בשאלה שהמשיך בו, ולקבל תשובות נכונות גם אם לא נכתבו במקום המיועד.</li>
 <li>בכל מקום שבו כתוב &quot;דרך פתרון&quot; — מתקבלת כל דרך נכונה ומנומקת, גם אם אינה הדרך שבמחוון.</li>
 <li>אין להוריד נקודות על מידע עודף שאינו סותר את דרך הפתרון.</li>
 <li>בפתרון משוואות, כל איבר שגוי נחשב טעות אחת.</li>
 <li>תשובה נכונה ללא דרך — רק כאשר המחוון מציין זאת במפורש. בשאלות &quot;הציגו את דרך הפתרון&quot; תשובה ללא דרך מקבלת לכל היותר את השורה המתאימה במחוון.</li>
 <li>טעות נגררת: כאשר סעיף נסמך על תוצאה שגויה מסעיף קודם, והעבודה בסעיף הנוכחי נכונה ועקבית — ניקוד מלא לסעיף הנוכחי, לפי הכלל הרשום בשאלה.</li>
 <li>בשאלות רב־ברירה עם תשובה אחת: סימון יותר מתשובה אחת — 0. בשאלות &quot;סמנו את כל&quot; — ניקוד רק לסימון המדויק.</li>
-<li>בשאלות &quot;כן/לא + נימוק&quot;: אם הסימון חסר או שגוי אך הנימוק נכון ומובן ממנו הסימון המתכוון — אין להפחית נקודות.</li>
+<li>בשאלות &quot;כן/לא + נימוק&quot;: אם הסימון חסר או שגוי אך הנימוק נכון ומובן ממנו הסימון שהתלמיד התכוון אליו — אין להפחית נקודות.</li>
 <li>אם אין תשובה כלל או שהתשובה אינה ניסיון לענות (&quot;לא יודע&quot;, שרבוט) — 0 נקודות לסעיף.</li>
 </ul>"""
 
@@ -392,5 +425,6 @@ def teacher_doc(qs, plan, assets="assets/"):
              '<h2 class="th">סיכום התמהיל</h2>%s<h2 class="th">כללי בדיקה</h2>%s</section>' % (teacher_map(qs), teacher_summary(qs, plan), RULES))
     for q in qs:
         body += teacher_question(q)
-    body += '</div>' + tfoot(assets)
-    return head("חוברת מורה — " + TITLE) + body + "</body></html>"
+    body += '</div>'
+    # the footer is printed by Chromium in the bottom page margin (render_teacher), so text never hides under it
+    return head("חוברת מורה — " + TITLE, TEACHER_PAGE_CSS) + H.auto_math(body) + "</body></html>"

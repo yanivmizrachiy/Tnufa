@@ -10,11 +10,17 @@ def check():
     assert y == 2 * x - 9
 
 
+KEY = {   # answer key (מחוון תשובות): part → (answer, how)
+    "א": (H.m("x = 5, y = 1"), "חיבור המשוואות: %s, ולכן %s; מהמשוואה השנייה %s." % (H.m("3x = 15"), H.m("x = 5"), H.m("y = 1"))),
+    "ב": ("כן", "%s, וזה ערך ה־%s של הנקודה (5, 1)." % (H.m("2 · 5 − 9 = 1"), H.m("y"))),
+}
+
+
 def build():
     a = Part(
         "א", 4, "algorithmic",
         "פתרו את מערכת המשוואות שלפניכם. הציגו את דרך הפתרון.<br>%s" % H.m(H.system(["2x + y = 11", "x − y = 4"])) +
-        H.work(140) + H.ans('תשובה: &nbsp;<bdi dir="ltr" class="math">x = %s &nbsp; y = %s</bdi>' % (H.BL_S, H.BL_S)),
+        H.work(140) + H.ans('תשובה: &nbsp;<bdi dir="ltr" class="math">x = %s</bdi> &nbsp;&nbsp; <bdi dir="ltr" class="math">y = %s</bdi>' % (H.BL_S, H.BL_S)),
         H.m("x = 5, y = 1"),
         "חיבור המשוואות: %s → %s. הצבה: %s → %s. בדיקה במשוואה הראשונה: %s." % (
             H.m("3x = 15"), H.m("x = 5"), H.m("5 − y = 4"), H.m("y = 1"), H.m("2·5 + 1 = 11")),

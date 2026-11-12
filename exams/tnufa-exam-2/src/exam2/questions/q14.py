@@ -13,27 +13,47 @@ def check():
 
 
 def figure():
-    # C at the center; A and E on one line through C, B and D on the other. Ratio CE:CA = 9:6.
-    Cp = (250, 150)
+    # C in the middle; A and E on one line through C, B and D on the other. CE:CA = CD:CB = 9:6 = 1.5,
+    # so the drawing is to scale and AB is parallel to DE by construction.
     import math
-    ang1, ang2 = math.radians(205), math.radians(335)       # directions to A and B (upper side)
-    k = 1.5                                                # CE/CA = CD/CB
-    rA, rB = 150, 110
-    Ap = (Cp[0] + rA * math.cos(ang1), Cp[1] + rA * math.sin(ang1))
-    Bp = (Cp[0] + rB * math.cos(ang2), Cp[1] + rB * math.sin(ang2))
-    Ep = (Cp[0] - k * rA * math.cos(ang1), Cp[1] - k * rA * math.sin(ang1))
-    Dp = (Cp[0] - k * rB * math.cos(ang2), Cp[1] - k * rB * math.sin(ang2))
-    b = S.poly([Ap, Bp, Cp], S.PALE, S.NAVY, 2.2) + S.poly([Ep, Dp, Cp], S.PALE2, S.NAVY, 2.2)
-    b += S.par_mark(Ap, Bp, 1, 7, S.BLUE) + S.par_mark(Dp, Ep, 1, 7, S.BLUE)
+    Cp = (250.0, 165.0)
+    k = F(CE, AC)                                           # 3/2
+    ang_a, ang_b = math.radians(212), math.radians(320)     # directions C→A (up-left) and C→B (up-right)
+    rA, rB = 150.0, 150.0 * BC / AC                         # CB : CA = 4 : 6
+    Ap = (Cp[0] + rA * math.cos(ang_a), Cp[1] + rA * math.sin(ang_a))
+    Bp = (Cp[0] + rB * math.cos(ang_b), Cp[1] + rB * math.sin(ang_b))
+    Ep = (Cp[0] - float(k) * rA * math.cos(ang_a), Cp[1] - float(k) * rA * math.sin(ang_a))
+    Dp = (Cp[0] - float(k) * rB * math.cos(ang_b), Cp[1] - float(k) * rB * math.sin(ang_b))
+
+    def pill(p, q, away, text, c=S.INK, bold=600, size=15):
+        """Length label in a small white pill, set off the segment p-q on the side away from 'away'."""
+        mx, my = (p[0] + q[0]) / 2, (p[1] + q[1]) / 2
+        dx, dy = q[0] - p[0], q[1] - p[1]
+        L = math.hypot(dx, dy)
+        nx, ny = -dy / L, dx / L
+        if (away[0] - mx) * nx + (away[1] - my) * ny > 0:
+            nx, ny = -nx, -ny
+        x, y = mx + nx * 17, my + ny * 17
+        w = 14 + 9 * len(text)
+        return (S.rect(x - w / 2, y - 12, w, 24, "#fff", c, 1.2, rx=12) +
+                S.t(x, y + 5.5, text, size, ltr=True, w=bold, c=c))
+
+    b = S.poly([Ap, Bp, Cp], S.PALE, S.G3, 2.4)
+    b += S.poly([Ep, Dp, Cp], "#e3eef8", S.BLUE, 2.4)
+    b += S.par_mark(Ap, Bp, 1, 8, S.G3, 2) + S.par_mark(Dp, Ep, 1, 8, S.BLUE, 2)
+    b += pill(Ap, Cp, Bp, "6") + pill(Bp, Cp, Ap, "4") + pill(Cp, Ep, Dp, "9") + pill(Cp, Dp, Ep, "?", c=S.AMBER, bold=800, size=16)
     for p in (Ap, Bp, Cp, Dp, Ep):
-        b += S.dot(p)
-    b += S.label(Ap, "A", -14, -6) + S.label(Bp, "B", 14, -6) + S.label(Cp, "C", 0, -12) + S.label(Dp, "D", -14, 12) + S.label(Ep, "E", 14, 12)
-    # lengths
-    b += S.t((Ap[0] + Cp[0]) / 2 - 14, (Ap[1] + Cp[1]) / 2 + 16, "6", 15, ltr=True, w=600)
-    b += S.t((Ep[0] + Cp[0]) / 2 + 16, (Ep[1] + Cp[1]) / 2 - 6, "9", 15, ltr=True, w=600)
-    b += S.t((Bp[0] + Cp[0]) / 2 + 14, (Bp[1] + Cp[1]) / 2 + 16, "4", 15, ltr=True, w=600)
-    b += S.t((Dp[0] + Cp[0]) / 2 - 16, (Dp[1] + Cp[1]) / 2 - 6, "?", 18, ltr=True, w=700, c=S.AMBER)
-    return S.svg(500, 330, b, "שני משולשים עם קודקוד משותף C, AB מקביל ל-DE", maxw=360)
+        b += S.circ(p[0], p[1], 4.2, "#fff", S.NAVY, 2)
+    b += (S.label(Ap, "A", -16, -8, 18) + S.label(Bp, "B", 16, -8, 18) + S.label(Cp, "C", 0, -16, 18) +
+          S.label(Dp, "D", -16, 20, 18) + S.label(Ep, "E", 16, 20, 18))
+    return S.svg(560, 320, b, "שני משולשים ABC ו-EDC עם קודקוד משותף C; AB מקביל ל-DE; AC = 6, BC = 4, CE = 9, CD לא ידוע", maxw=430)
+
+
+KEY = {   # answer key (מחוון תשובות): part → (answer, how)
+    "א": ("דומים לפי ז.ז.", "%s, ולכן %s ו־%s (זוויות מתחלפות); וגם %s (זוויות קודקודיות)." % (
+        H.m("AB ∥ DE"), H.m("∢BAC = ∢DEC"), H.m("∢ABC = ∢EDC"), H.m("∢ACB = ∢ECD"))),
+    "ב": ("6 ס״מ", "%s, ולכן %s." % (H.m("CD : CB = CE : CA = 9 : 6"), H.m("CD = 4 · 1.5 = 6"))),
+}
 
 
 def build():
@@ -61,18 +81,19 @@ def build():
          (1, "פרופורציה עם התאמה שגויה (למשל %s), או 6 ללא דרך." % H.m("CD/6 = 9/4")),
          (0, "כל אפשרות אחרת.")],
         alternatives="יחס הדמיון %s ולכן %s." % (H.m("9 : 6 = 1.5"), H.m("CD = 4 · 1.5 = 6")),
-        errors="13.5 (4·9/... התאמה שגויה) או 2.67 — התאמת קודקודים לא נכונה; 7 (4 + 3) — חשיבה חיבורית.",
+        errors="13.5 (%s) או 2.67 (%s) — התאמת קודקודים לא נכונה; 7 (%s) — חשיבה חיבורית (הוספת 3 במקום כפל ב־1.5)." % (
+            H.m("CD = 9 · 6 : 4"), H.m("CD = 4 · 6 : 9"), H.m("4 + 3")),
     )
     return Question(
         n=14, domain="geometry", topic="דמיון משולשים", skill="זיהוי משולשים דומים (ז.ז.) בתצורת &quot;שעון חול&quot;; חישוב צלע מפרופורציה",
         claim="התלמיד מזהה דמיון דרך זוויות קודקודיות ומתחלפות, ומתאים קודקודים נכון בפרופורציה.",
         evidence="נימוק ז.ז. עם שני הזוגות; פרופורציה נכונה ו־6.",
         task="נימוק קצר; חישוב פרופורציוני עם התאמת קודקודים.",
-        difficulty="mid", representations=["שרטוט → פרופורציה"], literacy=False, minutes=4,
+        difficulty="mid", representations=["סרטוט → פרופורציה"], literacy=False, minutes=4,
         stem="<p>בסרטוט שלפניכם %s. הקטעים %s ו־%s נחתכים בנקודה %s.</p>%s" % (H.m("AB ∥ DE"), H.m("AE"), H.m("BD"), H.m("C"), figure()),
         parts=[a, b],
         reference="הקרוב ביותר: שאלה 10 במבחן התרגול הקודם (DE ∥ BC בתוך משולש). הבדלים: (1) תצורת שעון חול עם זוויות קודקודיות, לא משולש בתוך משולש; (2) הזוויות השוות אינן &quot;זווית משותפת&quot;; (3) ההתאמה בין הקודקודים הפוכה (A↔E, B↔D) ומחייבת זהירות; (4) יחס דמיון לא שלם (1.5).",
-        accessibility="השרטוט מדויק ביחס 1.5; המספרים קטנים; חיצי הקבלה מסומנים.",
+        accessibility="הסרטוט מדויק ביחס 1.5; המספרים קטנים; חיצי הקבלה מסומנים.",
         notes="התאמת קודקודים בתצורה זו היא המכשול העיקרי; לתרגל כתיבת זוגות מתאימים לפני כתיבת פרופורציה.",
         check=check,
     )

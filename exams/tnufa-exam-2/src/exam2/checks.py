@@ -7,7 +7,7 @@ from .model import THINKING
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 HASHES = os.path.join(ROOT, "tests", "question-hashes.json")
-PLACEHOLDERS = ("TODO", "lorem", "ipsum", "XXX", "דמו", "placeholder", "TBD", "???", "%%")
+PLACEHOLDERS = ("TODO", "lorem", "ipsum", "XXX", "דמו", "placeholder", "TBD", "???", "%%", "...", "…")
 
 
 def q_hash(q):
@@ -15,7 +15,7 @@ def q_hash(q):
     h = hashlib.sha256()
     h.update(q.student_html.encode("utf-8"))
     for p in q.parts:
-        for s in (p.answer, p.solution, p.alternatives, p.errors, p.carry, str(p.rubric), str(p.points), p.thinking):
+        for s in (p.answer, p.solution, p.alternatives, p.errors, p.carry, str(p.rubric), str(p.points), p.thinking, p.key, p.how):
             h.update(s.encode("utf-8"))
     return h.hexdigest()[:16]
 
@@ -62,7 +62,7 @@ def run(qs, update_hashes=False):
             q.check()
         except AssertionError as e:
             fail("q%d: key check failed: %s" % (q.n, e))
-        texts = [q.stem, q.notes, q.reference, q.accessibility] + [p.html + p.answer + p.solution + p.alternatives + p.errors + p.carry + " ".join(c for _, c in p.rubric) for p in q.parts]
+        texts = [q.stem, q.notes, q.reference, q.accessibility] + [p.html + p.answer + p.solution + p.alternatives + p.errors + p.carry + p.key + p.how + " ".join(c for _, c in p.rubric) for p in q.parts]
         for s in texts:
             for ph in PLACEHOLDERS:
                 if ph in s:
@@ -70,6 +70,8 @@ def run(qs, update_hashes=False):
         for p in q.parts:
             if p.thinking not in THINKING:
                 fail("q%d: bad thinking" % q.n)
+            if not p.key.strip() or not p.how.strip():
+                fail("q%d%s: answer-key row (KEY) is empty" % (q.n, p.letter))
             pts = [r[0] for r in p.rubric]
             if pts != sorted(pts, reverse=True) or pts[0] != p.points:
                 fail("q%d%s: rubric rows must descend from %d to 0" % (q.n, p.letter, p.points))

@@ -1,7 +1,39 @@
 # -*- coding: utf-8 -*-
 """Markup helpers for the item text: math isolation, option lists, writing windows, answer lines."""
 
+import re
+
 LETTERS = "אבגדהו"
+
+_TOK = r"(?:[−-]?\d+(?:\.\d+)?[xy]?|[xy])"
+_OP = r"[+−·:/=≈≠<>≤≥×-]"
+_MATH = re.compile(r"(?<![A-Za-z\d.])(?:\(\s*%s\s*,\s*%s\s*\)|\(?%s\)?(?:\s*%s\s*\(?%s\)?)+|\d+\.\.\d+|−\d+(?:\.\d+)?)(?![A-Za-z\d])"
+                   % (_TOK, _TOK, _TOK, _OP, _TOK))
+_SKIP = ("bdi", "svg", "style", "script", "title")
+
+
+def _wrap(mt):
+    s, pre, post = mt.group(0), "", ""
+    while s.endswith(")") and s.count(")") > s.count("("):
+        s, post = s[:-1], ")" + post
+    while s.startswith("(") and s.count("(") > s.count(")"):
+        s, pre = s[1:], pre + "("
+    return '%s<bdi class="math" dir="ltr">%s</bdi>%s' % (pre, s, post)
+
+
+def auto_math(html):
+    """Isolate left-to-right every math run written as plain text (coordinates, arithmetic, negative numbers),
+    outside existing <bdi>/<svg>. Used on the key and the teacher booklet, where rubric text is free prose."""
+    out, depth = [], 0
+    for tok in re.split(r"(<[^>]+>)", html):
+        if tok.startswith("<"):
+            m = re.match(r"<(/?)([a-zA-Z0-9]+)", tok)
+            if m and m.group(2).lower() in _SKIP and not tok.endswith("/>"):
+                depth += -1 if m.group(1) else 1
+            out.append(tok)
+        else:
+            out.append(tok if depth else _MATH.sub(_wrap, tok))
+    return "".join(out)
 
 
 def m(s):

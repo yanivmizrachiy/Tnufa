@@ -117,22 +117,40 @@ def render_student(bw, qs, log=print):
         rendered = bw.pg.evaluate("Array.from(document.querySelectorAll('.page')).map(s => s.outerHTML)")
         raw = STUDENT_PDF + ".raw"
         bw.pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+
+        # the answer key: one long page as tall as its content (as in the previous exam), after the closing page
+        key_page = B.sheet(B.key_sheet(qs)).replace('class="page "', 'class="page key-page" style="height:auto;overflow:visible"', 1)
+        _write(tmp, B.head(B.TITLE) + key_page + "</body></html>")
+        bw.open(tmp)
+        key_h = math.ceil(bw.pg.evaluate("document.querySelector('.page').getBoundingClientRect().height")) + 48
+        bw.pg.evaluate("h => { const s = document.querySelector('.page').style; s.height = h + 'px'; s.overflow = 'hidden'; }", key_h)
+        assert not bw.errs, bw.errs
+        rendered.append(bw.pg.evaluate("document.querySelector('.page').outerHTML"))
+        key_raw = STUDENT_PDF + ".key"
+        bw.pg.add_style_tag(content="@page{size:210mm %dpx;margin:0}.page{break-after:auto}.key tbody{break-inside:auto}" % key_h)
+        bw.pg.pdf(path=key_raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+        log("key page height: %d px" % key_h)
     finally:
         if os.path.exists(tmp):
             os.remove(tmp)
     doc = fitz.open(raw)
     assert doc.page_count == len(pages), (doc.page_count, len(pages))
+    key_doc = fitz.open(key_raw)
+    assert key_doc.page_count == 1, key_doc.page_count
+    doc.insert_pdf(key_doc)
+    key_doc.close()
+    os.remove(key_raw)
     toc = [[1, "עמוד שער", 1], [1, "הוראות", 2]]
     for i, s in enumerate(sheets):
         toc += [[1, "שאלה %d" % qs[k].n, i + 3] for k in s]
     n = len(sheets) + 3
-    toc += [[1, "דף טיוטה 1", n], [1, "דף טיוטה 2", n + 1], [1, "עמוד סיום", n + 2]]
+    toc += [[1, "דף טיוטה 1", n], [1, "דף טיוטה 2", n + 1], [1, "עמוד סיום", n + 2], [1, "מחוון תשובות", n + 3]]
     doc.set_toc(toc)
     doc.set_metadata({"title": B.TITLE + " — " + B.SUBTITLE, "author": "יניב רז", "subject": "לקראת תנופה — מבחן לדוגמה, נובמבר 2026"})
     doc.save(STUDENT_PDF, garbage=4, deflate=True)
     doc.close()
     os.remove(raw)
-    log("wrote public/STUDENT.pdf: %d pages, %d KB" % (len(pages), os.path.getsize(STUDENT_PDF) // 1024))
+    log("wrote public/STUDENT.pdf: %d pages (+ answer key), %d KB" % (len(pages) + 1, os.path.getsize(STUDENT_PDF) // 1024))
     emit_reader(qs, sheets, rendered)
     return sheets, rendered
 
@@ -154,8 +172,8 @@ select.btn{appearance:none;padding-inline-end:22px}
 main{padding:18px 0 40px}
 main{overflow:hidden;direction:ltr}
 .wrap{width:794px;transform-origin:top left;direction:rtl;margin:0}
-.wrap .page{box-shadow:0 10px 30px rgba(10,30,50,.18);margin:0 auto 18px}
-.sep{width:210mm;max-width:100%;height:3px;background:#126c6a;margin:0 auto 18px;border-radius:2px}
+.wrap .page{margin:0 auto;box-shadow:0 0 0 1px #c3ced8}
+.sep{width:210mm;max-width:100%;height:2px;background:#126c6a;margin:0 auto}
 @media screen and (max-width:860px){.brand small{display:none}.btn span.l{display:none}select.btn{max-width:150px;font-size:13px}}
 @media print{body{background:#fff}.topbar,.sep{display:none}main{padding:0}.wrap{transform:none!important;height:auto!important}.wrap .page{box-shadow:none;margin:0}}
 """
@@ -183,7 +201,7 @@ def emit_reader(qs, sheets, rendered):
     for q in qs:
         opts.append('<option value="q%d">שאלה %d — %s</option>' % (q.n, q.n, q.topic))
     n = len(sheets) + 3
-    opts += ['<option value="p%d">דף טיוטה 1</option>' % n, '<option value="p%d">דף טיוטה 2</option>' % (n + 1), '<option value="p%d">עמוד סיום</option>' % (n + 2)]
+    opts += ['<option value="p%d">דף טיוטה 1</option>' % n, '<option value="p%d">דף טיוטה 2</option>' % (n + 1), '<option value="p%d">עמוד סיום</option>' % (n + 2), '<option value="p%d">מחוון תשובות</option>' % (n + 3)]
     body = ('<header class="topbar"><div class="in"><a class="brand" href="#p1"><img src="assets/logo.svg" alt=""><span><strong>%s</strong><small>%s</small></span></a>'
             '<div class="acts"><select id="goto" class="btn ghost" aria-label="מעבר בחוברת">%s</select>'
             '<button id="print" class="btn alt" type="button">🖨 <span class="l">הדפסה</span></button>'
@@ -212,8 +230,21 @@ def render_teacher(bw, qs, plan, log=print):
     _write(html_path, B.teacher_doc(qs, plan, assets="../public/assets/"))
     bw.open(html_path)
     raw = TEACHER_PDF + ".raw"
-    bw.pg.pdf(path=raw, prefer_css_page_size=True, print_background=True, margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+    bw.pg.pdf(path=raw, prefer_css_page_size=True, print_background=True)
+    # footer: rendered once on its own 210mm × 92px sheet and stamped into the empty 92px bottom margin of every
+    # page except the cover, so rubric text can never slide under it
+    foot_html = os.path.join(PRIVATE, ".tfoot.html")
+    _write(foot_html, B.head("footer", "@page{size:210mm 92px;margin:0}html,body{margin:0}.tfoot{position:relative}") +
+           B.tfoot(assets="../public/assets/") + "</body></html>")
+    bw.open(foot_html)
+    foot_pdf = raw + ".foot"
+    bw.pg.pdf(path=foot_pdf, prefer_css_page_size=True, print_background=True)
+    os.remove(foot_html)
     doc = fitz.open(raw)
+    fdoc = fitz.open(foot_pdf)
+    for i in range(1, doc.page_count):
+        r = doc[i].rect
+        doc[i].show_pdf_page(fitz.Rect(0, r.height - fdoc[0].rect.height, r.width, r.height), fdoc, 0)
     toc = [[1, "שער", 1], [1, "מפת המבחן וכללי בדיקה", 2]]
     # find the page of every question by its heading text
     for q in qs:
@@ -227,7 +258,9 @@ def render_teacher(bw, qs, plan, log=print):
     doc.save(TEACHER_PDF, garbage=4, deflate=True)
     pc = doc.page_count
     doc.close()
+    fdoc.close()
     os.remove(raw)
+    os.remove(foot_pdf)
     log("wrote private/TEACHER.pdf: %d pages, %d KB" % (pc, os.path.getsize(TEACHER_PDF) // 1024))
     return pc
 

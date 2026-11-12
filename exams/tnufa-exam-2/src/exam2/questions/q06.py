@@ -10,6 +10,11 @@ def check():
     assert (x + 2) / 3 - (x - 1) / 4 == 2
 
 
+KEY = {   # answer key (מחוון תשובות): part → (answer, how)
+    "": (H.m("x = 13"), "כופלים ב־12: %s, ולכן %s." % (H.m("4(x + 2) − 3(x − 1) = 24"), H.m("x + 11 = 24"))),
+}
+
+
 def build():
     eq = H.m('%s − %s = 2' % (H.frac("x + 2", "3"), H.frac("x − 1", "4")))
     p = Part(
