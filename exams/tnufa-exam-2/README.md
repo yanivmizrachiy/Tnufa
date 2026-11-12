@@ -20,6 +20,8 @@ python exams/tnufa-exam-2/build.py
 | מחוון תשובות בסוף עמוד הבחינה באתר (5 עמודות, עם ניקוד מלא/חלקי/אפס) | `public/index.html#answer-key` | כן |
 | מחוון להורדה — עמוד ארוך אחד בסגנון הבחינה הקודמת | `public/ANSWER_KEY.pdf` | כן |
 | מבחן משולב עם המחוון בעמוד האחרון, כמו המבחן הקודם | `public/EXAM_WITH_KEY.pdf` | כן |
+| **מחוון להדפסה בדפי A4 רגילים** (אותן 41 שורות ואותו ניקוד) | `public/ANSWER_KEY_A4.pdf` | כן |
+| **מבחן וחוברת מחוון בהדפסת A4** (17 דפי תלמיד + דפי מחוון תקניים) | `public/EXAM_WITH_KEY_A4.pdf` | כן |
 | אתר/קורא: שער + עמודי החוברת A4 + טבלת מחוון מתחת, הורדת מבחן/מבחן ומחוון | `public/index.html` | כן |
 | מניפסט: hash של כל קובצי PDF + חלוקת שאלות לעמודים | `public/manifest.json` | כן |
 | חוברת מורה מורחבת: מפת מבחן, כללי בדיקה, פתרונות מלאים וכל המחוונים | `private/TEACHER.pdf` | **לא** — `private/` אינו נשמר ב־git |
@@ -72,8 +74,8 @@ private/                 תוצרי המורה (לא ב־git)
 
 - עורכים את השאלה רק ב-`src/exam2/questions/qNN.py`, כולל נתונים, פתרון, `KEY` ו-`rubric`.
 - מאמתים ב-`python exams/tnufa-exam-2/build.py --check` ומיזוג אחרי כל הבדיקות.
-- ריפו הפרסום `yanivmizrachiy/tnufa-exam-2` מפעיל `.github/workflows/publish-from-source.yml` מול `Tnufa/main` בכל 6 שעות (או ידנית): בדיקות, בנייה של התלמיד+מחוון, SHA-256, והפצה מדויקת של התוצרים. הוא מדלג על בנייה כשה-`SOURCE.json` כבר מעודכן.
-- `tools/publish.py` ממשיך להיות כלי ידני חלופי (PR כברירת מחדל, `--push-main` רק במסלול מורשה). `.github/workflows/publish-exam2.yml` במקור מבצע בדיקות; מסלול הפרסום הקודם שלו תלוי ב-`PAGES_DEPLOY_TOKEN` ולכן **אינו** מסלול ההפצה הראשי.
+- ריפו הפרסום `yanivmizrachiy/tnufa-exam-2` מפעיל `.github/workflows/publish-from-source.yml` מול `Tnufa/main` בכל שעה (או ידנית): בדיקות, בנייה של התלמיד+מחוון, SHA-256, והפצה מדויקת של התוצרים. הוא מדלג על בנייה כשה-`SOURCE.json` כבר מעודכן.
+- `tools/publish.py` ממשיך להיות כלי ידני חלופי (PR כברירת מחדל, `--push-main` רק במסלול מורשה). `.github/workflows/publish-exam2.yml` במקור **בודק בלבד** (כולל PDF וקריטריוני ניקוד); רק workflow ריפו האתר מפרסם. טוקן `PAGES_DEPLOY_TOKEN` הישן אינו נדרש.
 - בדיקת האתר: https://yanivmizrachiy.github.io/tnufa-exam-2/#answer-key. אין לשנות `tnufa.vercel.app` או קובצי המבחן הקודם.
 
 

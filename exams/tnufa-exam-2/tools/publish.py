@@ -26,7 +26,7 @@ PUBLIC = os.path.join(EXAM2, "public")
 SITE = os.environ.get("SITE_DIR") or os.path.abspath(os.path.join(REPO, "..", "tnufa-exam-2"))
 SITE_REPO = "yanivmizrachiy/tnufa-exam-2"
 KEEP = {".git", ".github"}           # preserve GitHub release workflow; regenerate the site content
-SKIP = {".print.html", ".preview.html", ".answer-key-print.html"}
+SKIP = {".print.html", ".preview.html", ".answer-key-print.html", ".answer-key-a4-print.html"}
 
 README = """# מבחן תנופה לדוגמה — אתר הפרסום (נוצר אוטומטית)
 
@@ -94,12 +94,22 @@ def verify_public():
             errors.append("%s hash mismatch" % field)
         if meta.get("pageCount") != expected:
             errors.append("%s pageCount differs" % field)
+    for field, filename in (("answerKeyA4", "ANSWER_KEY_A4.pdf"),
+                            ("examWithKeyA4", "EXAM_WITH_KEY_A4.pdf")):
+        meta = rm.get(field) or {}
+        full = os.path.join(PUBLIC, filename)
+        if meta.get("file") != filename or not os.path.isfile(full):
+            errors.append("A4 printable file missing: %s" % filename)
+        elif meta.get("sha256") != "sha256-" + sha(full):
+            errors.append("%s hash mismatch" % field)
     index_path = os.path.join(PUBLIC, "index.html")
     if os.path.isfile(index_path):
         with open(index_path, encoding="utf-8") as f:
             index = f.read()
         if ('id="answer-key"' not in index or
-                index.count('class="rubric-breakdown"') < 41):
+                index.count('class="rubric-breakdown"') != 41 or
+                'href="ANSWER_KEY_A4.pdf"' not in index or
+                'href="EXAM_WITH_KEY_A4.pdf"' not in index):
             errors.append("public reader is missing the full 41-part scoring key")
     # Inspect actual PDF bytes, not only manifest declarations and file hashes.
     # Catch a truncated, swapped or mismatched PDF before release.
@@ -123,6 +133,34 @@ def verify_public():
                         break
                 if combined[-1].get_text() != key[0].get_text():
                     errors.append("combined PDF's last page differs from ANSWER_KEY.pdf")
+        import re
+        with fitz.open(os.path.join(PUBLIC, "STUDENT.pdf")) as student_a4, \
+             fitz.open(os.path.join(PUBLIC, "ANSWER_KEY_A4.pdf")) as key_a4, \
+             fitz.open(os.path.join(PUBLIC, "EXAM_WITH_KEY_A4.pdf")) as combined_a4:
+            nkey = key_a4.page_count
+            if not 2 <= nkey <= 15:
+                errors.append("A4 printable key should have 2 to 15 pages")
+            if any(abs(pg.rect.width - 595.28) > 1 or abs(pg.rect.height - 841.89) > 1
+                   for pg in key_a4):
+                errors.append("A4 key contains non-A4 pages")
+            if rm.get("answerKeyA4", {}).get("pageCount") != nkey:
+                errors.append("A4 key manifest page count mismatch")
+            if rm.get("examWithKeyA4", {}).get("pageCount") != student_a4.page_count + nkey:
+                errors.append("A4 combined manifest page count mismatch")
+            if combined_a4.page_count != student_a4.page_count + nkey:
+                errors.append("A4 combined actual page count mismatch")
+            full_text = "".join(pg.get_text() for pg in key_a4)
+            if len(re.findall(r'(?:כללי\s+ניקוד|ניקוד\s+כללי)', full_text)) != 41:
+                errors.append("A4 printable key is missing scoring criteria")
+            if combined_a4.page_count == student_a4.page_count + nkey:
+                for page_index in range(student_a4.page_count):
+                    if student_a4[page_index].get_text() != combined_a4[page_index].get_text():
+                        errors.append("A4 combined student page mismatch: %d" % (page_index + 1))
+                        break
+                for key_index in range(nkey):
+                    if key_a4[key_index].get_text() != combined_a4[student_a4.page_count + key_index].get_text():
+                        errors.append("A4 combined scoring page mismatch: %d" % (key_index + 1))
+                        break
     except (OSError, ValueError, RuntimeError, KeyError, IndexError) as exc:
         errors.append("PDF structural preflight failed: %s" % exc)
     if os.path.exists(os.path.join(PUBLIC, "TEACHER.pdf")) or os.path.isdir(os.path.join(PUBLIC, "private")):

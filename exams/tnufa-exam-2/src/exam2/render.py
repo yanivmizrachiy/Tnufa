@@ -15,6 +15,8 @@ BUILD = os.path.join(ROOT, "build")
 STUDENT_PDF = os.path.join(PUBLIC, "STUDENT.pdf")
 ANSWER_KEY_PDF = os.path.join(PUBLIC, "ANSWER_KEY.pdf")
 WITH_KEY_PDF = os.path.join(PUBLIC, "EXAM_WITH_KEY.pdf")
+A4_KEY_PDF = os.path.join(PUBLIC, "ANSWER_KEY_A4.pdf")
+WITH_A4_KEY_PDF = os.path.join(PUBLIC, "EXAM_WITH_KEY_A4.pdf")
 TEACHER_PDF = os.path.join(PRIVATE, "TEACHER.pdf")
 
 
@@ -26,6 +28,11 @@ def _write(p, s):
     os.makedirs(os.path.dirname(p), exist_ok=True)
     with open(p, "w", encoding="utf-8", newline="\n") as f:
         f.write(s)
+
+
+def _pdf_page_count(path):
+    with fitz.open(path) as doc:
+        return doc.page_count
 
 
 def _sha(p):
@@ -147,6 +154,7 @@ def render_student(bw, qs, log=print):
     os.remove(raw)
     log("wrote public/STUDENT.pdf: %d pages (students-only, no key), %d KB" % (len(pages), os.path.getsize(STUDENT_PDF) // 1024))
     key_markup = render_public_key(bw, qs, log=log)
+    render_printable_key(bw, key_markup, log=log)
     emit_reader(qs, sheets, rendered, key_markup)
     return sheets, rendered
 
@@ -203,6 +211,60 @@ def render_public_key(bw, qs, log=print):
     return key_html
 
 
+def render_printable_key(bw, key_html, log=print):
+    """Additional A4 print edition from the exact same five-column scoring key.
+
+    Preserve the previous long-page ANSWER_KEY.pdf and EXAM_WITH_KEY.pdf links.
+    This independent print alternative never changes STUDENT.pdf or district pages.
+    """
+    import re
+
+    temp_html = os.path.join(PUBLIC, ".answer-key-a4-print.html")
+    print_css = (
+        '@page{size:A4;margin:12mm 10mm}'
+        'html,body{margin:0;padding:0;width:auto;background:#fff}'
+        '.a4-print{width:auto;box-sizing:border-box}'
+        '.a4-print .key{font-size:12.4px;line-height:1.35}'
+        '.a4-print .key .rubric-breakdown{font-size:11.7px}'
+        '.a4-print .key th,.a4-print .key td{padding:4px 6px;vertical-align:top}'
+        '.a4-print .key thead{display:table-header-group}'
+        '.a4-print .key tbody{break-inside:avoid;page-break-inside:avoid}'
+        '.a4-print .key tr{break-inside:avoid;page-break-inside:avoid}'
+    )
+    try:
+        _write(temp_html, B.head("מחוון להדפסה A4 — " + B.TITLE, print_css) +
+               '<section class="a4-print">' + key_html + '</section></body></html>')
+        bw.open(temp_html)
+        bw.pg.pdf(path=A4_KEY_PDF, prefer_css_page_size=True, print_background=True,
+                  margin={"top": "0", "bottom": "0", "left": "0", "right": "0"})
+        assert not bw.errs, bw.errs
+    finally:
+        if os.path.exists(temp_html):
+            os.remove(temp_html)
+
+    with fitz.open(A4_KEY_PDF) as key_doc:
+        count = key_doc.page_count
+        assert 2 <= count <= 15, "unexpected printable key page count: %s" % count
+        assert all(abs(pg.rect.width - 595.28) < 1 and abs(pg.rect.height - 841.89) < 1
+                   for pg in key_doc), "print key has non-A4 pages"
+        key_text = "".join(pg.get_text() for pg in key_doc)
+        assert len(re.findall(r'(?:כללי\s+ניקוד|ניקוד\s+כללי)', key_text)) == 41, (
+            "printable key is missing one of the 41 score rubrics")
+        with fitz.open(STUDENT_PDF) as combined:
+            student_count = combined.page_count
+            combined.insert_pdf(key_doc)
+            assert combined.page_count == student_count + count
+            combined.set_toc(combined.get_toc() +
+                             [[1, "מחוון להדפסה (A4)", student_count + 1]])
+            combined.save(WITH_A4_KEY_PDF, garbage=4, deflate=True)
+        with fitz.open(WITH_A4_KEY_PDF) as check:
+            assert check.page_count == student_count + count
+            assert all(check[student_count + i].get_text() == key_doc[i].get_text()
+                       for i in range(count)), "printable combined PDF key differs"
+    log("checked printable A4 scoring key: %d pages; combined PDF: %d pages" %
+        (count, student_count + count))
+
+
 READER_CSS = r"""
 html,body{overflow-x:hidden}
 body{background:#e3e9ef;margin:0}
@@ -220,6 +282,9 @@ main{overflow:hidden;direction:ltr}
 .answer-panel .key{width:100%;font-size:12px;line-height:1.42}
 .answer-panel .key td{vertical-align:top}
 .answer-panel .key .rubric-breakdown{font-size:11.7px}
+.print-links{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+.print-links a{display:inline-block;border:1px solid #c9dcd1;background:#f3f8f5;border-radius:6px;
+  color:#18553a;text-decoration:none;padding:7px 12px;font:600 13px Heebo,Arial,sans-serif}
 .wrap{width:794px;transform-origin:top left;direction:rtl;margin:0}
 .wrap .page{margin:0 auto;box-shadow:0 0 0 1px #c3ced8}
 .sep{width:210mm;max-width:100%;height:2px;background:#126c6a;margin:0 auto}
@@ -250,7 +315,11 @@ def emit_reader(qs, sheets, rendered, key_markup):
     for i, html in enumerate(rendered):
         page = html.replace('<section class="page', '<section id="p%d" class="page' % (i + 1), 1)
         body += page + ('<div class="sep"></div>' if i < len(rendered) - 1 else "")
-    body += '</div><section id="answer-key" class="answer-panel" aria-label="מחוון תשובות וניקוד">' + key_markup + '</section></main><script>%s</script>' % READER_JS
+    body += ('</div><section id="answer-key" class="answer-panel" aria-label="מחוון תשובות וניקוד">'
+             '<nav class="print-links" aria-label="קובצי מחוון להדפסה">'
+             '<a href="ANSWER_KEY_A4.pdf" download>מחוון להדפסה ב־A4</a>'
+             '<a href="EXAM_WITH_KEY_A4.pdf" download>מבחן ומחוון להדפסה ב־A4</a>'
+             '</nav>' + key_markup + '</section></main><script>' + READER_JS + '</script>')
     doc = B.head(B.TITLE + " — " + B.SUBTITLE, READER_CSS) + body + "</body></html>"
     doc = doc.replace("<head>", '<head><meta name="description" content="מבחן תנופה לדוגמה (נובמבר 2026) — הכנה לכיתה ט׳ במתמטיקה: צפייה בחוברת, הדפסה והורדת PDF.">', 1)
     _write(os.path.join(PUBLIC, "index.html"), doc)
@@ -259,6 +328,10 @@ def emit_reader(qs, sheets, rendered, key_markup):
         "sheets": [[qs[i].n for i in s] for s in sheets], "pdf": {"file": "STUDENT.pdf", "sha256": "sha256-" + _sha(STUDENT_PDF), "pageCount": len(rendered)},
         "answerKey": {"file": "ANSWER_KEY.pdf", "sha256": "sha256-" + _sha(ANSWER_KEY_PDF), "pageCount": 1},
         "examWithKey": {"file": "EXAM_WITH_KEY.pdf", "sha256": "sha256-" + _sha(WITH_KEY_PDF), "pageCount": len(rendered) + 1},
+        "answerKeyA4": {"file": "ANSWER_KEY_A4.pdf", "sha256": "sha256-" + _sha(A4_KEY_PDF),
+                        "pageCount": _pdf_page_count(A4_KEY_PDF)},
+        "examWithKeyA4": {"file": "EXAM_WITH_KEY_A4.pdf", "sha256": "sha256-" + _sha(WITH_A4_KEY_PDF),
+                          "pageCount": _pdf_page_count(WITH_A4_KEY_PDF)},
         "builtAt": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     _write(os.path.join(PUBLIC, "manifest.json"), json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
