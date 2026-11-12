@@ -280,7 +280,7 @@ def cover(teacher=False, assets="assets/"):
     if teacher:
         fields = '<div class="fields"><div class="field"><label>שם המורה:</label><span class="line"></span></div><div class="field"><label>כיתה:</label><span class="line"></span></div></div>'
     return ('<section class="page cover%s">'
-            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover-math.svg" alt="איור ירושלים בעיצוב מתמטי מקורי עם קווים גאומטריים ומערכת צירים">'
+            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover-math.svg" alt="שלושה תלמידים לומדים מתמטיקה מול נוף ירושלים, אחד מהם חובש כיפה">'
             '<p class="kicker">לקראת תנופה</p>%s</figure>'
             '<div class="cv-body">%s'
             '<div class="head"><h1 class="title">%s</h1><p class="sub">%s</p>%s%s</div>%s'
