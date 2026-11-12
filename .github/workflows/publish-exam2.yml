@@ -36,6 +36,10 @@ permissions:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    env:
+      # 'true' once the PAGES_DEPLOY_TOKEN secret exists; until then main still builds and verifies,
+      # publishing is skipped with a visible warning, and the last good version stays live.
+      HAS_PAGES_TOKEN: ${{ secrets.PAGES_DEPLOY_TOKEN != '' }}
     steps:
       - name: Checkout Tnufa (single source of truth)
         uses: actions/checkout@v4
@@ -66,8 +70,12 @@ jobs:
           if-no-files-found: error
 
       # ---- Publish only from main / manual runs. A pull request stops after build + verify. ----
+      - name: Publishing skipped — PAGES_DEPLOY_TOKEN not set
+        if: github.event_name != 'pull_request' && env.HAS_PAGES_TOKEN != 'true'
+        run: echo "::warning title=Publish skipped::Add the repository secret PAGES_DEPLOY_TOKEN (contents:write on yanivmizrachiy/tnufa-exam-2) to publish automatically. The build and version gate passed; the live site keeps its last good version."
+
       - name: Check out the GitHub Pages repo
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && env.HAS_PAGES_TOKEN == 'true'
         uses: actions/checkout@v4
         with:
           repository: yanivmizrachiy/tnufa-exam-2
@@ -75,7 +83,7 @@ jobs:
           token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
 
       - name: Publish student outputs to GitHub Pages (verified, direct to main)
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && env.HAS_PAGES_TOKEN == 'true'
         working-directory: Tnufa
         env:
           SITE_DIR: ${{ github.workspace }}/tnufa-exam-2
