@@ -166,15 +166,12 @@ body{background:#e3e9ef;margin:0}
 .brand small{font-size:11.5px;opacity:.8}
 .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0;max-width:100%}
 .btn{display:inline-flex;align-items:center;gap:6px;background:#276149;color:#fff;border:0;border-radius:999px;padding:8px 14px;font:600 14px Heebo,Arial,sans-serif;cursor:pointer;text-decoration:none}
-.btn.alt{background:#2d4799}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.4)}
-select.btn{appearance:none;padding-inline-end:22px}
 main{padding:18px 0 40px}
 main{overflow:hidden;direction:ltr}
 .wrap{width:794px;transform-origin:top left;direction:rtl;margin:0}
 .wrap .page{margin:0 auto;box-shadow:0 0 0 1px #c3ced8}
 .sep{width:210mm;max-width:100%;height:2px;background:#126c6a;margin:0 auto}
-@media screen and (max-width:860px){.brand small{display:none}.btn span.l{display:none}select.btn{max-width:150px;font-size:13px}}
+@media screen and (max-width:860px){.brand small{display:none}}
 @media print{body{background:#fff}.topbar,.sep{display:none}main{padding:0}.wrap{transform:none!important;height:auto!important}.wrap .page{box-shadow:none;margin:0}}
 """
 
@@ -189,24 +186,15 @@ READER_JS = r"""
     wrap.style.height=(wrap.scrollHeight*s)+'px';
   }
   window.addEventListener('resize',fit); window.addEventListener('load',fit); fit();
-  document.getElementById('goto').addEventListener('change',e=>{const id=e.target.value; if(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});e.target.value='';}});
-  document.getElementById('print').addEventListener('click',()=>window.print());
 })();
 """
 
 
 def emit_reader(qs, sheets, rendered):
     """public/index.html: the cover and every A4 sheet, inline, from the same render as the PDF."""
-    opts = ['<option value="">מעבר בחוברת…</option>', '<option value="p1">עמוד שער</option>', '<option value="p2">הוראות</option>']
-    for q in qs:
-        opts.append('<option value="q%d">שאלה %d — %s</option>' % (q.n, q.n, q.topic))
-    n = len(sheets) + 3
-    opts += ['<option value="p%d">דף טיוטה 1</option>' % n, '<option value="p%d">דף טיוטה 2</option>' % (n + 1), '<option value="p%d">עמוד סיום</option>' % (n + 2), '<option value="p%d">מחוון תשובות</option>' % (n + 3)]
     body = ('<header class="topbar"><div class="in"><a class="brand" href="#p1"><img src="assets/logo.svg" alt=""><span><strong>%s</strong><small>%s</small></span></a>'
-            '<div class="acts"><select id="goto" class="btn ghost" aria-label="מעבר בחוברת">%s</select>'
-            '<button id="print" class="btn alt" type="button">🖨 <span class="l">הדפסה</span></button>'
-            '<a class="btn" href="STUDENT.pdf" download="מבחן-תנופה-לדוגמה.pdf">⬇ <span class="l">הורדה</span></a></div></div></header>'
-            '<main><div id="wrap" class="wrap">' % (B.TITLE, B.SUBTITLE, "".join(opts)))
+            '<div class="acts"><a class="btn" href="STUDENT.pdf" download="מבחן-תנופה-לדוגמה.pdf">⬇ הורדה</a></div></div></header>'
+            '<main><div id="wrap" class="wrap">' % (B.TITLE, B.SUBTITLE))
     for i, html in enumerate(rendered):
         page = html.replace('<section class="page', '<section id="p%d" class="page' % (i + 1), 1)
         body += page + ('<div class="sep"></div>' if i < len(rendered) - 1 else "")

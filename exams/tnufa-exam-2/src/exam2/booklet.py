@@ -90,15 +90,19 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .intro .luck{font-family:"Rubik","Heebo",sans-serif;font-weight:700;color:#2d4799;font-size:24px;text-align:center;margin-top:40px}
 h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align:center;font-family:"Rubik","Heebo",sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:#15386e}
 /* closing page */
-.finale{position:absolute;inset:0 0 var(--foot) 0;background:var(--deep);display:flex;flex-direction:column;overflow:hidden}
-.fsky{flex:0 0 auto;padding:52px 20px 10px;text-align:center;color:#fff;font-family:"Rubik","Heebo",sans-serif;font-weight:900;font-size:176px;line-height:1.04}
+.finale{position:absolute;inset:0 0 var(--foot) 0;display:flex;flex-direction:column;overflow:hidden;
+  background:#0f3266}
+.fsky{flex:0 0 auto;position:relative;z-index:1;padding:58px 24px 30px;background:linear-gradient(to bottom,#061634,#0f3266);text-align:center;color:#fff;font-family:"Suez One","Rubik",serif;
+  font-size:142px;line-height:1.06;text-shadow:0 6px 24px rgba(3,14,36,.45)}
 .fsky p{margin:0}
+.fsky p.gold{color:#ffcf6e}
+.fsky .rule{display:block;width:180px;height:4px;margin:22px auto 0;border-radius:2px;background:linear-gradient(90deg,transparent,#ffcf6e,transparent)}
 .fimg{flex:1 1 auto;min-height:0;position:relative}
-.fimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:53% 100%;display:block}
-.fimg::after{content:"";position:absolute;inset:0 0 auto 0;height:150px;background:linear-gradient(to bottom,#0a2550,rgba(10,37,80,0))}
+.fimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:46% 100%;display:block}
+.fimg::after{content:"";position:absolute;inset:0 0 auto 0;height:300px;background:linear-gradient(to bottom,#0f3266 0%,rgba(15,50,102,.6) 35%,rgba(15,50,102,0) 100%)}
 /* cover */
 .page.cover{padding:0;background:linear-gradient(152deg,var(--g1) 0%,var(--g2) 48%,var(--g3) 100%);color:var(--cream);display:flex;flex-direction:column;overflow:hidden}
-.cover .cv-banner{position:relative;width:100%;height:118mm;overflow:hidden;line-height:0;flex:0 0 auto}
+.cover .cv-banner{position:relative;width:100%;height:118mm;overflow:hidden;line-height:0;flex:0 0 auto;margin:0}
 .cover .cv-banner-img{width:100%;height:100%;display:block;object-fit:cover}
 .cover .cv-banner::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(14,54,38,.30) 0%,transparent 24% 56%,rgba(39,97,73,.55) 85%,var(--g3) 100%)}
 .cover .kicker{position:absolute;z-index:2;top:18px;inset-inline-start:26px;margin:0;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.6);font-size:20px;font-weight:800;letter-spacing:.03em;display:inline-flex;align-items:center;gap:9px;line-height:1.2}
@@ -288,7 +292,7 @@ def cover(teacher=False, assets="assets/"):
     if teacher:
         fields = '<div class="fields"><div class="field"><label>שם המורה:</label><span class="line"></span></div><div class="field"><label>כיתה:</label><span class="line"></span></div></div>'
     return ('<section class="page cover%s">'
-            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover.jpg" alt="תלמידות ותלמידים מירושלים נבחנים במתמטיקה על רקע נוף העיר העתיקה, דגל ישראל ונוסחאות">'
+            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover.jpg" alt="תלמיד ושתי תלמידות לומדים מתמטיקה על מרפסת אבן מול חומות העיר העתיקה בירושלים בשקיעה">'
             '<p class="kicker">לקראת תנופה</p>%s</figure>'
             '<div class="cv-body">%s'
             '<div class="head"><h1 class="title">%s</h1><p class="sub">%s</p>%s%s</div>%s'
@@ -336,7 +340,8 @@ def key_sheet(qs):
 
 
 def finale(assets="assets/"):
-    return '<div class="finale"><div class="fsky"><p>ירושלים</p><p>תצליח!</p></div><div class="fimg"><img src="%sjerusalem.jpg" alt=""></div></div>' % assets
+    return ('<div class="finale"><div class="fsky"><p>ירושלים</p><p class="gold">תצליח!</p><span class="rule"></span></div>'
+            '<div class="fimg"><img src="%sfinale.jpg" alt="זריחה מעל ירושלים מהר הזיתים; על אבן בחזית מחברת ומחוגה"></div></div>' % assets)
 
 
 # ---------------- teacher booklet ----------------
