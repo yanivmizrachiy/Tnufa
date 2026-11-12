@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="איור ירושלים וגאומטריה למבחן במתמטיקה">
+<defs>
+ <linearGradient id="sky" x2="1" y2="1"><stop stop-color="#082c39"/><stop offset=".45" stop-color="#145c60"/><stop offset="1" stop-color="#0b4539"/></linearGradient>
+ <radialGradient id="light"><stop stop-color="#fae7a0" stop-opacity=".55"/><stop offset="1" stop-color="#fae7a0" stop-opacity="0"/></radialGradient>
+ <linearGradient id="stone" x2="0" y2="1"><stop stop-color="#dcc8a0"/><stop offset="1" stop-color="#a99673"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff2a0"/><stop offset=".65" stop-color="#e7bc61"/><stop offset="1" stop-color="#a46a32"/></linearGradient>
+ <pattern id="grid" width="58" height="58" patternUnits="userSpaceOnUse"><path d="M58 0H0V58" fill="none" stroke="#cbeee4" stroke-opacity=".075" stroke-width="1"/></pattern>
+ <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="22"/></filter>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<rect width="1600" height="900" fill="url(#grid)"/>
+<circle cx="575" cy="366" r="390" fill="url(#light)"/>
+<g opacity=".23" fill="none" stroke="#b6e9df">
+ <circle cx="1290" cy="375" r="240" stroke-width="1.5"/>
+ <circle cx="1290" cy="375" r="190" stroke-dasharray="7 13"/>
+ <circle cx="1290" cy="375" r="110"/>
+ <path d="M1000 375H1550M1290 85V740" stroke-width="2"/>
+ <path d="M1050 565L1110 485L1170 525L1230 385L1290 421L1350 270L1410 316L1480 140" stroke="#aff8dd" stroke-width="5"/>
+ <path d="M1070 620Q1140 175 1208 390T1366 363T1535 520" stroke="#c7df9a" stroke-width="3"/>
+ <path d="M1030 245L1420 680M1030 680L1420 245" stroke-dasharray="8 10"/>
+</g>
+<g opacity=".32" fill="none" stroke="#a8fff1" stroke-width="3">
+ <path d="M72 150L318 150L318 394Z"/>
+ <path d="M72 150L318 394" stroke-dasharray="12 9"/>
+ <circle cx="72" cy="150" r="7" fill="#a8fff1"/><circle cx="318" cy="394" r="7" fill="#a8fff1"/>
+ <path d="M280 152V189H244"/>
+ <path d="M390 112Q550 20 720 175"/>
+</g>
+<g transform="translate(0 120)" opacity=".28" fill="#001a23" filter="url(#shadow)">
+ <rect x="120" y="600" width="1020" height="210" rx="15"/>
+</g>
+<g stroke="#584d3e" stroke-width="4" stroke-linejoin="round">
+ <path d="M0 721L135 704L135 658L190 658L190 615L252 615L252 667L294 667L294 584L352 584L352 634L430 634L430 607L502 607L502 543L557 543L557 630L615 630L615 587L685 587L685 655L745 655L745 592L798 592L798 643L861 643L861 606L927 606L927 696L1010 696L1010 728L1100 750V900H0Z" fill="#c8ba94"/>
+ <path d="M0 770Q280 746 520 765T1100 764V900H0Z" fill="url(#stone)"/>
+</g>
+<g stroke="#8c7853" stroke-width="3" opacity=".55">
+ <path d="M0 802H1100M0 844H1100M0 882H1100"/>
+ <path d="M65 773V802M155 770V802M270 766V802M370 768V802M480 765V802M620 770V802M740 766V802M865 767V802M972 767V802"/>
+ <path d="M118 802V844M227 802V844M329 802V844M440 802V844M549 802V844M658 802V844M768 802V844M875 802V844M990 802V844"/>
+</g>
+<g transform="translate(490 390)">
+ <path d="M-152 198V-2H152V198Z" fill="#dfcda9" stroke="#675b47" stroke-width="5"/>
+ <path d="M-164 10H164V-4H-164Z" fill="#e4d3ac" stroke="#7f6950" stroke-width="3"/>
+ <path d="M-123-2Q-109-120 0-151Q109-120 123-2Z" fill="url(#gold)" stroke="#996f36" stroke-width="6"/>
+ <path d="M0-151V-174M-12-162H12" stroke="#f5e6c0" stroke-width="6"/>
+ <rect x="-145" y="172" width="290" height="24" fill="#b39b75"/>
+ <path d="M-65 198V95Q0 30 65 95V198" fill="#0b3c43" stroke="#8a714c" stroke-width="8"/>
+ <path d="M-120 33H-85V93H-120ZM85 33H120V93H85Z" fill="#2f7880" stroke="#927b56" stroke-width="6"/>
+ <g fill="none" stroke="#baac8a" stroke-width="5"><path d="M-152 20H152M-152 158H152"/></g>
+</g>
+<g fill="#d5c79f" stroke="#7f6a51" stroke-width="3">
+ <path d="M60 714V600H95V714ZM102 714V632H142V714ZM904 715V581H946V715ZM949 715V625H994V715Z"/>
+ <path d="M330 642V504H365V642ZM365 642V545H397V642Z"/>
+</g>
+<g fill="none" stroke="#f2d59b" stroke-width="3" opacity=".65">
+ <path d="M1010 170L1110 126L1240 186" stroke-dasharray="12 10"/>
+ <circle cx="1110" cy="126" r="8" fill="#f2d59b"/>
+ <path d="M1520 150l-40 0 0 40M1010 680l90-90 90 90" />
+</g>
+<rect y="853" width="1600" height="47" fill="#0c423b" opacity=".35"/>
+</svg>
