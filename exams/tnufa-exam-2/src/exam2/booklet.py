@@ -165,6 +165,23 @@ h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align
 .key th.kt{color:#fff;font-size:12.6px}
 .key .kp{width:36px;text-align:center;font-weight:800}
 .key .ka{width:136px;font-weight:700}
+.key .khow{width:auto;min-width:0}
+.key .rubric-breakdown{margin-top:7px;border-top:1px solid #d9e3e0;padding-top:5px;font-size:11.9px;line-height:1.45;color:#3d4e58}
+.key .krh{font-weight:650;color:#15386e;margin-bottom:3px}
+.key .krl{margin:2px 0;break-inside:avoid}
+.key .krp{white-space:nowrap;font-weight:650;color:#276149}
+@media screen and (max-width:700px){
+ .answer-panel{padding:14px 12px!important;margin:10px!important}
+ .answer-panel .key,.answer-panel .key tbody,.answer-panel .key tr,.answer-panel .key td{display:block;width:100%!important}
+ .answer-panel .key thead{display:none}
+ .answer-panel .key tbody{margin:12px 0;border:1px solid #d3ded8;border-radius:8px;overflow:hidden}
+ .answer-panel .key tr{padding:10px 0;border-bottom:1px solid #e4ece7}
+ .answer-panel .key tr:last-child{border-bottom:0}
+ .answer-panel .key td{border:0!important;padding:5px 12px;text-align:right!important;font-size:13px}
+ .answer-panel .key td::before{content:attr(data-label);display:block;color:#50616e;font-size:11px;margin-bottom:2px}
+ .answer-panel .key .kp{text-align:right}
+ .answer-panel .key .rubric-breakdown{font-size:12.5px}
+}
 /* teacher booklet */
 .tpage{width:210mm;min-height:297mm;padding:34px 60px var(--foot);position:relative}
 .tfoot{position:fixed;bottom:0;inset-inline:0;height:var(--foot);background:#fff}
@@ -338,20 +355,30 @@ def draft_sheet(n):
 
 
 def key_group(q):
+    """Rows and scoring criteria from the SAME Part objects used by the teacher booklet."""
     rows = ""
-    for i, p in enumerate(q.parts):
-        lead = ('<td class="kq" rowspan="%d"><span class="num">%d</span></td><td class="kt" rowspan="%d">%s</td>'
-                % (len(q.parts), q.n, len(q.parts), q.topic)) if i == 0 else ""
-        rows += '<tr>%s<td class="kp">%s</td><td class="ka">%s</td><td>%s</td></tr>' % (lead, p.letter or "—", p.key, p.how)
+    for p in q.parts:
+        rubric = "".join(
+            '<div class="krl"><span class="krp">%d נק׳</span> — %s</div>' % (points, criterion)
+            for points, criterion in p.rubric
+        )
+        scoring = ('<div class="rubric-breakdown"><div class="krh">כללי ניקוד (מתוך %d נק׳)</div>%s</div>'
+                   % (p.points, rubric))
+        rows += (
+            '<tr><td class="kq" data-label="שאלה"><span class="num">%d</span></td>'
+            '<td class="kt" data-label="נושא">%s</td>'
+            '<td class="kp" data-label="סעיף">%s</td>'
+            '<td class="ka" data-label="תשובה">%s</td>'
+            '<td class="khow" data-label="דרך הפתרון וכללי ניקוד">%s%s</td></tr>'
+        ) % (q.n, q.topic, p.letter or "—", p.key, p.how, scoring)
     return "<tbody>%s</tbody>" % rows
 
 
 def key_sheet(qs):
-    """The answer key: one table, one row per part (answer + one-line method), as in the previous exam."""
+    """The prior exam's five-column table, enriched with full/partial/zero scoring."""
     head = '<h1 class="kh">מחוון תשובות</h1><p class="ks">%s במתמטיקה לכיתה ט׳ · %s · למורה</p>' % (TITLE, DATE)
     return head + ('<table class="key"><thead><tr><th class="kq">שאלה</th><th class="kt">נושא</th><th class="kp">סעיף</th><th class="ka">תשובה</th>'
                    '<th>דרך הפתרון</th></tr></thead>%s</table>' % H.auto_math("".join(key_group(q) for q in qs)))
-
 
 def finale(assets="assets/"):
     return ('<div class="finale"><div class="fsky"><p>ירושלים</p><p class="gold">תצליח!</p><span class="rule"></span></div>'
