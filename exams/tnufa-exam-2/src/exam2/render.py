@@ -319,7 +319,7 @@ def emit_reader(qs, sheets, rendered, key_markup):
              '<nav class="print-links" aria-label="קובצי מחוון להדפסה">'
              '<a href="ANSWER_KEY_A4.pdf" download>מחוון להדפסה ב־A4</a>'
              '<a href="EXAM_WITH_KEY_A4.pdf" download>מבחן ומחוון להדפסה ב־A4</a>'
-             '</nav>' + key_markup + '</section></main><script>%s</script>') % READER_JS
+             '</nav>' + key_markup + '</section></main><script>' + READER_JS + '</script>')
     doc = B.head(B.TITLE + " — " + B.SUBTITLE, READER_CSS) + body + "</body></html>"
     doc = doc.replace("<head>", '<head><meta name="description" content="מבחן תנופה לדוגמה (נובמבר 2026) — הכנה לכיתה ט׳ במתמטיקה: צפייה בחוברת, הדפסה והורדת PDF.">', 1)
     _write(os.path.join(PUBLIC, "index.html"), doc)
