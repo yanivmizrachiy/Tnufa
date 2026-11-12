@@ -21,7 +21,7 @@ def check():
 
 
 def figure():
-    cx, cy, r = 150, 140, 105
+    cx, cy, r = 150, 158, 105
     cols = [S.G3, S.BLUE, S.TURQ, "#b9c6d2"]
     b = ""
     a0 = -90
@@ -38,12 +38,12 @@ def figure():
         b += S.t(lx, ly + 5, "%d%%" % pct, 15, ltr=True, w=700, c=ink)
         a0 = a1
     # legend
-    ly = 70
+    ly = 100
     for (name, pct), c in zip(SHARE, cols):
         b += S.rect(392, ly - 11, 14, 14, c, rx=3) + S.t(384, ly, name, 14, "start", w=600)
         ly += 30
-    b += S.t(400, 34, "התפלגות חברי המועדון לפי ענף", 14, "start", w=700, c=S.NAVY)
-    return S.svg(520, 260, b, "דיאגרמת עיגול: כדורגל 40%, כדורסל 25%, שחייה 20%, אחר 15%", maxw=420)
+    b += S.t(cx, 30, "התפלגות חברי המועדון לפי ענף", 15, "middle", w=700, c=S.NAVY)
+    return S.svg(520, 278, b, "דיאגרמת עיגול: כדורגל 40%, כדורסל 25%, שחייה 20%, אחר 15%", maxw=420)
 
 
 KEY = {   # answer key (מחוון תשובות): part → (answer, how)
