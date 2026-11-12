@@ -105,7 +105,7 @@ def verify_public():
     # Catch a truncated, swapped or mismatched PDF before release.
     try:
         import fitz
-        with fitz.open(STUDENT_PDF) as student, \
+        with fitz.open(os.path.join(PUBLIC, "STUDENT.pdf")) as student, \
              fitz.open(os.path.join(PUBLIC, "ANSWER_KEY.pdf")) as key, \
              fitz.open(os.path.join(PUBLIC, "EXAM_WITH_KEY.pdf")) as combined:
             if student.page_count != rm["pdf"]["pageCount"]:
