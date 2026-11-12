@@ -25,15 +25,17 @@ PUBLIC = os.path.join(EXAM2, "public")
 SITE = os.environ.get("SITE_DIR") or os.path.abspath(os.path.join(REPO, "..", "tnufa-exam-2"))
 SITE_REPO = "yanivmizrachiy/tnufa-exam-2"
 KEEP = {".git"}                      # everything else in the site repo is regenerated
-SKIP = {".print.html", ".preview.html"}
+SKIP = {".print.html", ".preview.html", ".answer-key-print.html"}
 
 README = """# מבחן תנופה לדוגמה — אתר הפרסום (נוצר אוטומטית)
 
 **אין לערוך כאן.** ריפו זה הוא תוצר בנייה בלבד: תוכנו מוחלף כולו בכל הרצה של
 `python exams/tnufa-exam-2/tools/publish.py` בריפו `yanivmizrachiy/Tnufa` (מקור האמת היחיד: `exams/tnufa-exam-2`).
 
-מכיל רק את תוצרי התלמיד: `index.html` (קורא: שער, עמודי החוברת, הדפסה, הורדה), `STUDENT.pdf`, `manifest.json`, `assets/`.
-אין פתרונות ואין מחוון. `SOURCE.json` מציין מאיזה commit במקור נבנה האתר.
+מכיל חוברת תלמיד `STUDENT.pdf` (ללא פתרונות), מחוון תשובות וניקוד בטבלה בתוך `index.html`,
+קובץ `ANSWER_KEY.pdf`, וחוברת `EXAM_WITH_KEY.pdf` עם המחוון בסופה.
+המחוון ציבורי לבקשת בעל המבחן. חוברת המורה המורחבת `private/TEACHER.pdf` אינה מתפרסמת.
+`SOURCE.json` מציין את commit המקור.
 """
 
 
@@ -76,6 +78,28 @@ def verify_public():
     for href in (wm.get("assets", {}).get("css") or []):
         if not os.path.exists(os.path.join(PUBLIC, href)):
             errors.append("stylesheet referenced by manifest is missing: %s" % href)
+    # The public key and combined download must originate in this verified build.
+    for field, expected in (("answerKey", 1), ("examWithKey", rm["pdf"]["pageCount"] + 1)):
+        meta = rm.get(field) or {}
+        expected_file = {"answerKey": "ANSWER_KEY.pdf", "examWithKey": "EXAM_WITH_KEY.pdf"}[field]
+        if meta.get("file") != expected_file:
+            errors.append("%s missing or wrong filename" % field)
+            continue
+        full = os.path.join(PUBLIC, expected_file)
+        if not os.path.isfile(full):
+            errors.append("%s missing: %s" % (field, expected_file))
+            continue
+        if meta.get("sha256") != "sha256-" + sha(full):
+            errors.append("%s hash mismatch" % field)
+        if meta.get("pageCount") != expected:
+            errors.append("%s pageCount differs" % field)
+    index_path = os.path.join(PUBLIC, "index.html")
+    if os.path.isfile(index_path):
+        with open(index_path, encoding="utf-8") as f:
+            index = f.read()
+        if ('id="answer-key"' not in index or
+                index.count('class="rubric-breakdown"') < 41):
+            errors.append("public reader is missing the full 41-part scoring key")
     if os.path.exists(os.path.join(PUBLIC, "TEACHER.pdf")) or os.path.isdir(os.path.join(PUBLIC, "private")):
         errors.append("teacher material must never reach the published folder")
     return pdf_sha, errors
