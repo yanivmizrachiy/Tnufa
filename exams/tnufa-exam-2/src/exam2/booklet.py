@@ -66,7 +66,7 @@ body{color:var(--ink);font-family:"Heebo",Arial,sans-serif;font-size:14.8px;line
 .opt>span:last-child{flex:1 1 auto;min-width:0}
 .let{font-size:11px;color:var(--mute);width:10px;flex:0 0 auto}
 .box{flex:0 0 auto;width:16px;height:16px;border:1.3px solid #6d7a84;border-radius:3px;background:#fff}
-.sys{display:inline-block;font-family:Arial,"Heebo",sans-serif;border-inline-start:2px solid var(--ink);padding-inline-start:8px;line-height:1.45;text-align:left;margin-top:4px}
+.sys{display:inline-block;font-family:Arial,"Heebo",sans-serif;line-height:1.45;text-align:left;margin-top:4px}
 .work,.fill{position:relative;overflow:hidden}
 .work svg,.fill svg{position:absolute;inset:0;display:block}
 .fill{position:absolute;inset:0 0 var(--foot) 0}
