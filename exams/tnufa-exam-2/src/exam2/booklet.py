@@ -263,7 +263,7 @@ GEO = ('<div class="bg" aria-hidden="true"><span class="blob b1"></span><span cl
 
 
 def cover(teacher=False, assets="assets/"):
-    """Same branding as the existing site cover (index.html of the original exam): photo banner with the note,
+    """Keeps the existing cover structure but uses original vector mathematics/Jerusalem artwork with the note,
     Suez One title, grade circle, 'ישראל תצליח' badge, credit line with the round logo."""
     note = ('<figure class="note"><span class="tape" aria-hidden="true"></span><p><span class="hl">מירושלים תצא התנופה</span> '
             'ויפרצו המצליחים את הגבולות, ויגיעו <b>לאינסוף ∞</b></p></figure>')
@@ -280,7 +280,7 @@ def cover(teacher=False, assets="assets/"):
     if teacher:
         fields = '<div class="fields"><div class="field"><label>שם המורה:</label><span class="line"></span></div><div class="field"><label>כיתה:</label><span class="line"></span></div></div>'
     return ('<section class="page cover%s">'
-            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover.jpg" alt="תלמידות ותלמידים מירושלים נבחנים במתמטיקה על רקע נוף העיר העתיקה, דגל ישראל ונוסחאות">'
+            '<figure class="cv-banner"><img class="cv-banner-img" src="%scover-math.svg" alt="איור ירושלים בעיצוב מתמטי מקורי עם קווים גאומטריים ומערכת צירים">'
             '<p class="kicker">לקראת תנופה</p>%s</figure>'
             '<div class="cv-body">%s'
             '<div class="head"><h1 class="title">%s</h1><p class="sub">%s</p>%s%s</div>%s'
