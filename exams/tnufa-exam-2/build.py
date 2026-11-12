@@ -12,7 +12,7 @@
 Edit one question: open src/exam2/questions/qNN.py (text, data, figure, answer, rubric live together), then run
 build.py. The regression hashes report which questions changed.
 """
-import os, sys, json
+import os, sys, json, runpy
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -33,6 +33,10 @@ def main(argv):
         for e in errs:
             print("  -", e)
         return 1
+    # Independent fixed-answer baseline and arithmetic; deliberately does not use q.check().
+    ns = runpy.run_path(os.path.join(HERE, "tests", "independent_math_audit.py"))
+    assert ns["verify"](qs) == 100
+    print("independent math and scoring audit: OK — 41 parts, 100 points")
     print("checks: OK — %d questions, %d items, %d points; domains %s; thinking %s; literacy %d; solving minutes %d" % (
         act["questions"], act["items"], act["points"], act["domains"], act["thinking"], act["literacy"], act["minutes_solving"]))
     bp = blueprint.blueprint(qs)
