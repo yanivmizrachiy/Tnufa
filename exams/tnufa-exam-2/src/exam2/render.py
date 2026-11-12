@@ -71,13 +71,28 @@ def paginate(bw, qs, tmp):
     avail = bw.pg.evaluate("""() => { const c = document.createElement('section'); c.className='page';
         c.innerHTML='<div class="content"></div>'; document.body.append(c);
         const h = c.querySelector('.content').getBoundingClientRect().height; c.remove(); return h; }""")
+    # Reserve the measured student-name/class header only on the FIRST question sheet.
+    header_h = bw.pg.evaluate("""(markup) => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = markup;
+        const header = wrapper.firstElementChild;
+        const content = document.querySelector('.content');
+        content.prepend(header);
+        const computed = getComputedStyle(header);
+        const height = header.getBoundingClientRect().height + parseFloat(computed.marginBottom || '0');
+        header.remove();
+        return height;
+    }""", B.STUDENT_FIELDS)
+    assert heights[0] <= avail - header_h, "question 1 cannot fit under student details"
     too_tall = [qs[i].n for i, h in enumerate(heights) if h > avail]
     assert not too_tall, "questions taller than one sheet: %s" % too_tall
     sheets, cur, used = [], [], 0.0
+    page_avail = avail - header_h
     for i, h in enumerate(heights):
-        if cur and used + h > avail:
+        if cur and used + h > page_avail:
             sheets.append(cur)
             cur, used = [], 0.0
+            page_avail = avail
         cur.append(i)
         used += h
     sheets.append(cur)
@@ -91,7 +106,8 @@ def student_pages(qs, sheets):
     pages.append(B.sheet(B.INTRO, n))
     for s in sheets:
         n += 1
-        pages.append(B.sheet("".join(qs[i].student_html for i in s), n))
+        question_body = "".join(qs[i].student_html for i in s)
+        pages.append(B.sheet((B.STUDENT_FIELDS if n == 3 else "") + question_body, n))
     for d in (1, 2):
         n += 1
         pages.append(B.sheet(B.draft_sheet(d), n))

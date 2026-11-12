@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="שלושה תלמידים לומדים מתמטיקה במרפסת ירושלמית, סביבם ספרים, שרטוטי גאומטריה ונוף ירושלים">
+<defs>
+ <linearGradient id="sky" x2=".8" y2="1"><stop stop-color="#083b34"/><stop offset=".48" stop-color="#187868"/><stop offset="1" stop-color="#5fa483"/></linearGradient>
+ <radialGradient id="sun"><stop stop-color="#f1dfae" stop-opacity=".55"/><stop offset="1" stop-color="#f1dfae" stop-opacity="0"/></radialGradient>
+ <linearGradient id="stone" x2="0" y2="1"><stop stop-color="#ecd9b7"/><stop offset="1" stop-color="#a99275"/></linearGradient>
+ <linearGradient id="oldwall" x2="0" y2="1"><stop stop-color="#d8c49e"/><stop offset="1" stop-color="#b19c7a"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff5b9"/><stop offset=".56" stop-color="#e9be67"/><stop offset="1" stop-color="#b07c3b"/></linearGradient>
+ <linearGradient id="top" x2="0" y2="1"><stop stop-color="#e3c49c"/><stop offset="1" stop-color="#987453"/></linearGradient>
+ <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#fffef3"/><stop offset="1" stop-color="#d6e5df"/></linearGradient>
+ <linearGradient id="shirt1" x2="0" y2="1"><stop stop-color="#ecc39d"/><stop offset="1" stop-color="#bb805c"/></linearGradient>
+ <linearGradient id="shirt2" x2="0" y2="1"><stop stop-color="#c5d9c8"/><stop offset="1" stop-color="#5f958b"/></linearGradient>
+ <linearGradient id="shirt3" x2="0" y2="1"><stop stop-color="#e4e4d5"/><stop offset="1" stop-color="#9bb6aa"/></linearGradient>
+ <radialGradient id="shade"><stop stop-color="#0c342f" stop-opacity="0"/><stop offset="1" stop-color="#042822" stop-opacity=".35"/></radialGradient>
+ <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#3e8a84" opacity=".16"/></pattern>
+ <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="17"/></filter>
+</defs>
+<!-- The title, student fields and branding are live HTML outside this image. -->
+<rect width="1600" height="900" fill="url(#sky)"/><rect width="1600" height="900" fill="url(#grid)"/>
+<circle cx="720" cy="300" r="420" fill="url(#sun)"/><g fill="#d7eed2"><circle cx="87" cy="77" r="1" opacity=".35"/><circle cx="158" cy="174" r="2" opacity=".35"/><circle cx="229" cy="271" r="3" opacity=".35"/><circle cx="300" cy="78" r="1" opacity=".35"/><circle cx="371" cy="175" r="2" opacity=".35"/><circle cx="442" cy="272" r="3" opacity=".35"/><circle cx="513" cy="79" r="1" opacity=".35"/><circle cx="584" cy="176" r="2" opacity=".35"/><circle cx="655" cy="273" r="3" opacity=".35"/><circle cx="726" cy="80" r="1" opacity=".35"/><circle cx="797" cy="177" r="2" opacity=".35"/><circle cx="868" cy="274" r="3" opacity=".35"/><circle cx="939" cy="81" r="1" opacity=".35"/><circle cx="1010" cy="178" r="2" opacity=".35"/><circle cx="1081" cy="275" r="3" opacity=".35"/><circle cx="1152" cy="82" r="1" opacity=".35"/><circle cx="1223" cy="179" r="2" opacity=".35"/><circle cx="1294" cy="276" r="3" opacity=".35"/><circle cx="1365" cy="83" r="1" opacity=".35"/><circle cx="1436" cy="180" r="2" opacity=".35"/><circle cx="1507" cy="277" r="3" opacity=".35"/><circle cx="58" cy="84" r="1" opacity=".35"/><circle cx="129" cy="181" r="2" opacity=".35"/></g>
+<!-- Distant Jerusalem hills -->
+<path d="M0 435Q200 380 340 428T710 403T1050 405T1410 380T1600 412V750H0Z" fill="#588879" opacity=".72"/>
+<path d="M0 505Q155 462 330 490T625 461T920 485T1300 450T1600 490V742H0Z" fill="#a9ad86" opacity=".5"/>
+<!-- Old-city architecture: skyline and stone wall -->
+<g fill="#d8c8a7" stroke="#947f64" stroke-width="3">
+<path d="M0 582V471h72v-33h58v33h74v-71h54v71h93v-39h72v39h83v-58h64v58h83v-42h66v42h91v-83h63v83h94v-48h60v48h103v-34h91v34h87v-45h70v45h98v-65h54v65h54v111z"/>
+<path d="M84 437v-80h28v80M92 359v-23h12v23M253 399v-65h18v65M344 430v-85h26v85M1180 462v-82h25v82M1467 470v-116h28v116"/>
+</g>
+<g fill="#53766e" opacity=".6"><path d="M105 560v-30q15-16 30 0v30z" /><path d="M175 552v-30q15-16 30 0v30z" /><path d="M245 544v-30q15-16 30 0v30z" /><path d="M315 536v-30q15-16 30 0v30z" /><path d="M385 560v-30q15-16 30 0v30z" /><path d="M455 552v-30q15-16 30 0v30z" /><path d="M525 544v-30q15-16 30 0v30z" /><path d="M595 536v-30q15-16 30 0v30z" /><path d="M665 560v-30q15-16 30 0v30z" /><path d="M735 552v-30q15-16 30 0v30z" /><path d="M805 544v-30q15-16 30 0v30z" /><path d="M875 536v-30q15-16 30 0v30z" /><path d="M945 560v-30q15-16 30 0v30z" /><path d="M1015 552v-30q15-16 30 0v30z" /><path d="M1085 544v-30q15-16 30 0v30z" /></g>
+<g transform="translate(594 350)" stroke="#97784c" stroke-width="4">
+<rect x="-115" y="140" width="230" height="125" fill="#ddd0af"/><path d="M-128 142h256v-16h-256z" fill="#baaa8a"/>
+<path d="M-96 126C-93 22 93 22 96 126z" fill="url(#gold)"/>
+<path d="M0 24v-22M-12 13h24" stroke="#f3e4b7" stroke-width="6"/>
+<path d="M-45 265v-64q45-55 90 0v64" fill="#4f776f"/>
+</g>
+<path d="M0 596h1600v160H0z" fill="url(#oldwall)"/>
+<g stroke="#917c62" stroke-width="2" opacity=".43"><path d="M0 615 H1600" /><path d="M0 644 H1600" /><path d="M0 673 H1600" /><path d="M0 702 H1600" /><path d="M0 731 H1600" /><path d="M0 615v29"/><path d="M100 615v29"/><path d="M200 615v29"/><path d="M300 615v29"/><path d="M400 615v29"/><path d="M500 615v29"/><path d="M600 615v29"/><path d="M700 615v29"/><path d="M800 615v29"/><path d="M900 615v29"/><path d="M1000 615v29"/><path d="M1100 615v29"/><path d="M1200 615v29"/><path d="M1300 615v29"/><path d="M1400 615v29"/><path d="M1500 615v29"/><path d="M1600 615v29"/><path d="M48 644v29"/><path d="M148 644v29"/><path d="M248 644v29"/><path d="M348 644v29"/><path d="M448 644v29"/><path d="M548 644v29"/><path d="M648 644v29"/><path d="M748 644v29"/><path d="M848 644v29"/><path d="M948 644v29"/><path d="M1048 644v29"/><path d="M1148 644v29"/><path d="M1248 644v29"/><path d="M1348 644v29"/><path d="M1448 644v29"/><path d="M1548 644v29"/><path d="M1648 644v29"/><path d="M0 673v29"/><path d="M100 673v29"/><path d="M200 673v29"/><path d="M300 673v29"/><path d="M400 673v29"/><path d="M500 673v29"/><path d="M600 673v29"/><path d="M700 673v29"/><path d="M800 673v29"/><path d="M900 673v29"/><path d="M1000 673v29"/><path d="M1100 673v29"/><path d="M1200 673v29"/><path d="M1300 673v29"/><path d="M1400 673v29"/><path d="M1500 673v29"/><path d="M1600 673v29"/><path d="M48 702v29"/><path d="M148 702v29"/><path d="M248 702v29"/><path d="M348 702v29"/><path d="M448 702v29"/><path d="M548 702v29"/><path d="M648 702v29"/><path d="M748 702v29"/><path d="M848 702v29"/><path d="M948 702v29"/><path d="M1048 702v29"/><path d="M1148 702v29"/><path d="M1248 702v29"/><path d="M1348 702v29"/><path d="M1448 702v29"/><path d="M1548 702v29"/><path d="M1648 702v29"/></g>
+<path d="M0 613H1600" stroke="#f2dfb9" stroke-width="18"/>
+<!-- olive trees frame the courtyard and focus students -->
+<g fill="#124d3d" opacity=".65"><path d="M0 0Q108 123 143 291Q60 246 0 193ZM1600 0Q1479 109 1451 319Q1539 268 1600 176Z"/></g>
+<g fill="#41775b" opacity=".67"><ellipse cx="75" cy="104" rx="20" ry="12" transform="rotate(-40 75 104)"/><ellipse cx="136" cy="157" rx="27" ry="17" transform="rotate(-3 136 157)"/><ellipse cx="197" cy="210" rx="34" ry="22" transform="rotate(34 197 210)"/><ellipse cx="258" cy="145" rx="41" ry="12" transform="rotate(-9 258 145)"/><ellipse cx="319" cy="198" rx="20" ry="17" transform="rotate(28 319 198)"/><ellipse cx="380" cy="133" rx="27" ry="22" transform="rotate(-15 380 133)"/><ellipse cx="441" cy="186" rx="34" ry="12" transform="rotate(22 441 186)"/><ellipse cx="502" cy="121" rx="41" ry="17" transform="rotate(-21 502 121)"/><ellipse cx="563" cy="174" rx="20" ry="22" transform="rotate(16 563 174)"/><ellipse cx="624" cy="109" rx="27" ry="12" transform="rotate(-27 624 109)"/><ellipse cx="685" cy="162" rx="34" ry="17" transform="rotate(10 685 162)"/><ellipse cx="746" cy="215" rx="41" ry="22" transform="rotate(-33 746 215)"/><ellipse cx="807" cy="150" rx="20" ry="12" transform="rotate(4 807 150)"/><ellipse cx="868" cy="203" rx="27" ry="17" transform="rotate(-39 868 203)"/><ellipse cx="929" cy="138" rx="34" ry="22" transform="rotate(-2 929 138)"/><ellipse cx="990" cy="191" rx="41" ry="12" transform="rotate(35 990 191)"/><ellipse cx="1051" cy="126" rx="20" ry="17" transform="rotate(-8 1051 126)"/><ellipse cx="1112" cy="179" rx="27" ry="22" transform="rotate(29 1112 179)"/><ellipse cx="1173" cy="114" rx="34" ry="12" transform="rotate(-14 1173 114)"/><ellipse cx="1234" cy="167" rx="41" ry="17" transform="rotate(23 1234 167)"/><ellipse cx="1295" cy="220" rx="20" ry="22" transform="rotate(-20 1295 220)"/><ellipse cx="1356" cy="155" rx="27" ry="12" transform="rotate(17 1356 155)"/><ellipse cx="1417" cy="208" rx="34" ry="17" transform="rotate(-26 1417 208)"/><ellipse cx="1478" cy="143" rx="41" ry="22" transform="rotate(11 1478 143)"/></g>
+<g stroke="#0b4c3e" fill="none" stroke-width="11" stroke-linecap="round">
+<path d="M0 73Q135 154 245 134T430 204"/><path d="M1600 57Q1445 165 1341 125T1150 233"/>
+</g>
+<!-- Blackboard panel with word-free mathematics -->
+<g transform="translate(1225 288) rotate(3)">
+<rect x="-190" y="-129" width="372" height="270" rx="10" fill="#bfa57a" opacity=".35" filter="url(#soft)"/>
+<rect x="-190" y="-130" width="372" height="270" rx="8" fill="#133f37" stroke="#d5be8b" stroke-width="14"/>
+<g stroke="#c6e7c7" fill="none" opacity=".85" stroke-width="2">
+<path d="M-155 76H-20M-93 -97V95M-145 48Q-95 -113 -33 48"/>
+<path d="M25-75L125-49L78 42Z" stroke-width="3"/>
+<circle cx="75" cy="89" r="29"/>
+<path d="M75 89h29M40-102H145M40-89H115" stroke-width="2"/>
+</g></g>
+<!-- Students' seat backs -->
+<g fill="#3f6958" stroke="#275346" stroke-width="8"><path d="M195 715V598q0-38 40-38h258q45 0 45 38v147z"/><path d="M612 712V557q0-43 43-43h280q40 0 40 43v180z"/><path d="M1060 719V588q0-42 42-42h255q39 0 39 42v164z"/></g>
+<!-- Student A: girl, natural hair, pencil hand -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M218 790Q205 645 277 601L385 575Q472 600 501 790" fill="url(#shirt1)" stroke="#a47557" stroke-width="5"/>
+<path d="M301 594L302 642L362 659L407 603" fill="#ad7654" opacity=".6"/>
+<path d="M258 499Q253 424 337 396Q415 406 426 473Q455 520 432 583L404 601Q296 627 256 575Z" fill="#3b302a"/>
+<path d="M300 459Q336 422 395 453Q419 473 405 532L387 581Q352 612 315 579L284 540Z" fill="#e7ae81" stroke="#9e7155" stroke-width="4"/>
+<path d="M283 483Q302 426 345 430Q363 469 415 469Q403 421 360 409Q287 405 268 467Z" fill="#312b2b"/>
+<path d="M280 487Q252 527 271 570M410 470Q444 527 422 564" fill="none" stroke="#302b2b" stroke-width="19"/>
+<path d="M305 523q11-6 23 0M366 522q10-7 23 0" fill="none" stroke="#493f37" stroke-width="4"/>
+<path d="M345 542l-6 16 9 3M327 577q19 12 36-2" fill="none" stroke="#995d4a" stroke-width="3"/>
+<path d="M460 665Q531 706 610 731" fill="none" stroke="#c78d64" stroke-width="38"/>
+<path d="M589 731l31 11 27-14" fill="none" stroke="#e6ae87" stroke-width="17"/>
+<path d="M635 723l27-77" fill="none" stroke="#b2b1a7" stroke-width="6"/>
+</g>
+<!-- Student B: boy with uncovered curly hair, sage green sweater -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M579 789Q593 647 669 605Q751 574 823 601Q915 642 937 789" fill="url(#shirt2)" stroke="#487a70" stroke-width="5"/>
+<path d="M698 594v48l76 23 46-58" fill="#bf906f"/>
+<ellipse cx="758" cy="500" rx="103" ry="110" fill="#292a23"/>
+<path d="M687 476Q719 431 784 450Q839 477 823 550Q806 606 758 615Q708 594 681 539Z" fill="#d9a47b" stroke="#a37356" stroke-width="4"/>
+<g fill="#252822">
+<circle cx="675" cy="450" r="33"/><circle cx="710" cy="412" r="33"/><circle cx="750" cy="406" r="36"/>
+<circle cx="790" cy="416" r="35"/><circle cx="824" cy="438" r="28"/>
+</g>
+<path d="M710 513q14-7 25 0M775 516q13-6 25 0" fill="none" stroke="#5d4636" stroke-width="4"/>
+<path d="M754 531l-7 25 10 4M739 580q15 9 30-3" fill="none" stroke="#9b644c" stroke-width="3"/>
+<path d="M664 671Q654 713 703 755M886 676Q875 705 825 739" fill="none" stroke="#5b9085" stroke-width="51"/>
+<path d="M704 753l31 8 20-15M826 738l-29 24-27-4" fill="none" stroke="#d9a47b" stroke-width="25"/>
+</g>
+<!-- Student C: boy, one small kippah, white shirt -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M1064 794Q1080 657 1141 619L1290 605Q1364 638 1395 794" fill="url(#shirt3)" stroke="#78968a" stroke-width="5"/>
+<path d="M1167 606v47l81 22 44-68" fill="#c69270"/>
+<path d="M1113 494Q1098 411 1200 409Q1314 424 1303 534L1282 592Q1217 628 1161 590Z" fill="#43342d"/>
+<path d="M1162 481Q1201 440 1264 469Q1301 502 1277 558Q1262 609 1218 614Q1178 607 1157 553Z" fill="#dfae85" stroke="#a27354" stroke-width="4"/>
+<path d="M1149 472Q1177 440 1217 446Q1267 450 1294 485Q1290 426 1235 412Q1175 397 1149 453Z" fill="#342d2b"/>
+<!-- exactly one student wears a kippah -->
+<path d="M1165 428Q1207 393 1250 424Q1211 440 1165 428Z" fill="#183d4b" stroke="#173b40" stroke-width="4"/>
+<path d="M1182 518q13-5 24 0M1241 520q13-5 25 0" fill="none" stroke="#65503e" stroke-width="4"/>
+<path d="M1225 535l-5 23 11 4M1207 578q18 12 36-2" fill="none" stroke="#986b52" stroke-width="3"/>
+<path d="M1097 689Q1057 713 1006 756M1342 689Q1297 735 1242 750" fill="none" stroke="#b9cfc3" stroke-width="50"/>
+<path d="M1006 755l-23 2-18-16M1246 751l-33 12-19-14" fill="none" stroke="#dfac85" stroke-width="23"/>
+</g>
+<!-- Worktable with open ruled mathematics workbook -->
+<ellipse cx="818" cy="815" rx="714" ry="95" fill="#00352e" opacity=".3" filter="url(#soft)"/>
+<path d="M106 781Q803 732 1479 781L1572 873H23Z" fill="url(#top)" stroke="#7e5a3e" stroke-width="7"/>
+<path d="M104 785Q795 744 1487 784" fill="none" stroke="#f6ddb4" stroke-width="10"/>
+<g transform="translate(795 783)">
+<path d="M-245-12Q-119-42-4-16Q115-43 244-12L230 76Q119 50-1 74Q-118 50-226 76Z" fill="#c4bdb0" opacity=".5"/>
+<path d="M-243-24Q-125-54-3-24L-3 65Q-119 34-239 65Z" fill="url(#paper)" stroke="#d5d8c7" stroke-width="4"/>
+<path d="M-3-24Q120-53 244-24L238 65Q111 35-3 65Z" fill="#fffdf2" stroke="#d5d8c7" stroke-width="4"/>
+<path d="M-3-25V65" stroke="#aaa9a0" stroke-width="4"/>
+<g fill="none" stroke="#9fbdbc" stroke-width="2" opacity=".8">
+<path d="M-214-3H-31M-214 13H-31M-214 29H-31M-214 45H-31M23-3H212M23 13H212M23 29H212M23 45H212"/>
+<path d="M-185-10V48M-150-10V48M-115-10V48M-80-10V48M-45-10V48"/>
+</g>
+<g fill="none" stroke="#2f6b67" stroke-width="3">
+<path d="M-185 38L-140-16L-96 38Z"/><path d="M-142 38v-14h13"/>
+<path d="M39 23Q76-32 111 24"/><path d="M134-5h62v38h-62z"/><path d="M141 24l43-20"/>
+</g>
+</g>
+<!-- ruler, pencil, compass -->
+<path d="M342 854l290-37 6 23-293 40Z" fill="#d6e6dc" opacity=".72" stroke="#467b72" stroke-width="4"/>
+<g stroke="#45766e" stroke-width="2"><path d="M373 852v14M402 848v13M431 845v14M460 841v12M489 838v14M518 834v13M547 831v14M576 827v13"/></g>
+<path d="M948 810L1058 853" stroke="#0f4b3f" stroke-width="13"/><path d="M1058 853l15 8-7-15" fill="#edc998"/>
+<g fill="none" stroke="#e9e1ce" stroke-width="6"><path d="M1155 797L1100 866M1155 797l48 67M1138 837h35"/><circle cx="1155" cy="793" r="7" fill="#e9e1ce"/></g>
+<rect width="1600" height="900" fill="url(#shade)" pointer-events="none"/>
+</svg>
