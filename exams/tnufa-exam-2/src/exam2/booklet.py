@@ -170,17 +170,13 @@ h2.draft{position:absolute;z-index:1;top:30px;inset-inline:0;margin:0;text-align
 .key .krh{font-weight:650;color:#15386e;margin-bottom:3px}
 .key .krl{margin:2px 0;break-inside:avoid}
 .key .krp{white-space:nowrap;font-weight:650;color:#276149}
+/* Preserve the previous Tnufa exam's five-column answer-key table on phones too.
+   Scroll the key itself horizontally instead of changing rows to stacked cards;
+   the student booklet and printed PDFs are untouched. */
 @media screen and (max-width:700px){
- .answer-panel{padding:14px 12px!important;margin:10px!important}
- .answer-panel .key,.answer-panel .key tbody,.answer-panel .key tr,.answer-panel .key td{display:block;width:100%!important}
- .answer-panel .key thead{display:none}
- .answer-panel .key tbody{margin:12px 0;border:1px solid #d3ded8;border-radius:8px;overflow:hidden}
- .answer-panel .key tr{padding:10px 0;border-bottom:1px solid #e4ece7}
- .answer-panel .key tr:last-child{border-bottom:0}
- .answer-panel .key td{border:0!important;padding:5px 12px;text-align:right!important;font-size:13px}
- .answer-panel .key td::before{content:attr(data-label);display:block;color:#50616e;font-size:11px;margin-bottom:2px}
- .answer-panel .key .kp{text-align:right}
- .answer-panel .key .rubric-breakdown{font-size:12.5px}
+ .answer-panel{padding:14px 12px!important;margin:10px!important;max-width:calc(100% - 20px);overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .answer-panel .key{width:100%;min-width:720px;font-size:12.6px;line-height:1.38}
+ .answer-panel .key .rubric-breakdown{font-size:11.9px}
 }
 /* teacher booklet */
 .tpage{width:210mm;min-height:297mm;padding:34px 60px var(--foot);position:relative}
