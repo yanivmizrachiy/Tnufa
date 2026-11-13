@@ -156,7 +156,47 @@ def render_student(bw, qs, log=print):
     key_markup = render_public_key(bw, qs, log=log)
     render_printable_key(bw, key_markup, log=log)
     emit_reader(qs, sheets, rendered, key_markup)
+    verify_mobile_key_layout(bw)
     return sheets, rendered
+
+
+def verify_mobile_key_layout(bw):
+    """Guard the owner's original five-column rubric format at phone widths.
+
+    This runs in the existing Chromium build, without requiring any second source
+    of answer data or touching student PDF/page generation.
+    """
+    page = bw.br.new_page(viewport={"width": 390, "height": 844})
+    try:
+        for width in (390, 700):
+            page.set_viewport_size({"width": width, "height": 844})
+            page.goto(_uri(os.path.join(PUBLIC, "index.html")), wait_until="networkidle")
+            state = page.evaluate("""() => {
+                const panel = document.querySelector('#answer-key');
+                const table = panel.querySelector('table.key');
+                const head = table.querySelector('thead');
+                const row = table.querySelector('tbody tr');
+                const cell = row.querySelector('td');
+                return {
+                    headings: [...head.querySelectorAll('th')].map(el => el.textContent.trim()),
+                    rows: table.querySelectorAll('tbody tr').length,
+                    headDisplay: getComputedStyle(head).display,
+                    rowDisplay: getComputedStyle(row).display,
+                    cellDisplay: getComputedStyle(cell).display,
+                    panelOverflowX: getComputedStyle(panel).overflowX,
+                    panelCanScroll: panel.scrollWidth > panel.clientWidth,
+                    documentOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
+                };
+            }""")
+            assert state["headings"] == ["שאלה", "נושא", "סעיף", "תשובה", "דרך הפתרון"], state
+            assert state["rows"] == 41, state
+            assert state["headDisplay"] == "table-header-group", state
+            assert state["rowDisplay"] == "table-row" and state["cellDisplay"] == "table-cell", state
+            assert state["panelOverflowX"] == "auto" and state["panelCanScroll"], state
+            assert not state["documentOverflow"], state
+        print("mobile five-column answer-key layout: OK (390px and 700px)")
+    finally:
+        page.close()
 
 
 def render_public_key(bw, qs, log=print):
